@@ -170,6 +170,16 @@
                 rgba(255,255,255,0.2) 20%
             );
         }
+        
+        /* Possession Icon Animation */
+        .possession-icon {
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.4));
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
     </style>
 </head>
 <body class="h-screen w-screen relative text-white">
@@ -278,22 +288,41 @@
                 
                 <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden mb-4 md:mb-6">
                     <!-- LIVE badge -->
-                    <div id="steelers-live-badge" class="hidden absolute top-0 right-0 m-4 bg-red-600 px-4 py-1 rounded-full text-sm md:text-base font-bold uppercase tracking-wider live-pulse z-20">LIVE</div>
+                    <div id="steelers-live-badge" class="hidden absolute top-0 left-1/2 -translate-x-1/2 mt-4 bg-red-600 px-4 py-1 rounded-full text-sm md:text-base font-bold uppercase tracking-wider live-pulse z-20">LIVE</div>
                     
                     <div class="flex items-center justify-between">
+                        <!-- Home Team -->
                         <div class="text-center w-1/3">
-                            <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="steelers-home-score">--</div>
+                            <div class="flex items-center justify-center gap-2 md:gap-4">
+                                <div id="steelers-home-possession" class="hidden possession-icon">
+                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-6 h-6 md:w-10 md:h-10 rotate-45">
+                                        <ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" />
+                                        <path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" />
+                                    </svg>
+                                </div>
+                                <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="steelers-home-score">--</div>
+                            </div>
                             <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="steelers-home-name">--</div>
                             <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest" id="steelers-home-record"></div>
                         </div>
                         
+                        <!-- Clock / Status -->
                         <div class="text-center w-1/3 flex flex-col justify-center h-full">
                             <div id="steelers-game-clock" class="text-xl md:text-4xl text-gray-200 font-bold mb-1 md:mb-2 uppercase">VS</div>
                             <div id="steelers-game-detail" class="text-lg md:text-xl text-gray-500">Loading...</div>
                         </div>
                         
+                        <!-- Away Team -->
                         <div class="text-center w-1/3">
-                            <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="steelers-away-score">--</div>
+                             <div class="flex items-center justify-center gap-2 md:gap-4">
+                                <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="steelers-away-score">--</div>
+                                <div id="steelers-away-possession" class="hidden possession-icon">
+                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-6 h-6 md:w-10 md:h-10 rotate-45">
+                                        <ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" />
+                                        <path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" />
+                                    </svg>
+                                </div>
+                            </div>
                             <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="steelers-away-name">--</div>
                             <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest" id="steelers-away-record"></div>
                         </div>
@@ -676,9 +705,10 @@
                 processTeamData('pirates', API.MLB, 'slide-pirates', 'slide-pirates-prev', register)
             ]);
 
-            // Logic: If ANY game is live, only show live games.
+            // Logic: If ANY game is live, keep weather but prioritize live games
             if(liveSlides.size > 0) {
-                activeSlides = Array.from(liveSlides);
+                // Keep weather slide + live game slides
+                activeSlides = ['slide-weather', ...Array.from(liveSlides)];
                 liveGameActive = true;
             } else {
                 activeSlides = Array.from(validSlides);
@@ -751,9 +781,7 @@
                 if (mainGame) {
                     const gameDateStr = new Date(mainGame.date).toISOString().substring(0,10);
                     if (gameDateStr === todayStr && mainState === 'pre') {
-                        // Mark as 'in' simply to trigger the better data fetch, 
-                        // though mainState logic handles visuals. 
-                        // We keep 'pre' for visuals, but we trigger the fetch below.
+                        // Mark as 'in' simply to trigger the better data fetch
                     }
                 }
 
@@ -794,6 +822,9 @@
                             // "Situation" object exists in header for live games
                             if(freshComp.situation) {
                                 mainGame.competitions[0].situation = freshComp.situation;
+                            } else {
+                                // If situation is missing but we have lastPlay, we can maybe infer something, 
+                                // but for now let's just mark it as potentially undefined so renderGame handles it gracefully.
                             }
                         }
 
@@ -857,55 +888,75 @@
             const gameDetail = document.getElementById(`${elementPrefix}-game-detail`);
             const summary = document.getElementById(`${elementPrefix}-summary`);
             const liveBadge = document.getElementById(`${elementPrefix}-live-badge`);
+            const homePossIcon = document.getElementById(`${elementPrefix}-home-possession`);
+            const awayPossIcon = document.getElementById(`${elementPrefix}-away-possession`);
 
             if (liveBadge) liveBadge.classList.add('hidden');
+            if (homePossIcon) homePossIcon.classList.add('hidden');
+            if (awayPossIcon) awayPossIcon.classList.add('hidden');
             
             // --- LIVE VISUALIZATION (NFL Only) ---
             if(elementPrefix === 'steelers') {
                 const vizContainer = document.getElementById('steelers-live-viz');
-                if(state === 'in' && comp.situation) {
+                
+                // Show VIZ if state is IN. 
+                // We will handle "missing situation" data gracefully inside.
+                if(state === 'in') {
                     vizContainer.classList.remove('hidden');
-                    const sit = comp.situation;
+                    const sit = comp.situation || {}; // Safe access fallback
                     
-                    // SAFE ACCESS with fallbacks
-                    const downVal = sit.down > 0 ? sit.down : 1;
-                    const downStr = sit.down > 0 ? `${sit.down}${getOrdinal(sit.down)}` : '1st';
-                    const distStr = sit.distance > 0 ? ` & ${sit.distance}` : ' & 10';
-                    document.getElementById('steelers-down-dist').innerText = downStr + distStr;
+                    // SAFE ACCESS with fallbacks for Down/Distance
+                    // If 'down' is missing, it's likely a kickoff or timeout.
+                    const downVal = sit.down > 0 ? sit.down : 0; 
+                    let downDistText = "Drive Info Pending";
+                    
+                    if (downVal > 0) {
+                        const downStr = `${downVal}${getOrdinal(downVal)}`;
+                        const distStr = sit.distance > 0 ? ` & ${sit.distance}` : ' & Goal'; // Guessing Goal if dist missing on a down
+                        downDistText = downStr + distStr;
+                    } else if (comp.lastPlay && comp.lastPlay.text) {
+                        // Fallback to last play text if no down/dist (e.g. Kickoff)
+                        downDistText = "Last Play";
+                    }
+                    
+                    document.getElementById('steelers-down-dist').innerText = downDistText;
                     
                     let posTeam = "Ball";
                     let isSteelersBall = false;
                     let posTeamAbbrev = "";
 
                     // STRICT STRING COMPARISON FOR IDs
-                    if(String(sit.possession) === String(home.id)) {
-                        posTeam = home.team.abbreviation;
-                        posTeamAbbrev = home.team.abbreviation;
-                        isSteelersBall = (home.team.abbreviation === 'PIT');
-                    } else if(String(sit.possession) === String(away.id)) {
-                        posTeam = away.team.abbreviation;
-                        posTeamAbbrev = away.team.abbreviation;
-                        isSteelersBall = (away.team.abbreviation === 'PIT');
+                    // Only run if possession is defined
+                    if(sit.possession) {
+                        if(String(sit.possession) === String(home.id)) {
+                            posTeam = home.team.abbreviation;
+                            posTeamAbbrev = home.team.abbreviation;
+                            isSteelersBall = (home.team.abbreviation === 'PIT');
+                            if (homePossIcon) homePossIcon.classList.remove('hidden');
+                        } else if(String(sit.possession) === String(away.id)) {
+                            posTeam = away.team.abbreviation;
+                            posTeamAbbrev = away.team.abbreviation;
+                            isSteelersBall = (away.team.abbreviation === 'PIT');
+                            if (awayPossIcon) awayPossIcon.classList.remove('hidden');
+                        }
                     }
                     
                     // Ball On / Yardline Logic
-                    // ESPN typically returns yardLine 1-100.
-                    // < 50 is Own Territory. > 50 is Opp Territory. 50 is Midfield.
-                    // The bar should simply reflect this 1-100 value as a progress bar.
                     let yardText = "--";
-                    let pct = 50;
+                    let pct = 50; // Default to mid-field if unknown
 
-                    if(sit.yardLine !== undefined) {
-                        pct = sit.yardLine;
+                    if(sit.yardLine != null) { // Checks for null and undefined
+                        pct = Number(sit.yardLine);
+                        if(isNaN(pct)) pct = 50;
                         if(pct < 0) pct = 0;
                         if(pct > 100) pct = 100;
 
-                        if (sit.yardLine === 50) {
+                        if (pct === 50) {
                             yardText = "MIDFIELD";
-                        } else if (sit.yardLine < 50) {
-                            yardText = `${posTeamAbbrev} ${sit.yardLine}`;
+                        } else if (pct < 50) {
+                            yardText = `${posTeamAbbrev} ${Math.round(pct)}`;
                         } else {
-                            yardText = `OPP ${100 - sit.yardLine}`;
+                            yardText = `OPP ${100 - Math.round(pct)}`;
                         }
                         document.getElementById('steelers-ball-on').innerText = yardText;
                     } else {
@@ -931,7 +982,7 @@
                             arrowPath.setAttribute('fill', '#008E97');
                             container.style.filter = 'drop-shadow(0 0 10px rgba(0,142,151,0.5))';
                         } else {
-                            // Generic Opponent
+                            // Generic Opponent or Neutral
                             bar.style.backgroundColor = '#ffffff'; 
                             arrowPath.setAttribute('fill', '#ffffff');
                             container.style.filter = 'drop-shadow(0 0 10px rgba(255,255,255,0.5))';
@@ -982,7 +1033,16 @@
                          gameDetail.innerText = `${pLabel}${status.period}`;
                     }
                 }
-                if (summary) summary.innerText = game.name || "Live Game";
+                
+                // Show last play if available
+                if (summary) {
+                    if (comp.lastPlay && comp.lastPlay.text) {
+                        summary.innerText = comp.lastPlay.text;
+                    } else {
+                        summary.innerText = game.name || "Live Game";
+                    }
+                }
+                
             } else if (state === 'post') {
                 if (statusText) statusText.innerText = "Final Result"; 
                 if (gameClock) gameClock.innerText = "FINAL"; 
