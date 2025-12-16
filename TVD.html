@@ -911,12 +911,6 @@
                             if (summaryData.header?.competitions?.[0]?.status?.type?.state === 'in') { liveGame = summaryData; }
                         }
 
-                        const getOpponentRecord = (game) => {
-                             if (!game) return null;
-                             const opp = game.competitions[0].competitors.find(c => c.team.abbreviation !== teamId);
-                             return opp?.record?.[0]?.summary || opp?.records?.[0]?.summary || null;
-                        };
-
                         // Helper to fetch opponent record if not directly available
                         const fetchOpponentRecord = async (oppId, oppAbbrev) => {
                             if (!oppId) return null;
