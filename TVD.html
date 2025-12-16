@@ -1,0 +1,596 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { Settings, X, Plus, Trash2, TrendingUp, TrendingDown, Clock, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Loader, Trophy, Calendar, MapPin, ChevronRight, Check } from 'lucide-react';
+
+/**
+ * MOCK STOCK DATA
+ */
+const MOCK_STOCKS = {
+  JELD: { price: 18.45, name: "JELD-WEN Holding, Inc." },
+  BA: { price: 210.50, name: "The Boeing Company" },
+  HON: { price: 195.30, name: "Honeywell International" },
+  AAPL: { price: 175.20, name: "Apple Inc." },
+  GOOGL: { price: 140.10, name: "Alphabet Inc." },
+  MSFT: { price: 380.00, name: "Microsoft Corp." },
+  TSLA: { price: 240.00, name: "Tesla, Inc." },
+  AMZN: { price: 145.00, name: "Amazon.com, Inc." },
+  NVDA: { price: 460.00, name: "NVIDIA Corp." },
+  AMD: { price: 105.00, name: "Advanced Micro Devices" },
+};
+
+/**
+ * NFL TEAMS CONFIGURATION
+ */
+const NFL_TEAMS = [
+  { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' },
+  { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' },
+  { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' },
+  { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' },
+  { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' },
+  { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' },
+  { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' },
+  { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' },
+  { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' },
+  { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' },
+  { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' },
+  { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' },
+  { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' },
+  { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' },
+  { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' },
+  { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' },
+  { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' },
+  { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' },
+  { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' },
+  { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' },
+  { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' },
+  { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' },
+  { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' },
+  { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' },
+  { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' },
+  { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' },
+  { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' },
+  { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' },
+  { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' },
+  { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' },
+  { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' },
+  { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' },
+];
+
+/**
+ * HELPER: GENERATE MOCK NFL DATA
+ */
+const getTeamData = (teamId) => {
+  const meta = NFL_TEAMS.find(t => t.id === teamId);
+  if (!meta) return null;
+
+  const base = {
+    ...meta,
+    logo: `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId.toLowerCase()}.png`,
+    status: teamId === 'PIT' ? 'LIVE' : 'OFFLINE', // Demo: Only PIT is live
+  };
+
+  if (base.status === 'LIVE') {
+    return {
+      ...base,
+      live: {
+        opponent: 'BAL', opponentName: 'Ravens', opponentColor: '#241773',
+        score: { home: 24, away: 21 },
+        quarter: 4, time: '2:14',
+        possession: 'home', down: 2, distance: 6, yardLine: 68,
+        lastPlay: 'N. Harris rush to right tackle for 4 yards.'
+      },
+      schedule: { prev: { opponent: 'CIN', result: 'W 34-11', date: 'Sat, Dec 23' }, next: { opponent: 'SEA', time: 'Sun 4:05 PM', location: 'Lumen Field' } }
+    };
+  } else {
+    return {
+      ...base,
+      schedule: {
+        prev: { opponent: 'OPP', result: 'W 24-10', date: 'Last Week' },
+        next: { opponent: 'NXT', time: 'Sun 1:00 PM', location: 'Home Stadium' }
+      }
+    };
+  }
+};
+
+const getFluctuation = (basePrice) => {
+  const percentChange = (Math.random() - 0.5) * 0.02;
+  const newPrice = basePrice * (1 + percentChange);
+  return {
+    price: newPrice.toFixed(2),
+    change: (newPrice - basePrice).toFixed(2),
+    percent: (percentChange * 100).toFixed(2),
+  };
+};
+
+/**
+ * COMPONENT: NFL CARD
+ */
+const NFLCard = ({ teamId }) => {
+  const team = useMemo(() => getTeamData(teamId), [teamId]);
+  if (!team) return null;
+
+  const isLive = team.status === 'LIVE';
+
+  const fieldTurfStyle = {
+    backgroundColor: '#3f6228',
+    boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)',
+    border: '2px solid rgba(255,255,255,0.2)'
+  };
+
+  const fieldLinesStyle = {
+    backgroundImage: `repeating-linear-gradient(90deg, transparent 0%, transparent calc(10% - 1px), rgba(255, 255, 255, 0.3) 10%, transparent calc(10% + 1px))`
+  };
+
+  const getOrdinal = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
+
+  return (
+    <div className="h-full w-full flex flex-col relative overflow-hidden text-white"
+      style={{ background: `radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)`, borderLeft: `12px solid ${team.color}` }}>
+      
+      {/* HEADER */}
+      <div className="flex items-center gap-4 p-6 md:p-8 border-b border-white/10 relative z-10 bg-black/20 backdrop-blur-sm">
+        <img src={team.logo} alt={team.name} className="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-lg" />
+        <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-3">
+             <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">{team.name}</h2>
+            {isLive && <span className="bg-red-600 text-white text-xs md:text-sm font-bold px-2 py-0.5 rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)]">LIVE</span>}
+          </div>
+          <p className="text-lg md:text-xl font-bold uppercase tracking-widest mt-1" style={{ color: team.color }}>
+            {isLive ? `${team.live.quarter}Q - ${team.live.time}` : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+          </p>
+        </div>
+      </div>
+
+      {/* CONTENT */}
+      <div className="flex-1 flex flex-col justify-center p-4 md:p-8 relative z-10">
+        {isLive ? (
+          <div className="h-full flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-4 bg-white/5 rounded-2xl p-4 border border-white/5 shadow-2xl backdrop-blur-sm">
+              <div className="flex-1 text-center">
+                <div className="h-24 md:h-32 w-full flex items-center justify-center">
+                  <svg viewBox="0 0 100 60" className="w-full h-full overflow-visible">
+                    <text x="50" y="35" textAnchor="middle" dominantBaseline="central" className="font-black" style={{ fill: team.color, fontSize: '50px', filter: `drop-shadow(0 0 10px ${team.color}66)` }}>{team.live.score.home}</text>
+                  </svg>
+                </div>
+                <div className="text-2xl font-bold text-gray-400 -mt-2">{team.id}</div>
+              </div>
+              <div className="w-1/4 text-center opacity-60 flex flex-col justify-center">
+                 <div className="text-3xl font-black text-gray-500">VS</div>
+                 <div className="text-sm font-mono mt-1 text-gray-400">Week 14</div>
+              </div>
+              <div className="flex-1 text-center">
+                <div className="h-24 md:h-32 w-full flex items-center justify-center">
+                  <svg viewBox="0 0 100 60" className="w-full h-full overflow-visible">
+                     <text x="50" y="35" textAnchor="middle" dominantBaseline="central" className="font-black fill-white" style={{ fontSize: '50px' }}>{team.live.score.away}</text>
+                  </svg>
+                </div>
+                <div className="text-2xl font-bold text-gray-400 -mt-2">{team.live.opponent}</div>
+              </div>
+            </div>
+
+            <div className="bg-black/40 rounded-xl p-3 border border-white/10 mt-auto">
+              <div className="flex justify-between items-end mb-2 px-2">
+                <div>
+                  <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                  <div className="text-3xl font-black text-white leading-none">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
+                </div>
+                <div className="text-right">
+                   <div className="text-xs text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
+                   <div className="text-3xl font-black leading-none" style={{ color: team.color }}>{team.live.yardLine > 50 ? `OPP ${100 - team.live.yardLine}` : `OWN ${team.live.yardLine}`}</div>
+                </div>
+              </div>
+              <div className="relative h-16 w-full rounded overflow-hidden flex" style={fieldTurfStyle}>
+                <div className="w-[10%] h-full bg-black/30 border-r border-white/40 flex items-center justify-center z-10"><span className="text-xs font-black -rotate-90 opacity-70 text-white/50">HOME</span></div>
+                <div className="flex-1 relative h-full" style={fieldLinesStyle}>
+                    <div className="absolute bottom-1 w-full flex justify-between px-[10%] text-[10px] font-bold text-white/60 font-mono"><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>40</span><span>30</span><span>20</span><span>10</span></div>
+                    <div className="absolute top-1/2 -translate-y-1/2 h-3 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.8)] transition-all duration-1000 flex items-center" style={{ left: 0, width: `${team.live.yardLine}%`, backgroundColor: team.live.possession === 'home' ? team.color : (team.live.opponentColor || '#fff') }}>
+                       <div className="absolute -right-2 top-1/2 -translate-y-1/2 bg-white rounded-full p-0.5 shadow-md"><ChevronRight size={12} color="black" strokeWidth={4} /></div>
+                    </div>
+                    <div className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-0 opacity-80" style={{ left: `${team.live.yardLine}%` }} />
+                    <div className="absolute top-0 bottom-0 w-0.5 bg-yellow-400 z-0 opacity-80" style={{ left: `${Math.min(100, team.live.yardLine + team.live.distance)}%` }} />
+                </div>
+                <div className="w-[10%] h-full bg-black/30 border-l border-white/40 flex items-center justify-center z-10"><span className="text-xs font-black rotate-90 opacity-70 text-white/50">AWAY</span></div>
+              </div>
+              <div className="text-xs text-gray-400 mt-2 truncate font-mono uppercase px-1">Last Play: <span className="text-white">{team.live.lastPlay}</span></div>
+            </div>
+          </div>
+        ) : (
+          <div className="h-full flex flex-col justify-center gap-6">
+             <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm">
+                <h3 className="text-gray-400 font-bold uppercase tracking-widest text-sm mb-4">Previous Result</h3>
+                <div className="flex items-center justify-between">
+                  <div className="text-4xl font-black text-white">{team.schedule.prev.opponent}</div>
+                  <div className={`text-5xl font-mono font-bold ${team.schedule.prev.result.includes('W') ? 'text-green-400' : 'text-red-400'}`}>{team.schedule.prev.result}</div>
+                </div>
+                <div className="mt-2 text-gray-500 font-mono text-sm">{team.schedule.prev.date} - FINAL</div>
+             </div>
+             <div className="bg-white/5 rounded-2xl p-6 border border-white/5 backdrop-blur-sm relative overflow-hidden group">
+                <div className="absolute right-0 top-0 p-8 opacity-5 transform group-hover:scale-110 transition-transform duration-700"><Calendar size={120} /></div>
+                <h3 className="text-gray-400 font-bold uppercase tracking-widest text-sm mb-4">Upcoming Matchup</h3>
+                <div className="text-5xl font-black text-white mb-2"><span className="text-gray-500 text-3xl align-top mr-2">vs</span>{team.schedule.next.opponent}</div>
+                <div className="space-y-2 mt-4">
+                  <div className="flex items-center gap-3 text-xl"><Clock className="text-gray-400" size={20} /><span>{team.schedule.next.time}</span></div>
+                  <div className="flex items-center gap-3 text-lg text-gray-400"><MapPin size={18} /><span>{team.schedule.next.location}</span></div>
+                </div>
+             </div>
+          </div>
+        )}
+      </div>
+      <div className="absolute right-0 bottom-0 opacity-5 pointer-events-none"><Trophy size={400} /></div>
+    </div>
+  );
+};
+
+/**
+ * COMPONENT: STOCK CARD
+ */
+const StockCard = ({ enabledStocks }) => {
+  const [stockData, setStockData] = useState([]);
+
+  useEffect(() => {
+    const updateStocks = () => {
+      const data = enabledStocks.map(ticker => {
+        const base = MOCK_STOCKS[ticker] || { price: 100, name: ticker };
+        const fluctuation = getFluctuation(base.price);
+        return { ticker, name: base.name, ...fluctuation };
+      });
+      setStockData(data);
+    };
+    updateStocks();
+    const interval = setInterval(updateStocks, 3000);
+    return () => clearInterval(interval);
+  }, [enabledStocks]);
+
+  if (enabledStocks.length === 0) return null;
+
+  return (
+    <div className="h-full w-full flex flex-col justify-center p-8 bg-slate-900 text-white">
+      <h2 className="text-3xl font-light mb-6 flex items-center gap-3 text-emerald-400"><TrendingUp className="w-8 h-8" /> Market Watch</h2>
+      <div className="space-y-4">
+        {stockData.map((stock) => (
+          <div key={stock.ticker} className="flex items-center justify-between bg-white/5 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+            <div><div className="font-bold text-xl tracking-wider">{stock.ticker}</div><div className="text-xs text-slate-400">{stock.name}</div></div>
+            <div className="text-right">
+              <div className="text-2xl font-mono">${stock.price}</div>
+              <div className={`text-sm flex items-center justify-end gap-1 ${parseFloat(stock.change) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {parseFloat(stock.change) >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}{stock.change > 0 ? '+' : ''}{stock.change} ({stock.percent}%)
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * COMPONENT: WEATHER CARD
+ * Fetches real data based on ZIP
+ */
+const WeatherCard = ({ weatherData }) => {
+  const { temp, condition, wind, city, loading, error } = weatherData;
+
+  const getWeatherIcon = (code) => {
+    if (code === undefined) return <Loader className="animate-spin text-white" size={64} />;
+    if (code === 0) return <Sun className="w-32 h-32 text-yellow-400 animate-pulse" />;
+    if (code <= 3) return <div className="relative"><Sun className="w-32 h-32 text-yellow-400" /><Cloud className="w-24 h-24 text-gray-200 absolute bottom-0 -right-4" /></div>;
+    if (code <= 48) return <Cloud className="w-32 h-32 text-gray-400" />;
+    if (code <= 67) return <CloudRain className="w-32 h-32 text-blue-400" />;
+    if (code <= 77) return <CloudSnow className="w-32 h-32 text-white" />;
+    if (code >= 95) return <CloudLightning className="w-32 h-32 text-purple-400" />;
+    return <Cloud className="w-32 h-32 text-gray-400" />;
+  };
+
+  const getConditionText = (code) => {
+    if (code === 0) return "Clear Sky";
+    if (code <= 3) return "Partly Cloudy";
+    if (code <= 45) return "Foggy";
+    if (code <= 67) return "Rainy";
+    if (code <= 77) return "Snow";
+    if (code >= 95) return "Thunderstorms";
+    return "Cloudy";
+  };
+
+  if (loading) return (
+    <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white">
+      <div className="text-center"><Loader className="w-12 h-12 animate-spin mx-auto mb-4" /><p>Fetching weather...</p></div>
+    </div>
+  );
+
+  if (error) return (
+    <div className="h-full w-full flex items-center justify-center bg-red-900 text-white p-8 text-center"><p>Could not load weather. Check ZIP code.</p></div>
+  );
+
+  return (
+    <div className="h-full w-full flex flex-col justify-center items-center p-8 bg-gradient-to-br from-blue-600 to-cyan-500 text-white relative overflow-hidden">
+      <div className="absolute top-4 left-6 flex items-center gap-2 opacity-80"><MapPin size={20} /><span className="text-xl font-bold uppercase tracking-wider">{city}</span></div>
+      <div className="mb-6">{getWeatherIcon(condition)}</div>
+      <h1 className="text-8xl font-bold mb-2 tracking-tighter">{Math.round(temp)}°</h1>
+      <p className="text-2xl font-light opacity-90">{getConditionText(condition)}</p>
+      <div className="mt-8 grid grid-cols-2 gap-12 text-center w-full max-w-sm bg-white/20 p-6 rounded-3xl backdrop-blur-md">
+        <div><div className="opacity-75 text-sm uppercase font-bold tracking-wider mb-1">Wind</div><div className="font-bold text-2xl">{wind} mph</div></div>
+        <div><div className="opacity-75 text-sm uppercase font-bold tracking-wider mb-1">Precip</div><div className="font-bold text-2xl">{condition > 50 ? 'High' : 'Low'}</div></div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * COMPONENT: CLOCK CARD (REDESIGNED)
+ * New modern, high-contrast look
+ */
+const ClockCard = ({ timezoneOffset }) => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      if (timezoneOffset !== null && timezoneOffset !== undefined) {
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const targetTime = new Date(utc + (1000 * timezoneOffset));
+        setTime(targetTime);
+      } else {
+        setTime(now);
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timezoneOffset]);
+
+  // Format Helpers
+  const formatTime = (date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
+  };
+  const getAmPm = (date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
+  };
+  const formatDate = (date) => {
+    return date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  };
+
+  return (
+    <div className="h-full w-full flex flex-col justify-center items-center p-8 bg-[#0D0D0D] text-white relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
+      
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Date Header */}
+        <div className="text-xl md:text-3xl font-medium tracking-[0.2em] text-indigo-400 uppercase mb-4 opacity-90">
+          {formatDate(time)}
+        </div>
+
+        {/* Main Time Display */}
+        <div className="flex items-baseline gap-4 leading-none select-none">
+          <span className="text-[25vw] md:text-[12rem] font-bold tracking-tighter text-white drop-shadow-2xl">
+            {formatTime(time)}
+          </span>
+          <span className="text-3xl md:text-6xl font-light text-slate-500 uppercase">
+            {getAmPm(time)}
+          </span>
+        </div>
+
+        {/* Location / Status Footer */}
+        <div className="mt-8 flex items-center gap-3 text-slate-400 text-sm md:text-lg font-mono tracking-widest border-t border-white/10 pt-4 px-8">
+           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * MAIN APP COMPONENT
+ */
+export default function App() {
+  const [userStocks, setUserStocks] = useState([]);
+  const [showStockCard, setShowStockCard] = useState(false);
+  const [nflTeam, setNflTeam] = useState(null);
+  const [zipCode, setZipCode] = useState('10001'); 
+  const [tempZip, setTempZip] = useState('10001');
+  const [weatherData, setWeatherData] = useState({ 
+    temp: 72, condition: 0, wind: 5, city: 'New York', timezoneOffset: -14400, loading: false, error: false 
+  });
+
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [newTicker, setNewTicker] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if(zipCode.length < 5) return;
+      setWeatherData(prev => ({ ...prev, loading: true, error: false }));
+      try {
+        const zipRes = await fetch(`https://api.zippopotam.us/us/${zipCode}`);
+        if (!zipRes.ok) throw new Error("Invalid ZIP");
+        const zipData = await zipRes.json();
+        const { latitude, longitude, "place name": city, state } = zipData.places[0];
+        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`);
+        const wData = await weatherRes.json();
+        setWeatherData({
+          temp: wData.current_weather.temperature,
+          condition: wData.current_weather.weathercode,
+          wind: wData.current_weather.windspeed,
+          city: `${city}, ${state}`,
+          timezoneOffset: wData.utc_offset_seconds,
+          loading: false,
+          error: false
+        });
+      } catch (err) {
+        console.error(err);
+        setWeatherData(prev => ({ ...prev, loading: false, error: true }));
+      }
+    };
+    fetchData();
+  }, [zipCode]);
+
+  const allCards = [
+    { id: 'weather', component: <WeatherCard weatherData={weatherData} />, enabled: true },
+    { id: 'clock', component: <ClockCard timezoneOffset={weatherData.timezoneOffset} />, enabled: true },
+    { id: 'stocks', component: <StockCard enabledStocks={userStocks} />, enabled: showStockCard && userStocks.length > 0 },
+    { id: 'nfl', component: <NFLCard teamId={nflTeam} />, enabled: !!nflTeam }
+  ];
+
+  const activeCards = allCards.filter(card => card.enabled);
+
+  // --- SAFE CYCLE LOGIC ---
+  useEffect(() => {
+    if (activeCards.length === 0) return;
+    // Fix for "Blank Screen" bug: If current index is invalid, reset immediately
+    if (currentSlideIndex >= activeCards.length) {
+      setCurrentSlideIndex(0);
+      return;
+    }
+    if (activeCards.length <= 1 || isPaused || isSettingsOpen) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % activeCards.length);
+    }, 6000); 
+    return () => clearInterval(interval);
+  }, [activeCards.length, isPaused, isSettingsOpen, currentSlideIndex]);
+
+  // Ensure index validity on every render (backup safety)
+  const safeIndex = currentSlideIndex >= activeCards.length ? 0 : currentSlideIndex;
+
+  const handleAddStock = () => {
+    if (!newTicker) return;
+    const tick = newTicker.toUpperCase();
+    if (!userStocks.includes(tick)) {
+      setUserStocks([...userStocks, tick]);
+      if (!showStockCard) setShowStockCard(true);
+    }
+    setNewTicker("");
+  };
+
+  const removeStock = (tick) => {
+    const updated = userStocks.filter(t => t !== tick);
+    setUserStocks(updated);
+    if (updated.length === 0) setShowStockCard(false);
+  };
+
+  const toggleStockModule = () => {
+    if (!showStockCard && userStocks.length === 0) setUserStocks(['JELD', 'BA', 'HON']);
+    setShowStockCard(!showStockCard);
+  };
+
+  const saveZip = () => { setZipCode(tempZip); };
+  const closeSettings = () => { saveZip(); setIsSettingsOpen(false); };
+
+  return (
+    <div className="w-full h-screen bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white">
+      
+      {/* MAIN CAROUSEL AREA */}
+      <div className="w-full h-full relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
+        {activeCards.length > 0 ? (
+          activeCards.map((card, index) => (
+            <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === safeIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
+              {card.component}
+            </div>
+          ))
+        ) : (
+          <div className="flex items-center justify-center h-full"><p>No active slides. Open settings to configure.</p></div>
+        )}
+        
+        {/* Progress Indicators */}
+        <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-3">
+          {activeCards.map((_, idx) => (
+            <button key={idx} onClick={() => setCurrentSlideIndex(idx)} className={`h-1 rounded-full transition-all duration-300 ${idx === safeIndex ? 'w-8 bg-white' : 'w-2 bg-white/30'}`} />
+          ))}
+        </div>
+      </div>
+
+      {/* SETTINGS BUTTON */}
+      <button onClick={() => setIsSettingsOpen(true)} className="absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors border border-white/10 group">
+        <Settings className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-500" />
+      </button>
+
+      {/* SETTINGS MODAL */}
+      {isSettingsOpen && (
+        <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900 z-10 shrink-0">
+              <h2 className="text-xl font-bold text-white">Dashboard Settings</h2>
+              <button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button>
+            </div>
+            
+            <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar">
+              
+              {/* Location/Time */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-white border-b border-slate-700 pb-2">
+                   <MapPin size={20} className="text-blue-400" />
+                   <h3 className="font-bold">Location & Time</h3>
+                </div>
+                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                  <label className="block text-sm text-slate-400 mb-2">ZIP Code (US)</label>
+                  <div className="flex gap-2">
+                    <input type="text" value={tempZip} onChange={(e) => setTempZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white outline-none focus:border-blue-500" placeholder="e.g. 10001" maxLength={5} />
+                    <button onClick={saveZip} className="bg-blue-600 hover:bg-blue-500 text-white px-4 rounded-lg font-medium text-sm">Set</button>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">Sets local weather and adjusts the clock automatically.</p>
+                </div>
+              </div>
+
+              {/* NFL Module */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-white border-b border-slate-700 pb-2">
+                   <Trophy size={20} className="text-yellow-500" />
+                   <h3 className="font-bold">Sports Ticker</h3>
+                </div>
+                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                  <label className="block text-sm text-slate-400 mb-2">Select Active Team</label>
+                  <div className="relative">
+                    <select value={nflTeam || ''} onChange={(e) => setNflTeam(e.target.value || null)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-indigo-500 outline-none">
+                      <option value="">-- No Team Selected --</option>
+                      {NFL_TEAMS.map(t => (
+                        <option key={t.id} value={t.id}>{t.city} {t.name}</option>
+                      ))}
+                    </select>
+                    <ChevronRight className="absolute right-3 top-3.5 text-slate-500 rotate-90 pointer-events-none" size={16} />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-2">Select a team to add their card. (Note: Only 'Steelers' shows LIVE demo data).</p>
+                </div>
+              </div>
+
+              {/* Stock Module */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-slate-700 pb-2">
+                   <div className="flex items-center gap-2 text-white"><TrendingUp size={20} className="text-emerald-500" /><h3 className="font-bold">Stocks</h3></div>
+                   <button onClick={toggleStockModule} className={`w-10 h-5 rounded-full transition-colors relative ${showStockCard ? 'bg-emerald-500' : 'bg-slate-700'}`}>
+                    <div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${showStockCard ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </button>
+                </div>
+                {showStockCard && (
+                  <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {userStocks.map(tick => (
+                        <span key={tick} className="bg-emerald-900/30 border border-emerald-500/30 text-emerald-200 px-2 py-1 rounded text-xs flex items-center gap-2">
+                          {tick}<button onClick={() => removeStock(tick)} className="hover:text-white"><X size={12} /></button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <input type="text" value={newTicker} onChange={(e) => setNewTicker(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddStock()} placeholder="SYMBOL" className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500 uppercase" />
+                      <button onClick={handleAddStock} className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg"><Plus size={16} /></button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* DONE BUTTON FOOTER */}
+            <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0">
+               <button onClick={closeSettings} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                 <Check size={20} /> Done
+               </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
