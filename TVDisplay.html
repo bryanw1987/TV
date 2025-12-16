@@ -142,10 +142,10 @@
 </head>
 <body class="h-screen w-screen relative text-white bg-black">
 
-    <!-- CLOCK WIDGET (Compact Top Right) -->
-    <div class="absolute top-2 right-6 z-50 pointer-events-none flex items-baseline gap-3">
-        <div id="clock-time" class="text-[clamp(1.5rem,min(4vw,4vh),3rem)] font-black tracking-tighter text-gray-100 leading-none">--:--</div>
-        <div id="clock-date" class="text-[clamp(0.8rem,min(1.5vw,1.5vh),1.2rem)] text-gray-400 font-medium uppercase leading-none">Loading...</div>
+    <!-- CLOCK WIDGET (Reduced size for mobile to prevent overlap) -->
+    <div class="absolute top-2 right-4 md:right-6 z-50 pointer-events-none flex flex-col md:flex-row items-end md:items-baseline md:gap-3">
+        <div id="clock-time" class="text-[clamp(1.2rem,min(3vw,3vh),3rem)] font-black tracking-tighter text-gray-100 leading-none">--:--</div>
+        <div id="clock-date" class="text-[clamp(0.7rem,min(1.2vw,1.2vh),1.2rem)] text-gray-400 font-medium uppercase leading-none">Loading...</div>
     </div>
 
     <!-- MAIN DASHBOARD -->
@@ -227,17 +227,17 @@
         <!-- SLIDE 2: STEELERS (Next or Live) -->
         <div id="slide-steelers" class="slide-container bg-steelers">
             <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
-                <!-- Header (Flex None) -->
-                <div class="flex items-center gap-4 md:gap-6 mb-1 border-b border-gray-800 pb-1 flex-none">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Steelers">
+                <!-- Header (Flex None, Scaled down significantly on mobile) -->
+                <div class="flex items-center gap-2 md:gap-6 mb-1 border-b border-gray-800 pb-1 flex-none z-10">
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(2.5rem,min(8vw,8vh),6rem)] h-[clamp(2.5rem,min(8vw,8vh),6rem)] flex-shrink-0" alt="Steelers">
                     <div class="overflow-hidden flex flex-col justify-center">
-                        <div class="flex items-center gap-3">
-                            <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-black text-white uppercase tracking-tighter truncate leading-none">Steelers</h2>
-                            <!-- LIVE badge moved here -->
-                            <div id="steelers-live-badge-header" class="hidden bg-red-600 px-3 py-0.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider live-pulse text-white self-center">LIVE</div>
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <h2 class="text-[clamp(1.5rem,min(5vw,6vh),5rem)] font-black text-white uppercase tracking-tighter truncate leading-none">Steelers</h2>
+                            <!-- LIVE badge -->
+                            <div id="steelers-live-badge-header" class="hidden bg-red-600 px-2 py-0.5 rounded-full text-[0.6rem] md:text-sm font-bold uppercase tracking-wider live-pulse text-white self-center">LIVE</div>
                         </div>
-                        <div id="steelers-header-status" class="mt-1">
-                            <p id="steelers-status-text" class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-[#FFB612] font-bold uppercase truncate leading-none">Loading...</p>
+                        <div id="steelers-header-status" class="mt-0.5 md:mt-1">
+                            <p id="steelers-status-text" class="text-[clamp(0.8rem,min(2vw,2.5vh),1.8rem)] text-[#FFB612] font-bold uppercase truncate leading-none">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -246,69 +246,71 @@
                 <div class="bg-white/5 rounded-3xl p-2 backdrop-blur-md relative overflow-hidden mb-2 border border-white/5 flex flex-col justify-center flex-1 min-h-0">
                     <div class="flex items-center justify-between w-full h-full">
                         <!-- Home -->
-                        <div class="text-center w-1/3 flex flex-col items-center justify-center h-full">
-                            <div class="svg-score-container flex-1 mb-1 w-full">
+                        <div class="text-center w-1/3 flex flex-col items-center justify-center h-full overflow-hidden">
+                            <div class="svg-score-container flex-1 mb-1 w-full max-h-[15vh]">
                                 <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
                                     <text id="steelers-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                                 </svg>
                             </div>
                             <div class="flex items-center justify-center gap-2 w-full mb-1">
                                 <div id="steelers-home-possession" class="hidden possession-icon">
-                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-5 h-5 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
+                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-4 h-4 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
                                 </div>
-                                <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-home-name">--</div>
+                                <div class="text-[clamp(1rem,min(3vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-home-name">--</div>
                             </div>
-                            <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-home-record"></div>
+                            <div class="text-xs md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-home-record"></div>
                         </div>
                         
                         <!-- Center -->
-                        <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
-                            <div id="steelers-game-clock" class="text-[clamp(1.5rem,min(4vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
-                            <div id="steelers-game-detail" class="text-sm md:text-xl text-gray-500 whitespace-nowrap">Loading...</div>
+                        <div class="text-center w-1/3 flex flex-col justify-center px-1 flex-shrink-0">
+                            <div id="steelers-game-clock" class="text-[clamp(1.2rem,min(3vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
+                            <div id="steelers-game-detail" class="text-xs md:text-xl text-gray-500 whitespace-nowrap">Loading...</div>
                         </div>
                         
                         <!-- Away -->
-                        <div class="text-center w-1/3 flex flex-col items-center justify-center h-full">
-                             <div class="svg-score-container flex-1 mb-1 w-full">
+                        <div class="text-center w-1/3 flex flex-col items-center justify-center h-full overflow-hidden">
+                             <div class="svg-score-container flex-1 mb-1 w-full max-h-[15vh]">
                                 <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
                                     <text id="steelers-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                                 </svg>
                             </div>
                             <div class="flex items-center justify-center gap-2 w-full mb-1">
-                                <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-away-name">--</div>
+                                <div class="text-[clamp(1rem,min(3vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-away-name">--</div>
                                 <div id="steelers-away-possession" class="hidden possession-icon">
-                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-5 h-5 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
+                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-4 h-4 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
                                 </div>
                             </div>
-                            <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-away-record"></div>
+                            <div class="text-xs md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-away-record"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- LIVE FIELD VISUALIZATION (Flex None - Fixed height relative to viewport) -->
-                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-xl p-2 backdrop-blur-md mt-auto mb-2 border border-white/10 flex-none">
-                    <!-- Updated Top Row: Down | Summary | Ball On -->
-                    <div class="flex items-end justify-between mb-1 px-2 gap-2">
-                        <!-- Left: Down & Dist -->
-                        <div class="flex-none min-w-[20%]">
-                             <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
-                             <div id="steelers-down-dist" class="text-[clamp(1rem,3vh,2rem)] font-black text-white mt-1 leading-none whitespace-nowrap">--</div>
-                        </div>
+                <!-- INFO BLOCK (New dedicated area for summary) -->
+                <div id="steelers-info-block" class="flex-none mb-1 hidden">
+                    <div class="bg-black/40 border border-white/10 rounded-xl p-2 text-center shadow-lg backdrop-blur-sm">
+                        <p id="steelers-summary" class="text-[clamp(1rem,min(2.5vw,2.5vh),1.8rem)] text-white font-medium leading-tight">--</p>
+                    </div>
+                </div>
 
-                        <!-- Center: Summary Text (Moved from bottom) -->
-                        <div class="flex-1 text-center flex flex-col justify-end pb-1 overflow-hidden">
-                             <p id="steelers-summary" class="text-[clamp(0.8rem,min(2vw,2vh),1.5rem)] text-gray-300 font-light italic truncate w-full">--</p>
+                <!-- LIVE FIELD VISUALIZATION (Flex None - Fixed height relative to viewport) -->
+                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-xl p-2 backdrop-blur-md mt-auto mb-2 border border-white/10 flex-none z-10">
+                    <!-- Updated Top Row: Down | Ball On (Summary moved out) -->
+                    <div class="flex items-end justify-between mb-1 px-2">
+                        <!-- Left: Down & Dist -->
+                        <div class="flex-none">
+                             <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                             <div id="steelers-down-dist" class="text-[clamp(1.2rem,3vh,2rem)] font-black text-white mt-1 leading-none whitespace-nowrap">--</div>
                         </div>
 
                         <!-- Right: Ball On -->
-                        <div class="flex-none min-w-[20%] text-right">
+                        <div class="flex-none text-right">
                              <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
-                             <div id="steelers-ball-on" class="text-[clamp(1rem,3vh,2rem)] font-black text-[#FFB612] mt-1 leading-none whitespace-nowrap">--</div>
+                             <div id="steelers-ball-on" class="text-[clamp(1.2rem,3vh,2rem)] font-black text-[#FFB612] mt-1 leading-none whitespace-nowrap">--</div>
                         </div>
                     </div>
                     
                     <!-- THE FIELD -->
-                    <div class="relative h-[14vh] field-turf rounded w-full mt-1 overflow-hidden flex">
+                    <div class="relative h-[12vh] field-turf rounded w-full mt-1 overflow-hidden flex">
                          <!-- Left Endzone (Home) -->
                          <div class="h-full w-[8%] bg-black/40 flex items-center justify-center border-r-2 border-white/50 z-0 relative flex-shrink-0">
                              <span id="ez-text-left" class="text-[clamp(0.6rem,1.5vh,1rem)] font-black -rotate-90 whitespace-nowrap absolute">HOME</span>
@@ -854,6 +856,9 @@
             const statusText = document.getElementById(`${elementPrefix}-status-text`);
             const homePossIcon = document.getElementById(`${elementPrefix}-home-possession`);
             const awayPossIcon = document.getElementById(`${elementPrefix}-away-possession`);
+            
+            // Get the new info block container (Steelers only)
+            const infoBlock = document.getElementById('steelers-info-block');
 
             if (liveBadge) liveBadge.classList.add('hidden');
             if (homePossIcon) homePossIcon.classList.add('hidden');
@@ -864,6 +869,7 @@
                 const vizContainer = document.getElementById('steelers-live-viz');
                 if(state === 'in') {
                     vizContainer.classList.remove('hidden');
+                    if(infoBlock) infoBlock.classList.remove('hidden');
                     
                     // HEADER LOGIC: Show LIVE badge, hide text
                     if(liveBadgeHeader) liveBadgeHeader.classList.remove('hidden');
@@ -1005,6 +1011,7 @@
                     
                 } else {
                     vizContainer.classList.add('hidden');
+                    if(infoBlock) infoBlock.classList.add('hidden');
                     if(liveBadgeHeader) liveBadgeHeader.classList.add('hidden');
                     if(statusText) statusText.classList.remove('hidden');
                 }
@@ -1023,13 +1030,7 @@
             const baseSvgClass = "font-black leading-none";
             
             // DYNAMIC COLOR OVERRIDE
-            // Apply team specific color logic primarily for Steelers slide, or all if preferred.
-            // Requested: "Make the opp score their team color"
-            
             if (elementPrefix === 'steelers' || elementPrefix === 'steelers-prev') {
-                 // Steelers Logic: PIT score always Gold. Opponent score always Team Color.
-                 // We don't use the win-fill class here anymore, we use direct style fill
-                 
                  // Reset classes first
                  hScoreEl.setAttribute('class', baseSvgClass);
                  aScoreEl.setAttribute('class', baseSvgClass);
