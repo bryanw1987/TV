@@ -1,1145 +1,535 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart TV Display</title>
+import React, { useState, useEffect, useMemo } from 'react';
+import { Settings, X, Plus, Trash2, TrendingUp, TrendingDown, Clock, Sun, Cloud, CloudRain, CloudSnow, CloudLightning, Loader, Trophy, Calendar, MapPin, ChevronRight, Check } from 'lucide-react';
+
+// --- FONTS & GLOBAL STYLES ---
+const GlobalStyles = () => (
+  <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&display=swap');
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    body { font-family: 'Inter', sans-serif; }
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    .font-courier { font-family: 'Courier Prime', monospace; }
+    
+    .field-lines {
+      background-image: repeating-linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent calc(10% - 1px),
+        rgba(255, 255, 255, 0.3) 10%,
+        transparent calc(10% + 1px)
+      );
+    }
+    
+    /* Custom Scrollbar for Settings */
+    .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+  `}</style>
+);
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&display=swap');
+/**
+ * MOCK STOCK DATA
+ */
+const MOCK_STOCKS = {
+  JELD: { price: 18.45, name: "JELD-WEN Holding, Inc." },
+  BA: { price: 210.50, name: "The Boeing Company" },
+  HON: { price: 195.30, name: "Honeywell International" },
+  AAPL: { price: 175.20, name: "Apple Inc." },
+  GOOGL: { price: 140.10, name: "Alphabet Inc." },
+  MSFT: { price: 380.00, name: "Microsoft Corp." },
+  TSLA: { price: 240.00, name: "Tesla, Inc." },
+  AMZN: { price: 145.00, name: "Amazon.com, Inc." },
+  NVDA: { price: 460.00, name: "NVIDIA Corp." },
+  AMD: { price: 105.00, name: "Advanced Micro Devices" },
+};
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            overflow: hidden; 
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            width: 100vw;
-        }
+/**
+ * NFL TEAMS CONFIGURATION
+ */
+const NFL_TEAMS = [
+  { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' },
+  { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' },
+  { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' },
+  { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' },
+  { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' },
+  { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' },
+  { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' },
+  { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' },
+  { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' },
+  { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' },
+  { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' },
+  { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' },
+  { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' },
+  { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' },
+  { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' },
+  { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' },
+  { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' },
+  { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' },
+  { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' },
+  { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' },
+  { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' },
+  { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' },
+  { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' },
+  { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' },
+  { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' },
+  { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' },
+  { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' },
+  { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' },
+  { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' },
+  { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' },
+  { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' },
+  { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' },
+];
 
-        /* Fade Transition */
-        .slide-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1.2s ease-in-out;
-            /* Allow scrolling if content is too tall */
-            overflow-y: auto; 
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 0;
-            /* Increased bottom padding to prevent cutoff */
-            padding: 2vh 2vw 3vh 2vw; 
-            box-sizing: border-box;
-        }
+/**
+ * HELPER: GENERATE MOCK NFL DATA
+ */
+const getTeamData = (teamId) => {
+  const meta = NFL_TEAMS.find(t => t.id === teamId);
+  if (!meta) return null;
 
-        .slide-container.active {
-            opacity: 1;
-            z-index: 10;
-        }
+  const base = {
+    ...meta,
+    logo: `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId.toLowerCase()}.png`,
+    status: teamId === 'PIT' ? 'LIVE' : 'OFFLINE', // Demo: Only PIT is live
+  };
 
-        /* Team Themes */
-        .bg-steelers { background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); border-left: 2vw solid #FFB612; }
-        .bg-penguins { background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); border-left: 2vw solid #CFC493; }
-        .bg-pirates { background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%); border-left: 2vw solid #FDB827; }
-        .bg-weather { background: radial-gradient(circle at top right, #1e293b 0%, #0f172a 100%); }
+  if (base.status === 'LIVE') {
+    return {
+      ...base,
+      live: {
+        opponent: 'BAL', opponentName: 'Ravens', opponentColor: '#241773',
+        score: { home: 24, away: 21 },
+        quarter: 4, time: '2:14',
+        possession: 'home', down: 2, distance: 6, yardLine: 68,
+        lastPlay: 'N. Harris rush to right tackle for 4 yards.'
+      },
+      schedule: { prev: { opponent: 'CIN', result: 'W 34-11', date: 'Sat, Dec 23' }, next: { opponent: 'SEA', time: 'Sun 4:05 PM', location: 'Lumen Field' } }
+    };
+  } else {
+    return {
+      ...base,
+      schedule: {
+        prev: { opponent: 'OPP', result: 'W 24-10', date: 'Last Week' },
+        next: { opponent: 'NXT', time: 'Sun 1:00 PM', location: 'Home Stadium' }
+      }
+    };
+  }
+};
 
-        /* Text Colors */
-        .text-steelers-win { color: #FFB612; text-shadow: 0 0 20px rgba(255, 182, 18, 0.4); }
-        .text-penguins-win { color: #CFC493; text-shadow: 0 0 20px rgba(207, 196, 147, 0.4); }
-        .text-pirates-win { color: #FDB827; text-shadow: 0 0 20px rgba(253, 184, 39, 0.4); }
+const getFluctuation = (basePrice) => {
+  const percentChange = (Math.random() - 0.5) * 0.02;
+  const newPrice = basePrice * (1 + percentChange);
+  return {
+    price: newPrice.toFixed(2),
+    change: (newPrice - basePrice).toFixed(2),
+    percent: (percentChange * 100).toFixed(2),
+  };
+};
 
-        /* SVG Fill Colors (For Score Scaling) */
-        .fill-steelers-win { fill: #FFB612; filter: drop-shadow(0 0 10px rgba(255, 182, 18, 0.4)); }
-        .fill-penguins-win { fill: #CFC493; filter: drop-shadow(0 0 10px rgba(207, 196, 147, 0.4)); }
-        .fill-pirates-win { fill: #FDB827; filter: drop-shadow(0 0 10px rgba(253, 184, 39, 0.4)); }
-        .fill-white { fill: white; }
-        .fill-gray { fill: #6b7280; fill-opacity: 0.6; }
+/**
+ * COMPONENT: NFL CARD (EXACT REPLICA STYLE)
+ */
+const NFLCard = ({ teamId }) => {
+  const team = useMemo(() => getTeamData(teamId), [teamId]);
+  if (!team) return null;
 
-        /* Weather Icons */
-        .text-sun { color: #FACC15; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.5)); }
-        .text-rain { color: #60A5FA; filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5)); }
-        .text-cloud { color: #9CA3AF; }
-        .text-snow { color: #E0F2FE; }
-        .text-thunder { color: #C084FC; }
+  const isLive = team.status === 'LIVE';
 
-        .icon-stack { position: relative; width: 15vw; height: 15vw; max-width: 12rem; max-height: 12rem; margin: 0 auto; }
-        .icon-stack .sun-layer { position: absolute; top: -5%; right: -5%; z-index: 1; color: #FACC15; width: 60%; height: 60%; filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.6)); }
-        .icon-stack .cloud-layer { position: absolute; bottom: 0; left: 0; z-index: 2; color: #9CA3AF; width: 70%; height: 70%; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
+  const fieldTurfStyle = {
+    backgroundColor: '#3f6228',
+    boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)',
+    border: '2px solid rgba(255,255,255,0.8)'
+  };
 
-        .icon-stack-small { position: relative; width: 6rem; height: 6rem; margin: 0 auto; }
-        .icon-stack-small .sun-layer { position: absolute; top: -2px; right: -2px; z-index: 1; color: #FACC15; width: 3.5rem; height: 3.5rem; }
-        .icon-stack-small .cloud-layer { position: absolute; bottom: 2px; left: 2px; z-index: 2; color: #9CA3AF; width: 4rem; height: 4rem; }
+  // Using the exact radial gradient from your reference
+  const containerStyle = {
+    background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)',
+    borderLeft: `2vw solid ${team.color}`
+  };
 
-        /* Progress Bar */
-        .progress-bar { position: fixed; bottom: 0; left: 0; height: 6px; background-color: rgba(255, 255, 255, 0.3); width: 0%; transition: width 0.1s linear; z-index: 50; }
-        
-        .live-pulse { animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        
-        .possession-icon { filter: drop-shadow(0 0 5px rgba(255,255,255,0.4)); animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  const getOrdinal = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  };
 
-        /* Realistic Field */
-        .field-turf {
-            background-color: #3f6228;
-            border: 2px solid rgba(255,255,255,0.8);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        }
-        
-        /* Grid Lines logic: 
-           We want a line every 5%. 
-           5% of 100 yards = 5 yards.
-        */
-        .field-lines {
-            background-image: repeating-linear-gradient(
-                90deg,
-                transparent 0%,
-                transparent calc(5% - 1px),
-                rgba(255, 255, 255, 0.3) 5%,
-                transparent calc(5% + 1px)
-            );
-        }
-
-        .yard-number {
-            position: absolute;
-            bottom: 5%;
-            transform: translateX(-50%);
-            font-size: 1.5vh;
-            color: rgba(255,255,255,0.8);
-            font-weight: 700;
-            font-family: 'Courier Prime', monospace;
-            text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
-        }
-        
-        /* Flex Utils for direction */
-        .flex-row-reverse { flex-direction: row-reverse; }
-        .rotate-180 { transform: rotate(180deg); }
-        .right-0 { right: 0; left: auto; }
-        .left-0 { left: 0; right: auto; }
-        
-        /* SVG Text Utility */
-        .svg-score-container {
-            width: 100%;
-            height: 12vh; /* Responsive height */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
-</head>
-<body class="h-screen w-screen relative text-white bg-black">
-
-    <!-- CLOCK WIDGET (Reduced size for mobile to prevent overlap) -->
-    <div class="absolute top-2 right-4 md:right-6 z-50 pointer-events-none flex flex-col md:flex-row items-end md:items-baseline md:gap-3">
-        <div id="clock-time" class="text-[clamp(1.2rem,min(3vw,3vh),3rem)] font-black tracking-tighter text-gray-100 leading-none">--:--</div>
-        <div id="clock-date" class="text-[clamp(0.7rem,min(1.2vw,1.2vh),1.2rem)] text-gray-400 font-medium uppercase leading-none">Loading...</div>
-    </div>
-
-    <!-- MAIN DASHBOARD -->
-    <main id="dashboard" class="relative w-full h-full">
-
-        <!-- SLIDE 1: WEATHER -->
-        <div id="slide-weather" class="slide-container active bg-weather">
-            <div class="text-center w-full max-w-5xl flex flex-col justify-evenly h-full py-4">
-                <div class="flex items-center justify-center gap-4 opacity-70">
-                    <i data-lucide="map-pin" class="w-6 h-6 md:w-8 md:h-8"></i>
-                    <span id="location-name" class="text-xl md:text-3xl uppercase tracking-widest font-bold">Locating...</span>
-                </div>
-                
-                <div class="flex flex-col md:flex-row items-center justify-center gap-8">
-                    <div id="weather-icon-container" class="transform scale-90 md:scale-100">
-                        <i data-lucide="loader" class="w-32 h-32 md:w-48 md:h-48 text-gray-500 animate-spin"></i>
-                    </div>
-                    <div class="text-center">
-                        <div id="weather-temp" class="text-[clamp(6rem,20vw,14rem)] leading-none font-bold tracking-tighter">--°</div>
-                        <div id="weather-desc" class="text-2xl md:text-4xl text-gray-400 mt-2 font-light">Loading...</div>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap gap-8 md:gap-20 justify-center">
-                    <div class="text-center">
-                        <span class="block text-gray-500 text-sm md:text-xl uppercase mb-1 md:mb-2">Humidity</span>
-                        <span id="weather-humidity" class="text-2xl md:text-4xl font-semibold">--%</span>
-                    </div>
-                    <div class="text-center">
-                        <span class="block text-gray-500 text-sm md:text-xl uppercase mb-1 md:mb-2">Wind</span>
-                        <span id="weather-wind" class="text-2xl md:text-4xl font-semibold">-- mph</span>
-                    </div>
-                    <div class="text-center">
-                        <span class="block text-gray-500 text-sm md:text-xl uppercase mb-1 md:mb-2">High / Low</span>
-                        <span id="weather-hl" class="text-2xl md:text-4xl font-semibold">--° / --°</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 1B: FORECAST -->
-        <div id="slide-forecast" class="slide-container bg-weather">
-            <div class="w-full max-w-6xl px-4 md:px-8 flex flex-col justify-center h-full py-4">
-                <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-600 pb-4 opacity-80">
-                    <i data-lucide="calendar-days" class="w-8 h-8 md:w-12 md:h-12"></i>
-                    <h2 class="text-3xl md:text-5xl font-bold uppercase tracking-tighter">Forecast</h2>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 flex-grow">
-                    <!-- Day 1-3 -->
-                    <div class="bg-white/10 rounded-3xl p-4 md:p-8 backdrop-blur-md flex flex-row md:flex-col items-center justify-between md:justify-center">
-                        <div id="fc-day-1-name" class="text-2xl md:text-3xl font-bold text-gray-300 md:mb-4 uppercase w-20 md:w-auto">--</div>
-                        <div id="fc-day-1-icon" class="flex justify-center"><i data-lucide="cloud" class="w-12 h-12 md:w-24 md:h-24 text-gray-400"></i></div>
-                        <div class="text-right md:text-center">
-                            <div class="text-3xl md:text-5xl font-black"><span id="fc-day-1-max">--</span>°</div>
-                            <div class="text-lg md:text-2xl text-gray-400"><span id="fc-day-1-min">--</span>° Low</div>
-                        </div>
-                    </div>
-                    <div class="bg-white/10 rounded-3xl p-4 md:p-8 backdrop-blur-md flex flex-row md:flex-col items-center justify-between md:justify-center">
-                        <div id="fc-day-2-name" class="text-2xl md:text-3xl font-bold text-gray-300 md:mb-4 uppercase w-20 md:w-auto">--</div>
-                        <div id="fc-day-2-icon" class="flex justify-center"><i data-lucide="cloud" class="w-12 h-12 md:w-24 md:h-24 text-gray-400"></i></div>
-                        <div class="text-right md:text-center">
-                            <div class="text-3xl md:text-5xl font-black"><span id="fc-day-2-max">--</span>°</div>
-                            <div class="text-lg md:text-2xl text-gray-400"><span id="fc-day-2-min">--</span>° Low</div>
-                        </div>
-                    </div>
-                    <div class="bg-white/10 rounded-3xl p-4 md:p-8 backdrop-blur-md flex flex-row md:flex-col items-center justify-between md:justify-center">
-                        <div id="fc-day-3-name" class="text-2xl md:text-3xl font-bold text-gray-300 md:mb-4 uppercase w-20 md:w-auto">--</div>
-                        <div id="fc-day-3-icon" class="flex justify-center"><i data-lucide="cloud" class="w-12 h-12 md:w-24 md:h-24 text-gray-400"></i></div>
-                        <div class="text-right md:text-center">
-                            <div class="text-3xl md:text-5xl font-black"><span id="fc-day-3-max">--</span>°</div>
-                            <div class="text-lg md:text-2xl text-gray-400"><span id="fc-day-3-min">--</span>° Low</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 2: STEELERS (Next or Live) -->
-        <div id="slide-steelers" class="slide-container bg-steelers">
-            <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full pb-6">
-                <!-- Header (Flex None, Scaled down significantly on mobile) -->
-                <div class="flex items-center gap-2 md:gap-6 mb-1 border-b border-gray-800 pb-1 flex-none z-10">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(2.5rem,min(8vw,8vh),6rem)] h-[clamp(2.5rem,min(8vw,8vh),6rem)] flex-shrink-0" alt="Steelers">
-                    <div class="overflow-hidden flex flex-col justify-center">
-                        <div class="flex items-center gap-2 md:gap-3">
-                            <h2 class="text-[clamp(1.5rem,min(5vw,6vh),5rem)] font-black text-white uppercase tracking-tighter truncate leading-none">Steelers</h2>
-                            <!-- LIVE badge -->
-                            <div id="steelers-live-badge-header" class="hidden bg-red-600 px-2 py-0.5 rounded-full text-[0.6rem] md:text-sm font-bold uppercase tracking-wider live-pulse text-white self-center">LIVE</div>
-                        </div>
-                        <div id="steelers-header-status" class="mt-0.5 md:mt-1">
-                            <p id="steelers-status-text" class="text-[clamp(0.8rem,min(2vw,2.5vh),1.8rem)] text-[#FFB612] font-bold uppercase truncate leading-none">Loading...</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Main Scoreboard (Flex 1 - Shrinks if needed) -->
-                <div class="bg-white/5 rounded-3xl p-2 backdrop-blur-md relative overflow-hidden mb-2 border border-white/5 flex flex-col justify-center flex-1 min-h-0">
-                    <div class="flex items-center justify-between w-full h-full">
-                        <!-- Home -->
-                        <div class="text-center w-1/3 flex flex-col items-center justify-center h-full overflow-hidden">
-                            <div class="svg-score-container flex-1 mb-1 w-full max-h-[15vh]">
-                                <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
-                                    <text id="steelers-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                                </svg>
-                            </div>
-                            <div class="flex items-center justify-center gap-2 w-full mb-1">
-                                <div id="steelers-home-possession" class="hidden possession-icon">
-                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-4 h-4 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
-                                </div>
-                                <div class="text-[clamp(1rem,min(3vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-home-name">--</div>
-                            </div>
-                            <div class="text-xs md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-home-record"></div>
-                        </div>
-                        
-                        <!-- Center -->
-                        <div class="text-center w-1/3 flex flex-col justify-center px-1 flex-shrink-0">
-                            <div id="steelers-game-clock" class="text-[clamp(1.2rem,min(3vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
-                            <div id="steelers-game-detail" class="text-xs md:text-xl text-gray-500 whitespace-nowrap">Loading...</div>
-                        </div>
-                        
-                        <!-- Away -->
-                        <div class="text-center w-1/3 flex flex-col items-center justify-center h-full overflow-hidden">
-                             <div class="svg-score-container flex-1 mb-1 w-full max-h-[15vh]">
-                                <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
-                                    <text id="steelers-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                                </svg>
-                            </div>
-                            <div class="flex items-center justify-center gap-2 w-full mb-1">
-                                <div class="text-[clamp(1rem,min(3vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-away-name">--</div>
-                                <div id="steelers-away-possession" class="hidden possession-icon">
-                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-4 h-4 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
-                                </div>
-                            </div>
-                            <div class="text-xs md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-away-record"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- INFO BLOCK (New dedicated area for summary) -->
-                <div id="steelers-info-block" class="flex-none mb-1 hidden">
-                    <div class="bg-black/40 border border-white/10 rounded-xl p-2 text-center shadow-lg backdrop-blur-sm">
-                        <p id="steelers-summary" class="text-[clamp(1rem,min(2.5vw,2.5vh),1.8rem)] text-white font-medium leading-tight">--</p>
-                    </div>
-                </div>
-
-                <!-- LIVE FIELD VISUALIZATION (Flex None - Fixed height relative to viewport) -->
-                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-xl p-2 backdrop-blur-md mt-auto mb-0 border border-white/10 flex-none z-10">
-                    <!-- Updated Top Row: Down | Ball On (Summary moved out) -->
-                    <div class="flex items-end justify-between mb-1 px-2">
-                        <!-- Left: Down & Dist -->
-                        <div class="flex-none">
-                             <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
-                             <div id="steelers-down-dist" class="text-[clamp(1.2rem,3vh,2rem)] font-black text-white mt-1 leading-none whitespace-nowrap">--</div>
-                        </div>
-
-                        <!-- Right: Ball On -->
-                        <div class="flex-none text-right">
-                             <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
-                             <div id="steelers-ball-on" class="text-[clamp(1.2rem,3vh,2rem)] font-black text-[#FFB612] mt-1 leading-none whitespace-nowrap">--</div>
-                        </div>
-                    </div>
-                    
-                    <!-- THE FIELD - Slightly reduced height to prevent cutoff on wide/short screens -->
-                    <div class="relative h-[10vh] min-h-[50px] field-turf rounded w-full mt-1 overflow-hidden flex">
-                         <!-- Left Endzone (Home) -->
-                         <div class="h-full w-[8%] bg-black/40 flex items-center justify-center border-r-2 border-white/50 z-0 relative flex-shrink-0">
-                             <span id="ez-text-left" class="text-[clamp(0.6rem,1.5vh,1rem)] font-black -rotate-90 whitespace-nowrap absolute">HOME</span>
-                         </div>
-                         
-                         <!-- Playing Field (84% width) -->
-                         <div class="relative h-full flex-grow z-0 field-lines">
-                             <!-- Number Markings (Only 10s) -->
-                             <span class="yard-number left-[10%]">10</span>
-                             <span class="yard-number left-[20%]">20</span>
-                             <span class="yard-number left-[30%]">30</span>
-                             <span class="yard-number left-[40%]">40</span>
-                             <span class="yard-number left-[50%] text-white">50</span>
-                             <span class="yard-number left-[60%]">40</span>
-                             <span class="yard-number left-[70%]">30</span>
-                             <span class="yard-number left-[80%]">20</span>
-                             <span class="yard-number left-[90%]">10</span>
-
-                             <!-- Drive Container -->
-                             <div id="steelers-drive-container" class="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style="width: 0%;">
-                                <div id="steelers-drive-bar" class="h-[60%] flex-grow bg-[#FFB612] rounded-sm shadow-[0_0_10px_rgba(255,182,18,0.6)] relative">
-                                    <div id="steelers-drive-arrow" class="absolute top-1/2 -translate-y-1/2 text-black/60 w-4 h-4 md:w-6 md:h-6"></div>
-                                </div>
-                             </div>
-                         </div>
-
-                         <!-- Right Endzone (Away) -->
-                         <div class="h-full w-[8%] bg-black/40 flex items-center justify-center border-l-2 border-white/50 z-0 relative flex-shrink-0">
-                             <span id="ez-text-right" class="text-[clamp(0.6rem,1.5vh,1rem)] font-black rotate-90 whitespace-nowrap absolute">AWAY</span>
-                         </div>
-                    </div>
-                    
-                    <div class="flex justify-between text-xs text-gray-400 mt-1 px-1 font-mono uppercase">
-                        <span id="field-label-home">Home EZ</span>
-                        <span id="field-label-away">Opp EZ</span>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-
-        <!-- SLIDE 2B: STEELERS PREV -->
-        <div id="slide-steelers-prev" class="slide-container bg-steelers">
-            <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
-                <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-700 pb-4">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Steelers">
-                    <div>
-                        <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-bold text-gray-300">Previous Game</h2>
-                        <p class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-gray-500 font-bold uppercase">Final Result</p>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
-                    <div class="text-center w-1/3 flex flex-col items-center">
-                        <div class="svg-score-container">
-                            <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                                <text id="steelers-prev-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                            </svg>
-                        </div>
-                        <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="steelers-prev-home-name">--</div>
-                    </div>
-                    <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
-                        <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
-                        <div id="steelers-prev-game-detail" class="text-sm md:text-lg text-gray-600">--</div>
-                    </div>
-                    <div class="text-center w-1/3 flex flex-col items-center">
-                         <div class="svg-score-container">
-                             <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                                <text id="steelers-prev-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                            </svg>
-                        </div>
-                        <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="steelers-prev-away-name">--</div>
-                    </div>
-                </div>
-                <div class="mt-8 text-center"><p id="steelers-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
-            </div>
-        </div>
-
-        <!-- SLIDE 3: PENGUINS -->
-        <div id="slide-penguins" class="slide-container bg-penguins">
-             <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
-                <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-800 pb-4">
-                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Penguins">
-                    <div class="overflow-hidden">
-                        <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-black text-white uppercase tracking-tighter truncate">Penguins</h2>
-                        <p id="pens-status-text" class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-[#CFC493] font-bold uppercase truncate">Loading...</p>
-                    </div>
-                </div>
-                <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden min-h-[40vh] flex flex-col justify-center">
-                     <div id="pens-live-badge" class="hidden absolute top-0 right-0 m-4 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse z-20">LIVE</div>
-                     <div class="flex items-center justify-between w-full">
-                        <div class="text-center w-1/3 flex flex-col items-center">
-                            <div class="svg-score-container">
-                                <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                                    <text id="pens-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                                </svg>
-                            </div>
-                            <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight w-full mb-1" id="pens-home-name">--</div>
-                            <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pens-home-record"></div>
-                        </div>
-                        <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
-                            <div id="pens-game-clock" class="text-[clamp(1.5rem,min(4vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
-                            <div id="pens-game-detail" class="text-sm md:text-xl text-gray-500">Loading...</div>
-                        </div>
-                        <div class="text-center w-1/3 flex flex-col items-center">
-                             <div class="svg-score-container">
-                                <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                                    <text id="pens-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                                </svg>
-                             </div>
-                            <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight w-full mb-1" id="pens-away-name">--</div>
-                            <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pens-away-record"></div>
-                        </div>
-                    </div>
-                </div>
-                 <div class="mt-8 text-center"><p id="pens-summary" class="text-lg md:text-3xl text-gray-300 italic">--</p></div>
-            </div>
-        </div>
-
-        <!-- SLIDE 3B: PENGUINS PREV -->
-        <div id="slide-penguins-prev" class="slide-container bg-penguins">
-            <div class="w-full max-w-7xl px-4 md:px-8 opacity-90 flex flex-col justify-center h-full">
-               <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-700 pb-4">
-                   <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] grayscale opacity-80" alt="Penguins">
-                   <div>
-                       <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-bold text-gray-300">Previous Game</h2>
-                       <p class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-gray-500 font-bold uppercase">Final Result</p>
-                   </div>
-               </div>
-               <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
-                   <div class="text-center w-1/3 flex flex-col items-center">
-                       <div class="svg-score-container">
-                           <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                               <text id="pens-prev-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                           </svg>
-                       </div>
-                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="pens-prev-home-name">--</div>
-                   </div>
-                   <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
-                       <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
-                       <div id="pens-prev-game-detail" class="text-sm md:text-lg text-gray-600">--</div>
-                   </div>
-                   <div class="text-center w-1/3 flex flex-col items-center">
-                        <div class="svg-score-container">
-                            <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                                <text id="pens-prev-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                            </svg>
-                        </div>
-                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="pens-prev-away-name">--</div>
-                   </div>
-               </div>
-                <div class="mt-8 text-center"><p id="pens-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
-           </div>
-       </div>
-
-       <!-- SLIDE 4: PIRATES -->
-       <div id="slide-pirates" class="slide-container bg-pirates">
-        <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
-           <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-800 pb-4">
-               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Pirates">
-               <div class="overflow-hidden">
-                   <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-black text-white uppercase tracking-tighter truncate">Pirates</h2>
-                   <p id="pirates-status-text" class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-[#FDB827] font-bold uppercase truncate">Loading...</p>
-               </div>
-           </div>
-           <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden min-h-[40vh] flex flex-col justify-center">
-                <div id="pirates-live-badge" class="hidden absolute top-0 right-0 m-4 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse z-20">LIVE</div>
-                <div class="flex items-center justify-between w-full">
-                    <div class="text-center w-1/3 flex flex-col items-center">
-                        <div class="svg-score-container">
-                            <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                                <text id="pirates-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                            </svg>
-                        </div>
-                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-home-name">--</div>
-                       <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pirates-home-record"></div>
-                   </div>
-                   <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
-                       <div id="pirates-game-clock" class="text-[clamp(1.5rem,min(4vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
-                       <div id="pirates-game-detail" class="text-lg md:text-xl text-gray-500">Loading...</div>
-                   </div>
-                   <div class="text-center w-1/3 flex flex-col items-center">
-                        <div class="svg-score-container">
-                            <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                                <text id="pirates-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                            </svg>
-                        </div>
-                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-away-name">--</div>
-                       <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pirates-away-record"></div>
-                   </div>
-               </div>
-           </div>
-            <div class="mt-8 text-center"><p id="pirates-summary" class="text-lg md:text-3xl text-gray-300 italic">--</p></div>
-       </div>
-   </div>
-
-   <!-- SLIDE 4B: PIRATES PREV -->
-   <div id="slide-pirates-prev" class="slide-container bg-pirates">
-       <div class="w-full max-w-7xl px-4 md:px-8 opacity-90 flex flex-col justify-center h-full">
-          <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-700 pb-4">
-              <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] grayscale opacity-80" alt="Pirates">
-              <div>
-                  <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-bold text-gray-300">Previous Game</h2>
-                  <p class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-gray-500 font-bold uppercase">Final Result</p>
-              </div>
+  return (
+    <div className="h-full w-full flex flex-col relative overflow-hidden text-white font-sans" style={containerStyle}>
+      
+      {/* HEADER */}
+      <div className="flex-none flex items-center gap-[2vw] p-[3vh] border-b border-gray-800 relative z-10">
+        <img src={team.logo} alt={team.name} className="h-[8vh] w-[8vh] object-contain drop-shadow-lg" />
+        <div className="flex flex-col justify-center">
+          <div className="flex items-center gap-[1vw]">
+             <h2 className="text-[6vh] font-black uppercase tracking-tighter leading-none text-white">{team.name}</h2>
+            {isLive && <span className="bg-red-600 text-white text-[1.5vh] font-bold px-[1vw] py-[0.2vh] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}
           </div>
-          <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
-              <div class="text-center w-1/3 flex flex-col items-center">
-                  <div class="svg-score-container">
-                      <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                          <text id="pirates-prev-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                      </svg>
-                  </div>
-                  <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-prev-home-name">--</div>
-              </div>
-              <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
-                  <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
-                  <div id="pirates-prev-game-detail" class="text-sm md:text-lg text-gray-600">--</div>
-              </div>
-              <div class="text-center w-1/3 flex flex-col items-center">
-                  <div class="svg-score-container">
-                      <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
-                          <text id="pirates-prev-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                      </svg>
-                  </div>
-                  <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-prev-away-name">--</div>
-              </div>
-          </div>
-           <div class="mt-8 text-center"><p id="pirates-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
+          <p className="text-[2vh] font-bold uppercase tracking-widest mt-[0.5vh]" style={{ color: team.color }}>
+            {isLive ? `${team.live.quarter}Q - ${team.live.time}` : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+          </p>
+        </div>
       </div>
-  </div>
 
-    </main>
+      {/* CONTENT */}
+      <div className="flex-1 min-h-0 flex flex-col justify-center p-[2vh] relative z-10 gap-[2vh]">
+        {isLive ? (
+          <>
+            {/* SCOREBOARD */}
+            <div className="flex-shrink-0 flex items-center justify-between bg-white/5 rounded-3xl p-[1vh] border border-white/5 backdrop-blur-md h-[30vh]">
+              <div className="flex-1 text-center h-full flex flex-col justify-center">
+                <div className="flex-1 w-full flex items-center justify-center max-h-[20vh] mb-[1vh]">
+                  <svg viewBox="0 0 100 60" className="w-full h-full overflow-visible">
+                    <text x="50" y="32" textAnchor="middle" dominantBaseline="central" className="font-black" 
+                          style={{ fill: team.color, fontSize: '50px', filter: `drop-shadow(0 0 10px ${team.color}66)` }}>
+                      {team.live.score.home}
+                    </text>
+                  </svg>
+                </div>
+                <div className="text-[2.5vh] font-bold text-gray-400 -mt-[1vh] leading-tight">{team.id}</div>
+                <div className="text-[1.5vh] text-gray-500 font-mono tracking-widest mt-[0.5vh]">9-7</div>
+              </div>
+              
+              <div className="w-[20%] text-center flex flex-col justify-center px-1">
+                 <div className="text-[4vh] font-bold text-gray-200 uppercase mb-[0.5vh] leading-none">VS</div>
+                 <div className="text-[1.5vh] text-gray-500 whitespace-nowrap">Week 18</div>
+              </div>
+              
+              <div className="flex-1 text-center h-full flex flex-col justify-center">
+                <div className="flex-1 w-full flex items-center justify-center max-h-[20vh] mb-[1vh]">
+                  <svg viewBox="0 0 100 60" className="w-full h-full overflow-visible">
+                     <text x="50" y="32" textAnchor="middle" dominantBaseline="central" className="font-black fill-white" 
+                           style={{ fontSize: '50px', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.4))' }}>
+                       {team.live.score.away}
+                     </text>
+                  </svg>
+                </div>
+                <div className="text-[2.5vh] font-bold text-gray-400 -mt-[1vh] leading-tight">{team.live.opponent}</div>
+                <div className="text-[1.5vh] text-gray-500 font-mono tracking-widest mt-[0.5vh]">12-4</div>
+              </div>
+            </div>
 
-    <!-- Progress Bar -->
-    <div id="progress" class="progress-bar"></div>
-
-    <script>
-        const CONFIG = {
-            defaultDuration: 5000, 
-            liveDuration: 30000, 
-            fallbackLocation: { lat: 40.9525, long: -76.4613, name: "Catawissa, PA" }, 
-            currentLocation: null
-        };
-        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-        const TWO_WEEKS_MS = 14 * ONE_DAY_MS;
-
-        let currentSlideIndex = 0;
-        let activeSlides = ['slide-weather', 'slide-forecast']; 
-        let liveGameActive = false;
-        
-        const API = {
-            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', id: '23', name: 'Steelers', fillClass: 'fill-steelers-win', leaguePath: 'football/nfl' },
-            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/16/schedule', id: '16', name: 'Penguins', fillClass: 'fill-penguins-win', leaguePath: 'hockey/nhl' },
-            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', id: '23', name: 'Pirates', fillClass: 'fill-pirates-win', leaguePath: 'baseball/mlb' }
-        };
-
-        function init() {
-            lucide.createIcons();
-            startClock();
-            startCarousel();
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        CONFIG.currentLocation = { lat: position.coords.latitude, long: position.coords.longitude, name: "Your Location" };
-                        fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${position.coords.latitude}&longitude=${position.coords.longitude}&localityLanguage=en`)
-                            .then(r=>r.json()).then(d=>{ if(d.city) CONFIG.currentLocation.name = d.city; document.getElementById('location-name').innerText = CONFIG.currentLocation.name; })
-                            .catch(()=>{});
-                        fetchWeather();
-                    },
-                    () => { CONFIG.currentLocation = CONFIG.fallbackLocation; fetchWeather(); }
-                );
-            } else {
-                CONFIG.currentLocation = CONFIG.fallbackLocation;
-                fetchWeather();
-            }
-            // INITIAL FETCH
-            fetchSportsData();
-            // POLL DATA EVERY 10 SECONDS INDEPENDENTLY
-            setInterval(fetchSportsData, 10000);
-        }
-
-        function startClock() {
-            const updateTime = () => {
-                const now = new Date();
-                let hours = now.getHours();
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12 || 12; 
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                document.getElementById('clock-time').innerText = `${hours}:${minutes} ${ampm}`;
-                document.getElementById('clock-date').innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            };
-            updateTime();
-            setInterval(updateTime, 1000);
-        }
-
-        async function fetchWeather() {
-            const loc = CONFIG.currentLocation || CONFIG.fallbackLocation;
-            document.getElementById('location-name').innerText = loc.name;
-            try {
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.long}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=4`);
-                const data = await res.json();
-                if(!data.current) return;
-
-                document.getElementById('weather-temp').innerText = Math.round(data.current.temperature_2m) + '°';
-                document.getElementById('weather-humidity').innerText = data.current.relative_humidity_2m + '%';
-                document.getElementById('weather-wind').innerText = Math.round(data.current.wind_speed_10m) + ' mph';
-                document.getElementById('weather-hl').innerText = `${Math.round(data.daily.temperature_2m_max[0])}° / ${Math.round(data.daily.temperature_2m_min[0])}°`;
-                const info = getWeatherDetails(data.current.weather_code);
-                document.getElementById('weather-desc').innerText = info.desc;
-                
-                const container = document.getElementById('weather-icon-container');
-                if(info.desc === 'Partly Cloudy') container.innerHTML = `<div class="icon-stack"><i data-lucide="sun" class="sun-layer"></i><i data-lucide="cloud" class="cloud-layer"></i></div>`;
-                else container.innerHTML = `<i data-lucide="${info.icon}" class="w-32 h-32 md:w-48 md:h-48 ${info.color}"></i>`;
-
-                for(let i=1; i<=3; i++) {
-                    const date = new Date(data.daily.time[i]);
-                    document.getElementById(`fc-day-${i}-name`).innerText = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' });
-                    document.getElementById(`fc-day-${i}-max`).innerText = Math.round(data.daily.temperature_2m_max[i]);
-                    document.getElementById(`fc-day-${i}-min`).innerText = Math.round(data.daily.temperature_2m_min[i]);
-                    const fInfo = getWeatherDetails(data.daily.weather_code[i]);
-                    const fcContainer = document.getElementById(`fc-day-${i}-icon`);
-                    if(fInfo.desc === 'Partly Cloudy') fcContainer.innerHTML = `<div class="icon-stack-small"><i data-lucide="sun" class="sun-layer"></i><i data-lucide="cloud" class="cloud-layer"></i></div>`;
-                    else fcContainer.innerHTML = `<i data-lucide="${fInfo.icon}" class="w-12 h-12 md:w-24 md:h-24 ${fInfo.color}"></i>`;
-                }
-                lucide.createIcons();
-            } catch (e) {}
-        }
-
-        function getWeatherDetails(code) {
-            if (code === 0) return { desc: 'Clear Sky', icon: 'sun', color: 'text-sun' };
-            if (code <= 3) return { desc: 'Partly Cloudy', icon: 'cloud-sun', color: 'text-sun' };
-            if (code <= 48) return { desc: 'Foggy', icon: 'cloud-fog', color: 'text-cloud' };
-            if (code <= 55) return { desc: 'Drizzle', icon: 'cloud-drizzle', color: 'text-rain' };
-            if (code <= 65) return { desc: 'Rain', icon: 'cloud-rain', color: 'text-rain' };
-            if (code <= 77) return { desc: 'Snow', icon: 'snowflake', color: 'text-snow' };
-            if (code >= 95) return { desc: 'Thunderstorm', icon: 'cloud-lightning', color: 'text-thunder' };
-            return { desc: 'Cloudy', icon: 'cloud', color: 'text-cloud' };
-        }
-
-        async function fetchSportsData() {
-            const validSlides = new Set(['slide-weather', 'slide-forecast']);
-            const liveSlides = new Set();
-            const register = (id, isLive) => { validSlides.add(id); if(isLive) liveSlides.add(id); };
-
-            await Promise.all([
-                processTeamData('steelers', API.NFL, 'slide-steelers', 'slide-steelers-prev', register),
-                processTeamData('pens', API.NHL, 'slide-penguins', 'slide-penguins-prev', register),
-                processTeamData('pirates', API.MLB, 'slide-pirates', 'slide-pirates-prev', register)
-            ]);
-
-            // Logic Switch: If there are ANY live slides, show ONLY those.
-            if(liveSlides.size > 0) {
-                // EXCLUSIVE LIVE MODE
-                const newActive = Array.from(liveSlides);
-                
-                // If the active set changed, reset index to ensure we don't overflow
-                if(JSON.stringify(newActive) !== JSON.stringify(activeSlides)) {
-                    activeSlides = newActive;
-                    currentSlideIndex = 0;
+            {/* FIELD VIZ */}
+            <div className="flex-1 min-h-0 bg-white/10 rounded-xl p-[1.5vh] border border-white/10 flex flex-col justify-end backdrop-blur-md">
+              <div className="flex justify-between items-end mb-[1vh] px-2 flex-shrink-0">
+                <div>
+                  <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                  <div className="text-[3vh] font-black text-white leading-none mt-[0.5vh]">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
+                </div>
+                <div className="text-right">
+                   <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
+                   <div className="text-[3vh] font-black leading-none mt-[0.5vh]" style={{ color: team.color }}>{team.live.yardLine > 50 ? `OPP ${100 - team.live.yardLine}` : `OWN ${team.live.yardLine}`}</div>
+                </div>
+              </div>
+              
+              {/* Field Rect */}
+              <div className="relative w-full rounded overflow-hidden flex flex-1 min-h-[8vh] max-h-[15vh]" style={fieldTurfStyle}>
+                <div className="w-[8%] h-full bg-black/40 border-r-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black -rotate-90 whitespace-nowrap absolute">HOME</span></div>
+                <div className="flex-1 relative h-full field-lines z-0">
+                    <div className="absolute bottom-[5%] w-full flex justify-between px-[10%] text-[1.5vh] font-bold text-white/80 font-courier transform -translate-x-[0%]">
+                      <span>10</span><span>20</span><span>30</span><span>40</span><span className="text-white">50</span><span>40</span><span>30</span><span>20</span><span>10</span>
+                    </div>
                     
-                    // Immediately hide others and show first live
-                    document.querySelectorAll('.slide-container').forEach(el => el.classList.remove('active'));
-                    const firstLive = document.getElementById(activeSlides[0]);
-                    if(firstLive) firstLive.classList.add('active');
-                } else {
-                     activeSlides = newActive;
-                }
-                liveGameActive = true;
-            } else {
-                // NORMAL MODE (Weather + Forecast + Upcoming/Post)
-                activeSlides = Array.from(validSlides);
-                liveGameActive = false;
-            }
-            
-            // Safety check for index
-            if(currentSlideIndex >= activeSlides.length) currentSlideIndex = 0;
-            
-            // If only 1 slide (e.g. 1 live game), hide progress bar
-            const progBar = document.getElementById('progress');
-            if(activeSlides.length <= 1) {
-                progBar.style.display = 'none';
-            } else {
-                progBar.style.display = 'block';
-            }
-        }
+                    {/* Drive Bar */}
+                    <div className="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" 
+                         style={{ 
+                           left: team.live.possession === 'home' ? 0 : 'auto',
+                           right: team.live.possession === 'home' ? 'auto' : 0,
+                           width: `${team.live.possession === 'home' ? team.live.yardLine : (100 - team.live.yardLine)}%`,
+                           flexDirection: team.live.possession === 'home' ? 'row' : 'row-reverse'
+                         }}>
+                       <div className="h-[60%] flex-grow rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] relative" 
+                            style={{ backgroundColor: team.live.possession === 'home' ? team.color : team.live.opponentColor }}>
+                          <div className="absolute top-1/2 -translate-y-1/2 text-black/60 w-[2vh] h-[2vh]"
+                               style={{ right: team.live.possession === 'home' ? 0 : 'auto', left: team.live.possession === 'home' ? 'auto' : 0 }}>
+                             {team.live.possession === 'home' 
+                               ? <ChevronRight className="w-full h-full stroke-[4]" /> 
+                               : <ChevronRight className="w-full h-full stroke-[4] rotate-180" /> 
+                             }
+                          </div>
+                       </div>
+                    </div>
+                </div>
+                <div className="w-[8%] h-full bg-black/40 border-l-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black rotate-90 whitespace-nowrap absolute">AWAY</span></div>
+              </div>
+              <div className="text-[1.8vh] text-gray-300 mt-[1vh] truncate font-medium px-1 flex-shrink-0 opacity-80">
+                <span className="opacity-50 text-[1.2vh] uppercase tracking-widest mr-2">Last Play</span>
+                {team.live.lastPlay}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="h-full flex flex-col justify-center gap-[4vh]">
+             <div className="bg-black/20 rounded-3xl p-[4vh] border border-white/10 backdrop-blur-sm">
+                <div className="text-[1.5vh] opacity-50 font-bold mb-[2vh] uppercase">Last Game</div>
+                <div className="flex justify-between items-end mb-[1vh]">
+                  <div className="text-[4vh] font-bold leading-none">{team.schedule.prev.opponent}</div>
+                  <div className={`text-[3vh] font-mono ${team.schedule.prev.result.startsWith('W') ? 'text-emerald-400' : 'text-red-400'}`}>
+                    {team.schedule.prev.result}
+                  </div>
+                </div>
+                <div className="text-[1.5vh] opacity-60 flex items-center gap-2">
+                  <Calendar size="1.5vh" /> {team.schedule.prev.date}
+                </div>
+             </div>
+             
+             <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
+                <div className="absolute top-0 right-0 p-[2vh] opacity-10"><Calendar size="10vh" /></div>
+                <div className="text-[1.5vh] text-emerald-400 font-bold mb-[2vh] uppercase">Upcoming</div>
+                <div className="text-[5vh] font-bold mb-[1vh] leading-none">vs {team.schedule.next.opponent}</div>
+                <div className="space-y-[0.5vh]">
+                  <div className="flex items-center gap-2 text-[2vh]">
+                    <Clock size="2vh" /> {team.schedule.next.time}
+                  </div>
+                  <div className="flex items-center gap-2 text-[1.5vh] opacity-70">
+                    <MapPin size="1.5vh" /> {team.schedule.next.location}
+                  </div>
+                </div>
+             </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
-        async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId, registerCallback) {
-            try {
-                const res = await fetch(`${apiConfig.url}?t=${Date.now()}&r=${Math.random()}`);
-                const data = await res.json();
-                const allEvents = data.events || [];
-                const targetName = apiConfig.name.toLowerCase(); 
-                
-                // --- ROBUST FILTERING ---
-                // Match primarily by ID, fall back to name check
-                const events = allEvents.filter(e => 
-                    e.competitions[0].competitors.some(c => 
-                        c.id === apiConfig.id || 
-                        (c.team.displayName || c.team.name || "").toLowerCase().includes(targetName)
-                    )
-                );
-                
-                if (events.length === 0) return; 
-                events.sort((a, b) => new Date(a.date) - new Date(b.date));
+/**
+ * COMPONENT: STOCK CARD
+ */
+const StockCard = ({ enabledStocks }) => {
+  const [stockData, setStockData] = useState([]);
 
-                const now = new Date();
-                let mainGame = null, prevGame = null, mainState = '';
-                let nextGameIndex = events.findIndex(e => new Date(e.date) > now);
+  useEffect(() => {
+    const updateStocks = () => {
+      const data = enabledStocks.map(ticker => {
+        const base = MOCK_STOCKS[ticker] || { price: 100, name: ticker };
+        const fluctuation = getFluctuation(base.price);
+        return { ticker, name: base.name, ...fluctuation };
+      });
+      setStockData(data);
+    };
+    updateStocks();
+    const interval = setInterval(updateStocks, 3000);
+    return () => clearInterval(interval);
+  }, [enabledStocks]);
 
-                if (nextGameIndex === -1) { prevGame = events[events.length - 1]; } 
-                else if (nextGameIndex === 0) { mainGame = events[0]; mainState = 'pre'; } 
-                else { prevGame = events[nextGameIndex - 1]; mainGame = events[nextGameIndex]; mainState = 'pre'; }
-                
-                if (prevGame && prevGame.competitions?.[0]?.status?.type?.state === 'in') {
-                    mainGame = prevGame; mainState = 'in';
-                    prevGame = (nextGameIndex > 1) ? events[nextGameIndex - 2] : null; 
-                    if(prefix === 'steelers') liveGameActive = true;
-                }
-                
-                if (mainGame) {
-                    const gameTime = new Date(mainGame.date);
-                    const hoursDiff = (now - gameTime) / 36e5;
-                    if (hoursDiff > -1 && hoursDiff < 6) { }
-                }
+  if (enabledStocks.length === 0) return null;
 
-                if (prevGame && (now - new Date(prevGame.date) > TWO_WEEKS_MS)) prevGame = null; 
-                if (mainGame && mainState === 'pre' && (new Date(mainGame.date) - now > TWO_WEEKS_MS)) mainGame = null; 
+  return (
+    <div className="h-full w-full flex flex-col justify-center p-[4vh] bg-slate-900 text-white font-sans">
+      <h2 className="text-[3.5vh] font-light mb-[3vh] flex items-center gap-[1vh] text-emerald-400"><TrendingUp className="w-[3.5vh] h-[3.5vh]" /> Market Watch</h2>
+      <div className="space-y-[1.5vh] flex-1 overflow-y-auto min-h-0">
+        {stockData.map((stock) => (
+          <div key={stock.ticker} className="flex items-center justify-between bg-white/5 p-[2vh] rounded-xl backdrop-blur-sm border border-white/10 shrink-0">
+            <div><div className="font-bold text-[2.5vh] tracking-wider">{stock.ticker}</div><div className="text-[1.5vh] text-slate-400">{stock.name}</div></div>
+            <div className="text-right">
+              <div className="text-[3vh] font-mono">${stock.price}</div>
+              <div className={`text-[1.5vh] flex items-center justify-end gap-1 ${parseFloat(stock.change) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                {parseFloat(stock.change) >= 0 ? <TrendingUp size="1.5vh" /> : <TrendingDown size="1.5vh" />}{stock.change > 0 ? '+' : ''}{stock.change} ({stock.percent}%)
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
-                // LIVE DATA FETCHING
-                if (mainGame && (mainState === 'in' || (new Date(mainGame.date).toDateString() === new Date().toDateString()))) {
-                    try {
-                        const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${apiConfig.leaguePath}/summary?event=${mainGame.id}&t=${Date.now()}&r=${Math.random()}`);
-                        const summaryData = await summaryRes.json();
-                        
-                        if(summaryData.header?.competitions?.[0]) {
-                            const freshComp = summaryData.header.competitions[0];
-                            mainGame.competitions[0].status = freshComp.status;
-                            if (freshComp.status.type.state === 'in') mainState = 'in';
-                            
-                            // Important: Score updates here
-                            mainGame.competitions[0].competitors = freshComp.competitors;
-                            
-                            if(freshComp.situation) {
-                                mainGame.competitions[0].situation = freshComp.situation;
-                            } else if (summaryData.drives?.current?.plays?.length > 0) {
-                                // Infer from drive if main situation is missing (e.g. timeout)
-                                const lastPlay = summaryData.drives.current.plays[summaryData.drives.current.plays.length-1];
-                                if(lastPlay.end) {
-                                    mainGame.competitions[0].situation = {
-                                        down: lastPlay.end.down,
-                                        distance: lastPlay.end.distance,
-                                        yardLine: lastPlay.end.yardLine,
-                                        possession: summaryData.drives.current.team.id
-                                    };
-                                }
-                            }
-                            
-                            if(summaryData.drives?.current?.plays) {
-                                mainGame.competitions[0].lastPlay = summaryData.drives.current.plays[summaryData.drives.current.plays.length-1];
-                            }
-                        }
-                    } catch(err) { console.log(err); }
-                }
+/**
+ * COMPONENT: WEATHER CARD
+ */
+const WeatherCard = ({ weatherData }) => {
+  const { temp, condition, wind, city, loading, error } = weatherData;
 
-                if (mainGame) { renderGame(prefix, mainGame, mainState, apiConfig.fillClass); registerCallback(mainSlideId, mainState === 'in'); }
-                if(prevGame) { renderGame(prefix + '-prev', prevGame, 'post', apiConfig.fillClass); registerCallback(prevSlideId, false); }
-            } catch (e) {
-                console.error("Error " + prefix, e);
-            }
-        }
+  const getWeatherIcon = (code) => {
+    const sizeClass = "w-[20vh] h-[20vh]";
+    if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} />;
+    if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} />;
+    if (code <= 3) return <div className="relative"><Sun className={`${sizeClass} text-yellow-400`} /><Cloud className="w-[15vh] h-[15vh] text-gray-200 absolute bottom-0 -right-4" /></div>;
+    if (code <= 48) return <Cloud className={`${sizeClass} text-gray-400`} />;
+    if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} />;
+    if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} />;
+    if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} />;
+    return <Cloud className={`${sizeClass} text-gray-400`} />;
+  };
 
-        // --- HELPER TO GET TEAM COLORS ---
-        const getTeamColor = (abbrev) => {
-            if(abbrev === 'PIT') return '#FFB612';
-            // NFL
-            if(abbrev === 'MIA') return '#008E97';
-            if(abbrev === 'BAL') return '#241773';
-            if(abbrev === 'CIN') return '#FB4F14';
-            if(abbrev === 'CLE') return '#FF3C00';
-            if(abbrev === 'KC') return '#E31837';
-            if(abbrev === 'BUF') return '#00338D';
-            if(abbrev === 'NE') return '#002244';
-            if(abbrev === 'NYJ') return '#125740';
-            if(abbrev === 'TEN') return '#4B92DB';
-            if(abbrev === 'IND') return '#002C5F';
-            if(abbrev === 'HOU') return '#03202F';
-            if(abbrev === 'JAX') return '#006778';
-            if(abbrev === 'LV') return '#A5ACAF';
-            if(abbrev === 'LAC') return '#0080C6';
-            if(abbrev === 'DEN') return '#FB4F14';
-            if(abbrev === 'DAL') return '#003594';
-            if(abbrev === 'PHI') return '#004C54';
-            if(abbrev === 'WAS') return '#5A1414';
-            if(abbrev === 'NYG') return '#0B2265';
-            if(abbrev === 'GB') return '#203731';
-            if(abbrev === 'MIN') return '#4F2683';
-            if(abbrev === 'DET') return '#0076B6';
-            if(abbrev === 'CHI') return '#C83803';
-            if(abbrev === 'TB') return '#D50A0A';
-            if(abbrev === 'NO') return '#D3BC8D';
-            if(abbrev === 'ATL') return '#a71930';
-            if(abbrev === 'CAR') return '#0085CA';
-            if(abbrev === 'SF') return '#AA0000';
-            if(abbrev === 'SEA') return '#69BE28';
-            if(abbrev === 'LAR') return '#003594';
-            if(abbrev === 'ARI') return '#97233F';
-            
-            // NHL
-            if(abbrev === 'WSH') return '#C8102E';
-            if(abbrev === 'PHI') return '#F74902';
-            if(abbrev === 'NYR') return '#0038A8';
-            if(abbrev === 'NYI') return '#F26924';
-            if(abbrev === 'NJD') return '#CE1126';
-            if(abbrev === 'CBJ') return '#002654';
-            if(abbrev === 'CAR') return '#CC0000';
-            
-            // MLB
-            if(abbrev === 'CIN') return '#C6011F';
-            if(abbrev === 'MIL') return '#12284B';
-            if(abbrev === 'CHC') return '#0E3386';
-            if(abbrev === 'STL') return '#C41E3A';
-            
-            return '#ffffff';
-        };
+  const getConditionText = (code) => {
+    if (code === 0) return "Clear Sky";
+    if (code <= 3) return "Partly Cloudy";
+    if (code <= 45) return "Foggy";
+    if (code <= 67) return "Rainy";
+    if (code <= 77) return "Snow";
+    if (code >= 95) return "Thunderstorms";
+    return "Cloudy";
+  };
 
-        function renderGame(elementPrefix, game, state, winFillClass) {
-            const comp = game.competitions?.[0];
-            if (!comp) return;
-            const home = comp.competitors.find(c => c.homeAway === 'home');
-            const away = comp.competitors.find(c => c.homeAway === 'away');
-            const status = comp.status;
+  if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+  if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
 
-            const setTxt = (id, txt) => { const el = document.getElementById(elementPrefix + '-' + id); if (el) el.textContent = txt || '--'; };
-            const getRec = (c) => (c.records && c.records[0] && c.records[0].summary) ? c.records[0].summary : ((c.record && c.record[0]) ? c.record[0].summary : "");
+  return (
+    <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-gradient-to-br from-blue-600 to-cyan-500 text-white relative overflow-hidden font-sans">
+      <div className="absolute top-[3vh] left-[3vw] flex items-center gap-[1vh] opacity-80"><MapPin className="w-[2.5vh] h-[2.5vh]" /><span className="text-[2.5vh] font-bold uppercase tracking-wider">{city}</span></div>
+      <div className="mb-[2vh]">{getWeatherIcon(condition)}</div>
+      <h1 className="text-[15vh] font-bold mb-[1vh] tracking-tighter leading-none">{Math.round(temp)}°</h1>
+      <p className="text-[3vh] font-light opacity-90">{getConditionText(condition)}</p>
+      <div className="mt-[4vh] grid grid-cols-2 gap-[5vh] text-center w-full max-w-[50vh] bg-white/20 p-[3vh] rounded-3xl backdrop-blur-md">
+        <div><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Wind</div><div className="font-bold text-[3vh]">{wind} mph</div></div>
+        <div><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Precip</div><div className="font-bold text-[3vh]">{condition > 50 ? 'High' : 'Low'}</div></div>
+      </div>
+    </div>
+  );
+};
 
-            setTxt('home-name', home.team.abbreviation); setTxt('away-name', away.team.abbreviation);
-            
-            // FIXED SCORE ACCESS
-            const getScore = (c) => (c.score && c.score.value) ? c.score.value : (c.score || '0');
-            setTxt('home-score', getScore(home)); 
-            setTxt('away-score', getScore(away));
-            
-            setTxt('home-record', getRec(home)); setTxt('away-record', getRec(away));
+/**
+ * COMPONENT: CLOCK CARD
+ */
+const ClockCard = ({ timezoneOffset }) => {
+  const [time, setTime] = useState(new Date());
 
-            const summary = document.getElementById(`${elementPrefix}-summary`);
-            const gameClock = document.getElementById(`${elementPrefix}-game-clock`);
-            const gameDetail = document.getElementById(`${elementPrefix}-game-detail`);
-            const liveBadge = document.getElementById(`${elementPrefix}-live-badge`); 
-            const liveBadgeHeader = document.getElementById(`${elementPrefix}-live-badge-header`);
-            const statusText = document.getElementById(`${elementPrefix}-status-text`);
-            const homePossIcon = document.getElementById(`${elementPrefix}-home-possession`);
-            const awayPossIcon = document.getElementById(`${elementPrefix}-away-possession`);
-            
-            // Get the new info block container (Steelers only)
-            const infoBlock = document.getElementById('steelers-info-block');
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      if (timezoneOffset !== null && timezoneOffset !== undefined) {
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const targetTime = new Date(utc + (1000 * timezoneOffset));
+        setTime(targetTime);
+      } else {
+        setTime(now);
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timezoneOffset]);
 
-            if (liveBadge) liveBadge.classList.add('hidden');
-            if (homePossIcon) homePossIcon.classList.add('hidden');
-            if (awayPossIcon) awayPossIcon.classList.add('hidden');
-            
-            // --- LIVE VISUALIZATION (NFL Only) ---
-            if(elementPrefix === 'steelers') {
-                const vizContainer = document.getElementById('steelers-live-viz');
-                if(state === 'in') {
-                    vizContainer.classList.remove('hidden');
-                    if(infoBlock) infoBlock.classList.remove('hidden');
-                    
-                    // HEADER LOGIC: Show LIVE badge, hide text
-                    if(liveBadgeHeader) liveBadgeHeader.classList.remove('hidden');
-                    if(statusText) statusText.classList.add('hidden');
+  const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
+  const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
+  const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
 
-                    const sit = comp.situation || {};
-                    
-                    // DOWN & DISTANCE
-                    let downDistText = "Drive Info Pending";
-                    if (sit.down > 0) {
-                        downDistText = `${sit.down}${getOrdinal(sit.down)} & ${sit.distance > 0 ? sit.distance : 'Goal'}`;
-                    } else if (comp.lastPlay?.text) {
-                        downDistText = "Last Play";
-                    }
-                    document.getElementById('steelers-down-dist').innerText = downDistText;
-                    
-                    // POSSESSION & DIRECTION
-                    let isAwayPossession = false;
-                    let isSteelersBall = false;
-                    let posTeamAbbrev = "";
+  return (
+    <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
+      <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
+      <div className="relative z-10 flex flex-col items-center">
+        <div className="text-[3vh] font-medium tracking-[0.2em] text-indigo-400 uppercase mb-[2vh] opacity-90">{formatDate(time)}</div>
+        <div className="flex items-baseline gap-[2vh] leading-none select-none">
+          <span className="text-[25vh] md:text-[35vh] font-bold tracking-tighter text-white drop-shadow-2xl">{formatTime(time)}</span>
+          <span className="text-[6vh] font-light text-slate-500 uppercase">{getAmPm(time)}</span>
+        </div>
+        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vh] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
+           <div className="w-[1vh] h-[1vh] rounded-full bg-green-500 animate-pulse" />
+           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-                    const possID = sit.possession ? String(sit.possession) : null;
-                    if(possID) {
-                        if(possID === String(home.id)) {
-                            isSteelersBall = (home.team.abbreviation === 'PIT');
-                            posTeamAbbrev = home.team.abbreviation;
-                            if (homePossIcon) homePossIcon.classList.remove('hidden');
-                        } else if(possID === String(away.id)) {
-                            isSteelersBall = (away.team.abbreviation === 'PIT');
-                            isAwayPossession = true;
-                            posTeamAbbrev = away.team.abbreviation;
-                            if (awayPossIcon) awayPossIcon.classList.remove('hidden');
-                        }
-                    }
-                    
-                    // ENDZONE & BALL ON LOGIC
-                    const ezLeft = document.getElementById('ez-text-left');
-                    const ezRight = document.getElementById('ez-text-right');
-                    
-                    if(ezLeft) {
-                        ezLeft.innerText = home.team.abbreviation;
-                        ezLeft.style.color = getTeamColor(home.team.abbreviation);
-                        ezLeft.style.opacity = '1';
-                    }
-                    if(ezRight) {
-                        ezRight.innerText = away.team.abbreviation;
-                        ezRight.style.color = getTeamColor(away.team.abbreviation);
-                        ezRight.style.opacity = '1';
-                    }
+/**
+ * MAIN APP COMPONENT
+ */
+export default function App() {
+  const [userStocks, setUserStocks] = useState([]);
+  const [showStockCard, setShowStockCard] = useState(false);
+  const [nflTeam, setNflTeam] = useState(null);
+  const [zipCode, setZipCode] = useState('10001'); 
+  const [tempZip, setTempZip] = useState('10001');
+  const [weatherData, setWeatherData] = useState({ 
+    temp: 72, condition: 0, wind: 5, city: 'New York', timezoneOffset: -14400, loading: false, error: false 
+  });
 
-                    // BALL ON
-                    let yardText = "--";
-                    let absoluteYardLine = 50; 
-                    let ballOnColor = '#ffffff';
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [newTicker, setNewTicker] = useState("");
 
-                    if(sit.yardLine != null) {
-                        absoluteYardLine = Number(sit.yardLine);
-                        if(isNaN(absoluteYardLine)) absoluteYardLine = 50;
-                        if(absoluteYardLine < 0) absoluteYardLine = 0; 
-                        if(absoluteYardLine > 100) absoluteYardLine = 100;
-                        
-                        let labelTeam = "";
-                        let labelLine = 0;
-                        
-                        if (absoluteYardLine === 50) {
-                            yardText = "MIDFIELD";
-                            ballOnColor = "#ffffff";
-                        } else {
-                            if (isAwayPossession) {
-                                if (absoluteYardLine > 50) {
-                                    labelTeam = away.team.abbreviation; // Own
-                                    labelLine = 100 - absoluteYardLine;
-                                } else {
-                                    labelTeam = home.team.abbreviation; // Opp
-                                    labelLine = absoluteYardLine;
-                                }
-                            } else {
-                                if (absoluteYardLine < 50) {
-                                    labelTeam = home.team.abbreviation; // Own
-                                    labelLine = absoluteYardLine;
-                                } else {
-                                    labelTeam = away.team.abbreviation; // Opp
-                                    labelLine = 100 - absoluteYardLine;
-                                }
-                            }
-                            yardText = `${labelTeam} ${labelLine}`;
-                            ballOnColor = getTeamColor(labelTeam);
-                        }
-                        
-                        const ballOnEl = document.getElementById('steelers-ball-on');
-                        ballOnEl.innerText = yardText;
-                        ballOnEl.style.color = ballOnColor;
-                        
-                    } else if (sit.downDistanceText) {
-                        const parts = sit.downDistanceText.split(' at ');
-                        if (parts.length > 1) {
-                            yardText = parts[1];
-                            const ballOnEl = document.getElementById('steelers-ball-on');
-                            ballOnEl.innerText = yardText;
-                            const possibleTeam = yardText.split(' ')[0];
-                            if(possibleTeam && possibleTeam.length <= 3) {
-                                ballOnEl.style.color = getTeamColor(possibleTeam);
-                            }
-                        } else {
-                            document.getElementById('steelers-ball-on').innerText = "--";
-                        }
-                    } else {
-                         document.getElementById('steelers-ball-on').innerText = "--";
-                    }
-                    
-                    // BAR RENDER
-                    const container = document.getElementById('steelers-drive-container');
-                    const arrowIcon = document.getElementById('steelers-drive-arrow');
-                    
-                    container.classList.remove('left-0', 'right-0', 'flex-row-reverse');
-                    arrowIcon.innerHTML = ''; 
+  useEffect(() => {
+    const fetchData = async () => {
+      if(zipCode.length < 5) return;
+      setWeatherData(prev => ({ ...prev, loading: true, error: false }));
+      try {
+        const zipRes = await fetch(`https://api.zippopotam.us/us/${zipCode}`);
+        if (!zipRes.ok) throw new Error("Invalid ZIP");
+        const zipData = await zipRes.json();
+        const { latitude, longitude, "place name": city, state } = zipData.places[0];
+        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&temperature_unit=fahrenheit&windspeed_unit=mph&timezone=auto`);
+        const wData = await weatherRes.json();
+        setWeatherData({
+          temp: wData.current_weather.temperature,
+          condition: wData.current_weather.weathercode,
+          wind: wData.current_weather.windspeed,
+          city: `${city}, ${state}`,
+          timezoneOffset: wData.utc_offset_seconds,
+          loading: false,
+          error: false
+        });
+      } catch (err) {
+        console.error(err);
+        setWeatherData(prev => ({ ...prev, loading: false, error: true }));
+      }
+    };
+    fetchData();
+  }, [zipCode]);
 
-                    if (isAwayPossession) {
-                        const barLength = 100 - absoluteYardLine;
-                        container.style.width = `${barLength}%`;
-                        container.classList.add('right-0', 'flex-row-reverse');
-                        arrowIcon.classList.remove('right-0');
-                        arrowIcon.classList.add('left-0');
-                        arrowIcon.innerHTML = `<i data-lucide="chevron-left" class="w-full h-full text-black/60 stroke-[4]"></i>`;
-                    } else {
-                        const barLength = absoluteYardLine;
-                        container.style.width = `${barLength}%`;
-                        container.classList.add('left-0');
-                        arrowIcon.classList.remove('left-0');
-                        arrowIcon.classList.add('right-0');
-                        arrowIcon.innerHTML = `<i data-lucide="chevron-right" class="w-full h-full text-black/60 stroke-[4]"></i>`;
-                    }
-                    
-                    const teamColor = isSteelersBall ? '#FFB612' : getTeamColor(posTeamAbbrev);
-                    const bar = document.getElementById('steelers-drive-bar');
-                    bar.style.backgroundColor = teamColor;
-                    
-                    lucide.createIcons();
-                    
-                } else {
-                    vizContainer.classList.add('hidden');
-                    if(infoBlock) infoBlock.classList.add('hidden');
-                    if(liveBadgeHeader) liveBadgeHeader.classList.add('hidden');
-                    if(statusText) statusText.classList.remove('hidden');
-                }
-            } else {
-                if(liveBadgeHeader) liveBadgeHeader.classList.add('hidden');
-                if(statusText) statusText.classList.remove('hidden');
-                if(state === 'in' && liveBadge) liveBadge.classList.remove('hidden'); 
-            }
+  const allCards = [
+    { id: 'weather', component: <WeatherCard weatherData={weatherData} />, enabled: true },
+    { id: 'clock', component: <ClockCard timezoneOffset={weatherData.timezoneOffset} />, enabled: true },
+    { id: 'stocks', component: <StockCard enabledStocks={userStocks} />, enabled: showStockCard && userStocks.length > 0 },
+    { id: 'nfl', component: <NFLCard teamId={nflTeam} />, enabled: !!nflTeam }
+  ];
 
-            // Scores Color Logic (SVG Fill)
-            const hScore = parseInt(getScore(home));
-            const aScore = parseInt(getScore(away));
-            const hScoreEl = document.getElementById(`${elementPrefix}-home-score`);
-            const aScoreEl = document.getElementById(`${elementPrefix}-away-score`);
-            
-            const baseSvgClass = "font-black leading-none";
-            
-            // DYNAMIC COLOR OVERRIDE
-            if (elementPrefix === 'steelers' || elementPrefix === 'steelers-prev') {
-                 // Reset classes first
-                 hScoreEl.setAttribute('class', baseSvgClass);
-                 aScoreEl.setAttribute('class', baseSvgClass);
-                 
-                 const homeColor = getTeamColor(home.team.abbreviation);
-                 const awayColor = getTeamColor(away.team.abbreviation);
-                 
-                 hScoreEl.style.fill = homeColor;
-                 aScoreEl.style.fill = awayColor;
-                 
-                 // Add dropshadow filter for readability
-                 hScoreEl.style.filter = `drop-shadow(0 0 10px ${homeColor}66)`;
-                 aScoreEl.style.filter = `drop-shadow(0 0 10px ${awayColor}66)`;
-                 
-            } else {
-                // Fallback for other sports (using win logic)
-                hScoreEl.setAttribute('class', `${baseSvgClass} fill-white`);
-                aScoreEl.setAttribute('class', `${baseSvgClass} fill-white`);
-                hScoreEl.style.fill = ''; aScoreEl.style.fill = ''; // Clear inline styles
-                
-                if (state === 'post' || (state === 'in' && (hScore > 0 || aScore > 0))) {
-                    if (hScore > aScore) {
-                        hScoreEl.setAttribute('class', `${baseSvgClass} ${winFillClass}`);
-                        aScoreEl.setAttribute('class', `${baseSvgClass} fill-gray`);
-                    } else if (aScore > hScore) {
-                        aScoreEl.setAttribute('class', `${baseSvgClass} ${winFillClass}`);
-                        hScoreEl.setAttribute('class', `${baseSvgClass} fill-gray`);
-                    }
-                }
-            }
+  const activeCards = allCards.filter(card => card.enabled);
 
-            if (state === 'in') {
-                if(status.displayClock) gameClock.innerText = status.displayClock;
-                else gameClock.innerText = "LIVE";
-                
-                if (elementPrefix !== 'steelers' && liveBadge) liveBadge.classList.remove('hidden');
-                
-                if (gameDetail) {
-                    if (status.type?.state === 'in' && status.period === 0) gameDetail.innerText = "Pregame";
-                    else if (status.type?.description === 'Halftime') gameDetail.innerText = "Halftime";
-                    else gameDetail.innerText = `Q${status.period}`;
-                }
-                
-                if (summary) {
-                    if (comp.lastPlay && comp.lastPlay.text) summary.innerText = comp.lastPlay.text;
-                    else summary.innerText = game.name || "Live Game";
-                }
-            } else if (state === 'post') {
-                if(gameClock) gameClock.innerText = "FINAL"; 
-                if (gameDetail) gameDetail.innerText = new Date(game.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                if (summary) summary.innerText = `${game.shortName || 'Game'} - ${hScore > aScore ? home.team.displayName : away.team.displayName} wins.`;
-                if(statusText) statusText.innerText = "Final Result"; 
-            } else {
-                const isToday = new Date().toDateString() === new Date(game.date).toDateString();
-                if (gameClock) gameClock.innerText = isToday ? "TODAY" : new Date(game.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                if (gameDetail) gameDetail.innerText = new Date(game.date).toLocaleTimeString('en-US', { hour: 'numeric', minute:'2-digit' });
-                if (summary) summary.innerText = `Upcoming at ${comp.venue?.fullName || 'Stadium'}`;
-                if(statusText) statusText.innerText = "Upcoming Game"; 
-            }
-        }
-        
-        function getOrdinal(n) { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; }
+  useEffect(() => {
+    if (activeCards.length === 0) return;
+    if (currentSlideIndex >= activeCards.length) { setCurrentSlideIndex(0); return; }
+    if (activeCards.length <= 1 || isPaused || isSettingsOpen) return;
+    const interval = setInterval(() => {
+      setCurrentSlideIndex((prev) => (prev + 1) % activeCards.length);
+    }, 6000); 
+    return () => clearInterval(interval);
+  }, [activeCards.length, isPaused, isSettingsOpen, currentSlideIndex]);
 
-        function startCarousel() {
-            let startTime = Date.now();
-            function updateProgress() {
-                if (activeSlides.length <= 1) {
-                    requestAnimationFrame(updateProgress);
-                    return;
-                }
+  const safeIndex = currentSlideIndex >= activeCards.length ? 0 : currentSlideIndex;
 
-                const currentId = activeSlides[currentSlideIndex];
-                let duration = CONFIG.defaultDuration;
-                if(currentId === 'slide-steelers' && liveGameActive) duration = CONFIG.liveDuration;
-                
-                const elapsed = Date.now() - startTime;
-                const pct = Math.min((elapsed / duration) * 100, 100);
-                document.getElementById('progress').style.width = `${pct}%`;
-                
-                if (elapsed >= duration) {
-                    if (activeSlides.length > 0) {
-                        const currentEl = document.getElementById(activeSlides[currentSlideIndex]);
-                        if(currentEl) currentEl.classList.remove('active');
-                    }
-                    currentSlideIndex = (currentSlideIndex + 1) % activeSlides.length;
-                    if (activeSlides.length > 0) {
-                        const nextEl = document.getElementById(activeSlides[currentSlideIndex]);
-                        if(nextEl) nextEl.classList.add('active');
-                    }
-                    startTime = Date.now();
-                    if (currentSlideIndex === 0 && !liveGameActive) { fetchWeather(); } 
-                }
-                requestAnimationFrame(updateProgress);
-            }
-            updateProgress();
-        }
+  const handleAddStock = () => { if (!newTicker) return; const tick = newTicker.toUpperCase(); if (!userStocks.includes(tick)) { setUserStocks([...userStocks, tick]); if (!showStockCard) setShowStockCard(true); } setNewTicker(""); };
+  const removeStock = (tick) => { const updated = userStocks.filter(t => t !== tick); setUserStocks(updated); if (updated.length === 0) setShowStockCard(false); };
+  const toggleStockModule = () => { setShowStockCard(!showStockCard); };
+  const saveZip = () => { setZipCode(tempZip); };
+  const closeSettings = () => { saveZip(); setIsSettingsOpen(false); };
 
-        window.onload = init;
-    </script>
-</body>
-</html>
+  return (
+    <div className="w-full h-screen bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white">
+      <GlobalStyles />
+      <div className="w-full h-full relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
+        {activeCards.length > 0 ? (
+          activeCards.map((card, index) => (
+            <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === safeIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
+              {card.component}
+            </div>
+          ))
+        ) : (
+          <div className="flex items-center justify-center h-full"><p>No active slides. Open settings to configure.</p></div>
+        )}
+        <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-3">
+          {activeCards.map((_, idx) => (
+            <button key={idx} onClick={() => setCurrentSlideIndex(idx)} className={`h-1 rounded-full transition-all duration-300 ${idx === safeIndex ? 'w-8 bg-white' : 'w-2 bg-white/30'}`} />
+          ))}
+        </div>
+      </div>
+      <button onClick={() => setIsSettingsOpen(true)} className="absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors border border-white/10 group"><Settings className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-500" /></button>
+      {isSettingsOpen && (
+        <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900 z-10 shrink-0"><h2 className="text-xl font-bold text-white">Dashboard Settings</h2><button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
+            <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar">
+              <div className="space-y-3"><div className="flex items-center gap-2 text-white border-b border-slate-700 pb-2"><MapPin size={20} className="text-blue-400" /><h3 className="font-bold">Location & Time</h3></div><div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><label className="block text-sm text-slate-400 mb-2">ZIP Code (US)</label><div className="flex gap-2"><input type="text" value={tempZip} onChange={(e) => setTempZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white outline-none focus:border-blue-500" placeholder="e.g. 10001" maxLength={5} /><button onClick={saveZip} className="bg-blue-600 hover:bg-blue-500 text-white px-4 rounded-lg font-medium text-sm">Set</button></div><p className="text-xs text-slate-500 mt-2">Sets local weather and adjusts the clock automatically.</p></div></div>
+              <div className="space-y-3"><div className="flex items-center gap-2 text-white border-b border-slate-700 pb-2"><Trophy size={20} className="text-yellow-500" /><h3 className="font-bold">NFL Ticker</h3></div><div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><label className="block text-sm text-slate-400 mb-2">Select Active Team</label><div className="relative"><select value={nflTeam || ''} onChange={(e) => setNflTeam(e.target.value || null)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-indigo-500 outline-none"><option value="">-- No Team Selected --</option>{NFL_TEAMS.map(t => (<option key={t.id} value={t.id}>{t.city} {t.name}</option>))}</select><ChevronRight className="absolute right-3 top-3.5 text-slate-500 rotate-90 pointer-events-none" size={16} /></div><p className="text-xs text-slate-500 mt-2">Select a team to add their card. (Note: Only 'Steelers' shows LIVE demo data).</p></div></div>
+              <div className="space-y-3"><div className="flex items-center justify-between border-b border-slate-700 pb-2"><div className="flex items-center gap-2 text-white"><TrendingUp size={20} className="text-emerald-500" /><h3 className="font-bold">Stocks</h3></div><button onClick={toggleStockModule} className={`w-10 h-5 rounded-full transition-colors relative ${showStockCard ? 'bg-emerald-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${showStockCard ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>{showStockCard && (<div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><div className="flex flex-wrap gap-2 mb-4">{userStocks.map(tick => (<span key={tick} className="bg-emerald-900/30 border border-emerald-500/30 text-emerald-200 px-2 py-1 rounded text-xs flex items-center gap-2">{tick}<button onClick={() => removeStock(tick)} className="hover:text-white"><X size={12} /></button></span>))}</div><div className="flex gap-2"><input type="text" value={newTicker} onChange={(e) => setNewTicker(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddStock()} placeholder="SYMBOL" className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-emerald-500 uppercase" /><button onClick={handleAddStock} className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg"><Plus size={16} /></button></div></div>)}</div>
+            </div>
+            <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0"><button onClick={closeSettings} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]"><Check size={20} /> Done</button></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
