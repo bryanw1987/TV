@@ -620,7 +620,7 @@
                     <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
                     <div className="relative z-10 flex flex-col items-center">
                         <div className="text-[3vh] font-medium tracking-[0.2em] text-indigo-400 uppercase mb-[2vh] opacity-90">{formatDate(time)}</div>
-                        <div className="flex items-baseline gap-[2vh] leading-none select-none"><span className="text-[25vh] md:text-[35vh] font-bold tracking-tighter text-white drop-shadow-2xl">{formatTime(time)}</span><span className="text-[6vh] font-light text-slate-500 uppercase">{getAmPm(time)}</span></div>
+                        <div className="flex items-baseline gap-[2vh] leading-none select-none"><span className="text-[25vmin] font-bold tracking-tighter text-white drop-shadow-2xl">{formatTime(time)}</span><span className="text-[6vh] font-light text-slate-500 uppercase">{getAmPm(time)}</span></div>
                         <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vh] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
                            <div className="w-[1vh] h-[1vh] rounded-full bg-green-500 animate-pulse" />
                            {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
@@ -799,6 +799,21 @@
             }, [mlbTeamsSelected]);
 
             const allCards = useMemo(() => {
+                // Determine if ANY game is LIVE
+                const liveNfl = nflTeamsSelected.filter(id => nflData[id]?.status === 'LIVE');
+                const liveNhl = nhlTeamsSelected.filter(id => nhlData[id]?.status === 'LIVE');
+                const liveMlb = mlbTeamsSelected.filter(id => mlbData[id]?.status === 'LIVE');
+                
+                // If there are any live games, override the rotation to ONLY show those live games
+                if (liveNfl.length > 0 || liveNhl.length > 0 || liveMlb.length > 0) {
+                    const liveCards = [];
+                    liveNfl.forEach(id => liveCards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }));
+                    liveNhl.forEach(id => liveCards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }));
+                    liveMlb.forEach(id => liveCards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }));
+                    return liveCards;
+                }
+
+                // Otherwise, show standard rotation
                 const cards = [
                     { id: 'weather', component: <WeatherCard weatherData={weatherData} /> },
                     { id: 'clock', component: <ClockCard timezoneOffset={weatherData.timezoneOffset} /> }
