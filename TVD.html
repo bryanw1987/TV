@@ -307,12 +307,14 @@
                                         <div className="flex flex-col items-center w-[40%]">
                                             <img src={team.logo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" />
                                             <div className="text-[3vh] font-bold text-gray-400">{team.id}</div>
+                                            <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.record}</div>
                                             <div className="text-[8vh] font-black leading-none" style={{ textShadow: `0 0 10px ${team.color}` }}>{team.live.score.myScore}</div>
                                         </div>
                                         <div className="text-[4vh] font-bold text-gray-400">VS</div>
                                         <div className="flex flex-col items-center w-[40%]">
                                              {team.live.opponentLogo ? <img src={team.live.opponentLogo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" /> : <div className="h-[8vh] w-[8vh] bg-white/10 rounded-full flex items-center justify-center text-[3vh] font-bold">{team.live.opponent}</div>}
                                             <div className="text-[3vh] font-bold text-gray-400">{team.live.opponent}</div>
+                                            {team.live.opponentRecord && <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.live.opponentRecord}</div>}
                                             <div className="text-[8vh] font-black leading-none text-white">{team.live.score.oppScore}</div>
                                         </div>
                                     </div>
@@ -343,10 +345,15 @@
                                                 <span>10</span><span>20</span><span>30</span><span>40</span><span className="text-white">50</span><span>40</span><span>30</span><span>20</span><span>10</span>
                                             </div>
                                             <div className="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style={{ left: team.live.possession === 'myTeam' ? 0 : 'auto', right: team.live.possession === 'myTeam' ? 'auto' : 0, width: `${team.live.possession === 'myTeam' ? team.live.yardLine : (100 - team.live.yardLine)}%`, flexDirection: team.live.possession === 'myTeam' ? 'row' : 'row-reverse' }}>
-                                               <div className="h-[60%] flex-grow rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] relative" style={{ backgroundColor: team.live.possession === 'myTeam' ? team.color : (team.live.opponentColor || '#fff') }}>
-                                                  <div className="absolute top-1/2 -translate-y-1/2 text-black/60 w-[2vh] h-[2vh]" style={{ right: team.live.possession === 'myTeam' ? 0 : 'auto', left: team.live.possession === 'myTeam' ? 'auto' : 0 }}>
-                                                     {team.live.possession === 'myTeam' ? <ChevronRight className="w-full h-full stroke-[4]" /> : <ChevronRight className="w-full h-full stroke-[4] rotate-180" /> }
-                                                  </div>
+                                               <div className="h-[60%] flex-grow rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] relative flex items-center overflow-visible" style={{ backgroundColor: team.live.possession === 'myTeam' ? team.color : (team.live.opponentColor || '#fff') }}>
+                                                    {/* Possession Logo on the Drive Line */}
+                                                    <div className="absolute h-[160%] w-auto aspect-square z-20" style={{ right: team.live.possession === 'myTeam' ? '-1vh' : 'auto', left: team.live.possession === 'myTeam' ? 'auto' : '-1vh', top: '50%', transform: 'translateY(-50%)' }}>
+                                                        <img 
+                                                            src={team.live.possession === 'myTeam' ? team.logo : (team.live.opponentLogo || 'https://via.placeholder.com/50')} 
+                                                            className="w-full h-full object-contain drop-shadow-md"
+                                                            alt="possession"
+                                                        />
+                                                    </div>
                                                </div>
                                             </div>
                                         </div>
@@ -447,22 +454,24 @@
                     <div className="flex-1 min-h-0 flex flex-col justify-center p-[2vh] relative z-10 gap-[2vh]">
                         {isLive ? (
                             <div className="flex-1 flex flex-col justify-center items-center">
-                                <div className="flex items-center justify-center w-full gap-[4vh]">
-                                    <div className="text-center flex flex-col items-center">
-                                        <div className="flex items-center gap-[2vh] mb-[1vh]">
-                                             <img src={team.logo} className="h-[14vh] w-[14vh] object-contain" />
-                                             <div className="text-[18vh] font-black leading-none" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
-                                        </div>
+                                {/* Updated Live Score Container for better alignment */}
+                                <div className="flex items-center justify-center w-full gap-[2vw]">
+                                    {/* Left Team */}
+                                    <div className="flex flex-1 items-center justify-end gap-[2vh]">
+                                         <img src={team.logo} className="h-[12vmin] w-[12vmin] object-contain" />
+                                         <div className="text-[20vmin] font-black leading-none text-right tabular-nums" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
                                     </div>
-                                    <div className="text-[4vh] font-black text-gray-600">-</div>
-                                    <div className="text-center flex flex-col items-center">
-                                         <div className="flex items-center gap-[2vh] mb-[1vh]">
-                                             <div className="text-[18vh] font-black leading-none text-white">{team.live.score.oppScore}</div>
-                                             {team.live.opponentLogo && <img src={team.live.opponentLogo} className="h-[14vh] w-[14vh] object-contain" />}
-                                        </div>
-                                        <div className="text-[3vh] font-bold text-gray-400">{team.live.opponent}</div>
+                                    
+                                    {/* Divider */}
+                                    <div className="text-[4vh] font-black text-gray-600 px-[2vh]">-</div>
+                                    
+                                    {/* Right Team */}
+                                    <div className="flex flex-1 items-center justify-start gap-[2vh]">
+                                         <div className="text-[20vmin] font-black leading-none text-white text-left tabular-nums">{team.live.score.oppScore}</div>
+                                         {team.live.opponentLogo && <img src={team.live.opponentLogo} className="h-[12vmin] w-[12vmin] object-contain" />}
                                     </div>
                                 </div>
+                                <div className="mt-[2vh] text-[3vh] font-bold text-gray-400">{team.id} vs {team.live.opponent}</div>
                                 <div className="mt-[4vh] text-[3vh] font-mono bg-white/10 px-[3vh] py-[1vh] rounded-full backdrop-blur-md">{team.live.time} - Period {team.live.period}</div>
                             </div>
                         ) : (
@@ -562,14 +571,11 @@
             // Inning Scoreboard (Line Score)
             const InningScoreboard = ({ team1, team2, scores }) => {
                 const innings = scores || Array(9).fill({ score1: 0, score2: 0 });
-                // Assuming standard: Top (Away) first, Bottom (Home) second
-                // But request says: "Home team always on bottom"
-                // And selected team on left in main summary, but here it's top/bottom rows.
-                // We'll map Team 1 = Away, Team 2 = Home based on MLB rules for line score
+                // Team 1 = Away, Team 2 = Home
                 
                 return (
                     <div className="w-full overflow-x-auto no-scrollbar pb-2">
-                         <div className="grid grid-rows-3 gap-y-2 text-center min-w-[40vh]">
+                          <div className="grid grid-rows-3 gap-y-2 text-center min-w-[40vh]">
                             {/* Header Row */}
                             <div className="grid grid-flow-col auto-cols-fr gap-x-2 border-b border-white/10 pb-2">
                                 <div className="w-16 font-bold text-gray-400 text-left pl-2">TEAM</div>
@@ -592,7 +598,7 @@
                                 {innings.map((inn, i) => <div key={i} className="w-8 font-mono text-gray-300">{inn.score2 !== undefined ? inn.score2 : '-'}</div>)}
                                 <div className="w-10 font-bold text-yellow-400 border-l border-white/10">{team2.total}</div>
                             </div>
-                         </div>
+                          </div>
                     </div>
                 );
             };
@@ -608,7 +614,8 @@
                                 {isLive && <span className="bg-red-600 text-white text-[1.5vh] font-bold px-[1vw] py-[0.2vh] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider ml-[1vw]">LIVE</span>}
                             </div>
                             <p className="text-[2vh] font-bold uppercase tracking-widest mt-[0.5vh]" style={{ color: team.color }}>
-                                {isLive ? `${team.live.inningState} ${team.live.inning}` : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+                                {/* Fixed Inning Display */}
+                                {isLive ? team.live.inningState : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
                             </p>
                         </div>
                     </div>
@@ -718,10 +725,7 @@
                 </div>
             );
         };
-        // ... (Remaining components unchanged: WeatherCard, ForecastCard, ClockCard, TeamSelector, ZipSelector, App)
-        // Ensure App, ZipSelector, TeamSelector etc are included below this as per previous file structure.
         
-        // (Re-adding the rest of the file for completeness)
         const WeatherCard = ({ weatherData }) => {
             const { temp, condition, wind, city, loading, error, daily } = weatherData;
             const getConditionText = (code) => {
@@ -1075,7 +1079,6 @@
                             const myTeam = comp.competitors.find(c => c.team.abbreviation === teamId);
                             const oppTeam = comp.competitors.find(c => c.team.abbreviation !== teamId);
 
-                            // Find Opponent Logo in Live Game data (Mock doesn't have it, but real API does)
                             let oppLogo = null;
                             if (oppTeam.team.logos && oppTeam.team.logos.length > 0) {
                                 oppLogo = oppTeam.team.logos[0].href;
@@ -1092,10 +1095,14 @@
                                     if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${t.id.toLowerCase()}.png`;
                                 }
                             }
+
+                            // Fetch Live Opponent Record if possible
+                            const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id, oppTeam.team.abbreviation);
                             
                             const liveBase = {
                                 opponent: oppTeam.team.abbreviation,
                                 opponentLogo: oppLogo,
+                                opponentRecord: liveOppRecord,
                                 score: { myScore: myTeam.score, oppScore: oppTeam.score },
                                 time: comp.status.displayClock
                             };
@@ -1115,7 +1122,7 @@
                                 const sit = liveGame.situation || {};
                                 mapped.live = { ...liveBase, 
                                     inning: comp.status.period,
-                                    inningState: comp.status.type.detail,
+                                    inningState: comp.status.type.detail || `Inn ${comp.status.period}`, // Ensures we use the text like "Bot 7th"
                                     balls: sit.balls || 0, 
                                     strikes: sit.strikes || 0, 
                                     outs: sit.outs || 0, 
@@ -1132,11 +1139,11 @@
             // Batched Loading to prevent freezing
             useEffect(() => {
                 const loadAll = async () => {
-                     const promises = [];
-                     nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
-                     nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
-                     mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
-                     await Promise.all(promises);
+                      const promises = [];
+                      nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
+                      nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
+                      mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
+                      await Promise.all(promises);
                 };
                 loadAll();
                 const interval = setInterval(loadAll, 60000);
