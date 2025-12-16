@@ -41,7 +41,8 @@
             align-items: center;
             justify-content: center;
             z-index: 0;
-            padding: 2vh 2vw 1vh 2vw; 
+            /* Increased bottom padding to prevent cutoff */
+            padding: 2vh 2vw 3vh 2vw; 
             box-sizing: border-box;
         }
 
@@ -226,7 +227,7 @@
 
         <!-- SLIDE 2: STEELERS (Next or Live) -->
         <div id="slide-steelers" class="slide-container bg-steelers">
-            <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
+            <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full pb-6">
                 <!-- Header (Flex None, Scaled down significantly on mobile) -->
                 <div class="flex items-center gap-2 md:gap-6 mb-1 border-b border-gray-800 pb-1 flex-none z-10">
                     <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(2.5rem,min(8vw,8vh),6rem)] h-[clamp(2.5rem,min(8vw,8vh),6rem)] flex-shrink-0" alt="Steelers">
@@ -293,7 +294,7 @@
                 </div>
 
                 <!-- LIVE FIELD VISUALIZATION (Flex None - Fixed height relative to viewport) -->
-                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-xl p-2 backdrop-blur-md mt-auto mb-2 border border-white/10 flex-none z-10">
+                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-xl p-2 backdrop-blur-md mt-auto mb-0 border border-white/10 flex-none z-10">
                     <!-- Updated Top Row: Down | Ball On (Summary moved out) -->
                     <div class="flex items-end justify-between mb-1 px-2">
                         <!-- Left: Down & Dist -->
@@ -309,8 +310,8 @@
                         </div>
                     </div>
                     
-                    <!-- THE FIELD -->
-                    <div class="relative h-[12vh] field-turf rounded w-full mt-1 overflow-hidden flex">
+                    <!-- THE FIELD - Slightly reduced height to prevent cutoff on wide/short screens -->
+                    <div class="relative h-[10vh] min-h-[50px] field-turf rounded w-full mt-1 overflow-hidden flex">
                          <!-- Left Endzone (Home) -->
                          <div class="h-full w-[8%] bg-black/40 flex items-center justify-center border-r-2 border-white/50 z-0 relative flex-shrink-0">
                              <span id="ez-text-left" class="text-[clamp(0.6rem,1.5vh,1rem)] font-black -rotate-90 whitespace-nowrap absolute">HOME</span>
