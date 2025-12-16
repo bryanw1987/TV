@@ -428,7 +428,7 @@ export default function App() {
 
   const handleAddStock = () => { if (!newTicker) return; const tick = newTicker.toUpperCase(); if (!userStocks.includes(tick)) { setUserStocks([...userStocks, tick]); if (!showStockCard) setShowStockCard(true); } setNewTicker(""); };
   const removeStock = (tick) => { const updated = userStocks.filter(t => t !== tick); setUserStocks(updated); if (updated.length === 0) setShowStockCard(false); };
-  const toggleStockModule = () => { if (!showStockCard && userStocks.length === 0) setUserStocks(['JELD', 'BA', 'HON']); setShowStockCard(!showStockCard); };
+  const toggleStockModule = () => { setShowStockCard(!showStockCard); };
   const saveZip = () => { setZipCode(tempZip); };
   const closeSettings = () => { saveZip(); setIsSettingsOpen(false); };
 
