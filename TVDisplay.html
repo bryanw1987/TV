@@ -305,7 +305,8 @@
                              <!-- Width is 0-100% of this middle section -->
                              <div id="steelers-drive-container" class="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style="width: 0%;">
                                 <div id="steelers-drive-bar" class="h-[60%] flex-grow bg-[#FFB612] rounded-sm shadow-[0_0_10px_rgba(255,182,18,0.6)]"></div>
-                                <div id="steelers-drive-head-wrapper" class="h-[80%] aspect-[1/2] relative -ml-[1px]"> 
+                                <!-- MODIFIED: dynamic width for arrow head to ~5 yards -->
+                                <div id="steelers-drive-head-wrapper" class="h-[80%] w-[4vw] max-w-full relative -ml-[1px]"> 
                                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="h-full w-auto block filter drop-shadow-md">
                                         <path d="M0,0 L100,50 L0,100 Z" id="steelers-drive-head-path" fill="#FFB612" />
                                     </svg>
