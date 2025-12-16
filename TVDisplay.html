@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pittsburgh Smart Dashboard</title>
+    <title>Smart TV Display</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -35,6 +35,7 @@
             align-items: center;
             justify-content: center;
             z-index: 0;
+            padding: 2rem; /* Safety padding for TV overscan */
         }
 
         .slide-container.active {
@@ -72,32 +73,43 @@
         .text-snow { color: #E0F2FE; }
         .text-thunder { color: #C084FC; }
 
-        /* Custom Stacked Icon for Partly Cloudy - Improved Separation */
+        /* Custom Stacked Icon for Partly Cloudy */
         .icon-stack { 
             position: relative; 
-            width: 14rem; 
-            height: 14rem; 
+            width: 10rem; 
+            height: 10rem; 
             margin: 0 auto;
         }
+        @media (min-width: 768px) {
+            .icon-stack { width: 14rem; height: 14rem; }
+        }
+
         .icon-stack .sun-layer { 
             position: absolute; 
-            top: -10px; 
-            right: -10px; 
+            top: -5px; 
+            right: -5px; 
             z-index: 1; 
             color: #FACC15; 
-            width: 9rem; 
-            height: 9rem; 
+            width: 6rem; 
+            height: 6rem; 
             filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.6)); 
         }
+        @media (min-width: 768px) {
+            .icon-stack .sun-layer { width: 9rem; height: 9rem; top: -10px; right: -10px; }
+        }
+
         .icon-stack .cloud-layer { 
             position: absolute; 
             bottom: 0; 
             left: 0; 
             z-index: 2; 
             color: #9CA3AF; 
-            width: 10rem; 
-            height: 10rem; 
+            width: 7rem; 
+            height: 7rem; 
             filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); 
+        }
+        @media (min-width: 768px) {
+            .icon-stack .cloud-layer { width: 10rem; height: 10rem; }
         }
 
         /* Small Forecast Versions */
@@ -162,10 +174,10 @@
 </head>
 <body class="h-screen w-screen relative text-white">
 
-    <!-- CLOCK WIDGET -->
-    <div class="absolute top-8 right-12 z-50 text-right">
-        <div id="clock-time" class="text-6xl font-black tracking-tighter text-gray-100">--:--</div>
-        <div id="clock-date" class="text-2xl text-gray-400 font-medium mt-1">Loading...</div>
+    <!-- CLOCK WIDGET (Moved for TV Safe Area) -->
+    <div class="absolute top-4 right-4 md:top-12 md:right-16 z-50 text-right">
+        <div id="clock-time" class="text-4xl md:text-6xl font-black tracking-tighter text-gray-100">--:--</div>
+        <div id="clock-date" class="text-xl md:text-2xl text-gray-400 font-medium mt-1">Loading...</div>
     </div>
 
     <!-- MAIN DASHBOARD -->
@@ -173,35 +185,35 @@
 
         <!-- SLIDE 1: CURRENT WEATHER -->
         <div id="slide-weather" class="slide-container active bg-weather">
-            <div class="text-center w-full">
-                <div class="flex items-center justify-center gap-4 mb-6 opacity-70">
-                    <i data-lucide="map-pin" class="w-8 h-8"></i>
-                    <span id="location-name" class="text-3xl uppercase tracking-widest font-bold">Locating...</span>
+            <div class="text-center w-full max-w-5xl">
+                <div class="flex items-center justify-center gap-4 mb-4 md:mb-6 opacity-70">
+                    <i data-lucide="map-pin" class="w-6 h-6 md:w-8 md:h-8"></i>
+                    <span id="location-name" class="text-xl md:text-3xl uppercase tracking-widest font-bold">Locating...</span>
                 </div>
                 
-                <div class="flex items-center justify-center gap-12">
-                    <div id="weather-icon-container" class="transform scale-150">
-                        <i data-lucide="loader" class="w-48 h-48 text-gray-500 animate-spin"></i>
+                <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-12">
+                    <div id="weather-icon-container" class="transform scale-90 md:scale-150 mb-2 md:mb-0">
+                        <i data-lucide="loader" class="w-32 h-32 md:w-48 md:h-48 text-gray-500 animate-spin"></i>
                     </div>
                     
                     <div class="text-center">
-                        <div id="weather-temp" class="text-[12rem] leading-none font-bold tracking-tighter">--°</div>
-                        <div id="weather-desc" class="text-4xl text-gray-400 mt-4 font-light">Loading...</div>
+                        <div id="weather-temp" class="text-8xl md:text-[12rem] leading-none font-bold tracking-tighter">--°</div>
+                        <div id="weather-desc" class="text-2xl md:text-4xl text-gray-400 mt-2 md:mt-4 font-light">Loading...</div>
                     </div>
                 </div>
 
-                <div class="flex gap-20 mt-20 justify-center">
+                <div class="flex flex-wrap gap-8 md:gap-20 mt-8 md:mt-12 justify-center">
                     <div class="text-center">
-                        <span class="block text-gray-500 text-xl uppercase mb-2">Humidity</span>
-                        <span id="weather-humidity" class="text-4xl font-semibold">--%</span>
+                        <span class="block text-gray-500 text-sm md:text-xl uppercase mb-1 md:mb-2">Humidity</span>
+                        <span id="weather-humidity" class="text-2xl md:text-4xl font-semibold">--%</span>
                     </div>
                     <div class="text-center">
-                        <span class="block text-gray-500 text-xl uppercase mb-2">Wind</span>
-                        <span id="weather-wind" class="text-4xl font-semibold">-- mph</span>
+                        <span class="block text-gray-500 text-sm md:text-xl uppercase mb-1 md:mb-2">Wind</span>
+                        <span id="weather-wind" class="text-2xl md:text-4xl font-semibold">-- mph</span>
                     </div>
                     <div class="text-center">
-                        <span class="block text-gray-500 text-xl uppercase mb-2">High / Low</span>
-                        <span id="weather-hl" class="text-4xl font-semibold">--° / --°</span>
+                        <span class="block text-gray-500 text-sm md:text-xl uppercase mb-1 md:mb-2">High / Low</span>
+                        <span id="weather-hl" class="text-2xl md:text-4xl font-semibold">--° / --°</span>
                     </div>
                 </div>
             </div>
@@ -209,39 +221,45 @@
 
         <!-- SLIDE 1B: 3-DAY FORECAST -->
         <div id="slide-forecast" class="slide-container bg-weather">
-            <div class="w-full max-w-6xl px-8">
-                <div class="flex items-center gap-6 mb-16 border-b border-gray-600 pb-6 opacity-80">
-                    <i data-lucide="calendar-days" class="w-12 h-12"></i>
-                    <h2 class="text-5xl font-bold uppercase tracking-tighter">3-Day Forecast</h2>
+            <div class="w-full max-w-6xl px-4 md:px-8">
+                <div class="flex items-center gap-4 md:gap-6 mb-8 md:mb-12 border-b border-gray-600 pb-4 md:pb-6 opacity-80">
+                    <i data-lucide="calendar-days" class="w-8 h-8 md:w-12 md:h-12"></i>
+                    <h2 class="text-3xl md:text-5xl font-bold uppercase tracking-tighter">3-Day Forecast</h2>
                 </div>
 
-                <div class="grid grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
                     <!-- Day 1 -->
-                    <div class="bg-white/10 rounded-3xl p-8 backdrop-blur-md text-center">
-                        <div id="fc-day-1-name" class="text-3xl font-bold text-gray-300 mb-4 uppercase">--</div>
-                        <div id="fc-day-1-icon" class="flex justify-center my-6">
-                            <i data-lucide="cloud" class="w-24 h-24 text-gray-400"></i>
+                    <div class="bg-white/10 rounded-3xl p-4 md:p-8 backdrop-blur-md text-center flex flex-row md:flex-col items-center justify-between md:justify-center">
+                        <div id="fc-day-1-name" class="text-2xl md:text-3xl font-bold text-gray-300 md:mb-4 uppercase w-20 md:w-auto text-left md:text-center">--</div>
+                        <div id="fc-day-1-icon" class="flex justify-center my-0 md:my-6">
+                            <i data-lucide="cloud" class="w-12 h-12 md:w-24 md:h-24 text-gray-400"></i>
                         </div>
-                        <div class="text-5xl font-black mb-2"><span id="fc-day-1-max">--</span>°</div>
-                        <div class="text-2xl text-gray-400"><span id="fc-day-1-min">--</span>° Low</div>
+                        <div class="text-right md:text-center">
+                            <div class="text-3xl md:text-5xl font-black md:mb-2"><span id="fc-day-1-max">--</span>°</div>
+                            <div class="text-lg md:text-2xl text-gray-400"><span id="fc-day-1-min">--</span>° Low</div>
+                        </div>
                     </div>
                     <!-- Day 2 -->
-                    <div class="bg-white/10 rounded-3xl p-8 backdrop-blur-md text-center">
-                        <div id="fc-day-2-name" class="text-3xl font-bold text-gray-300 mb-4 uppercase">--</div>
-                        <div id="fc-day-2-icon" class="flex justify-center my-6">
-                            <i data-lucide="cloud" class="w-24 h-24 text-gray-400"></i>
+                    <div class="bg-white/10 rounded-3xl p-4 md:p-8 backdrop-blur-md text-center flex flex-row md:flex-col items-center justify-between md:justify-center">
+                        <div id="fc-day-2-name" class="text-2xl md:text-3xl font-bold text-gray-300 md:mb-4 uppercase w-20 md:w-auto text-left md:text-center">--</div>
+                        <div id="fc-day-2-icon" class="flex justify-center my-0 md:my-6">
+                            <i data-lucide="cloud" class="w-12 h-12 md:w-24 md:h-24 text-gray-400"></i>
                         </div>
-                        <div class="text-5xl font-black mb-2"><span id="fc-day-2-max">--</span>°</div>
-                        <div class="text-2xl text-gray-400"><span id="fc-day-2-min">--</span>° Low</div>
+                        <div class="text-right md:text-center">
+                            <div class="text-3xl md:text-5xl font-black md:mb-2"><span id="fc-day-2-max">--</span>°</div>
+                            <div class="text-lg md:text-2xl text-gray-400"><span id="fc-day-2-min">--</span>° Low</div>
+                        </div>
                     </div>
                     <!-- Day 3 -->
-                    <div class="bg-white/10 rounded-3xl p-8 backdrop-blur-md text-center">
-                        <div id="fc-day-3-name" class="text-3xl font-bold text-gray-300 mb-4 uppercase">--</div>
-                        <div id="fc-day-3-icon" class="flex justify-center my-6">
-                            <i data-lucide="cloud" class="w-24 h-24 text-gray-400"></i>
+                    <div class="bg-white/10 rounded-3xl p-4 md:p-8 backdrop-blur-md text-center flex flex-row md:flex-col items-center justify-between md:justify-center">
+                        <div id="fc-day-3-name" class="text-2xl md:text-3xl font-bold text-gray-300 md:mb-4 uppercase w-20 md:w-auto text-left md:text-center">--</div>
+                        <div id="fc-day-3-icon" class="flex justify-center my-0 md:my-6">
+                            <i data-lucide="cloud" class="w-12 h-12 md:w-24 md:h-24 text-gray-400"></i>
                         </div>
-                        <div class="text-5xl font-black mb-2"><span id="fc-day-3-max">--</span>°</div>
-                        <div class="text-2xl text-gray-400"><span id="fc-day-3-min">--</span>° Low</div>
+                        <div class="text-right md:text-center">
+                            <div class="text-3xl md:text-5xl font-black md:mb-2"><span id="fc-day-3-max">--</span>°</div>
+                            <div class="text-lg md:text-2xl text-gray-400"><span id="fc-day-3-min">--</span>° Low</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -249,214 +267,214 @@
 
         <!-- SLIDE 2: STEELERS (Next or Live) -->
         <div id="slide-steelers" class="slide-container bg-steelers">
-            <div class="w-full max-w-7xl px-8">
-                <div class="flex items-center gap-6 mb-6 border-b border-gray-800 pb-6">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-24 h-24" alt="Steelers">
+            <div class="w-full max-w-7xl px-4 md:px-8">
+                <div class="flex items-center gap-4 md:gap-6 mb-6 md:mb-8 border-b border-gray-800 pb-4 md:pb-6">
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-16 h-16 md:w-24 md:h-24" alt="Steelers">
                     <div>
-                        <h2 class="text-6xl font-black text-white uppercase tracking-tighter">Steelers</h2>
-                        <p id="steelers-status-text" class="text-2xl text-[#FFB612] font-bold uppercase">Loading...</p>
+                        <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Steelers</h2>
+                        <p id="steelers-status-text" class="text-xl md:text-2xl text-[#FFB612] font-bold uppercase">Loading...</p>
                     </div>
                 </div>
                 
-                <div class="flex items-center justify-between bg-white/5 rounded-3xl p-12 backdrop-blur-md relative overflow-hidden mb-6">
+                <div class="flex items-center justify-between bg-white/5 rounded-3xl p-4 md:p-12 backdrop-blur-md relative overflow-hidden mb-4 md:mb-6">
                     <div id="steelers-live-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse">LIVE</div>
                     
                     <div class="text-center w-1/3">
-                        <div class="text-8xl font-black mb-2" id="steelers-home-score">--</div>
-                        <div class="text-4xl font-bold text-gray-400 mb-1" id="steelers-home-name">--</div>
-                        <div class="text-xl text-gray-500 font-mono" id="steelers-home-record"></div>
+                        <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="steelers-home-score">--</div>
+                        <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="steelers-home-name">--</div>
+                        <div class="text-sm md:text-xl text-gray-500 font-mono" id="steelers-home-record"></div>
                     </div>
                     
                     <div class="text-center w-1/3 flex flex-col justify-center h-full">
-                        <div id="steelers-game-clock" class="text-3xl text-gray-200 font-bold mb-2 uppercase">VS</div>
-                        <div id="steelers-game-detail" class="text-xl text-gray-500">Loading...</div>
+                        <div id="steelers-game-clock" class="text-xl md:text-3xl text-gray-200 font-bold mb-1 md:mb-2 uppercase">VS</div>
+                        <div id="steelers-game-detail" class="text-lg md:text-xl text-gray-500">Loading...</div>
                     </div>
                     
                     <div class="text-center w-1/3">
-                        <div class="text-8xl font-black mb-2" id="steelers-away-score">--</div>
-                        <div class="text-4xl font-bold text-gray-400 mb-1" id="steelers-away-name">--</div>
-                        <div class="text-xl text-gray-500 font-mono" id="steelers-away-record"></div>
+                        <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="steelers-away-score">--</div>
+                        <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="steelers-away-name">--</div>
+                        <div class="text-sm md:text-xl text-gray-500 font-mono" id="steelers-away-record"></div>
                     </div>
                 </div>
 
-                <!-- LIVE FIELD VISUALIZATION (Hidden unless live) -->
-                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-3xl p-6 backdrop-blur-md">
+                <!-- LIVE FIELD VISUALIZATION -->
+                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-3xl p-4 md:p-6 backdrop-blur-md">
                     <div class="flex justify-between items-end mb-4 px-2">
                         <div>
-                             <div class="text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
-                             <div id="steelers-down-dist" class="text-4xl font-black text-white mt-1">1st & 10</div>
+                             <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                             <div id="steelers-down-dist" class="text-2xl md:text-4xl font-black text-white mt-1">1st & 10</div>
                         </div>
                         <div class="text-right">
-                             <div class="text-sm text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
-                             <div id="steelers-ball-on" class="text-4xl font-black text-[#FFB612] mt-1">OPP 40</div>
+                             <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
+                             <div id="steelers-ball-on" class="text-2xl md:text-4xl font-black text-[#FFB612] mt-1">OPP 40</div>
                         </div>
                     </div>
-                    <div class="relative h-6 bg-green-900/60 rounded-full overflow-hidden border border-white/20 w-full field-bar">
+                    <div class="relative h-4 md:h-6 bg-green-900/60 rounded-full overflow-hidden border border-white/20 w-full field-bar">
                          <div id="steelers-drive-bar" class="absolute top-0 left-0 h-full bg-[#FFB612] transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(255,182,18,0.5)]" style="width: 0%;"></div>
                          <div class="absolute top-0 left-[50%] h-full w-0.5 bg-white/30"></div>
                     </div>
                 </div>
                 <div class="mt-4 text-center">
-                    <p id="steelers-summary" class="text-3xl text-gray-300 font-light italic">--</p>
+                    <p id="steelers-summary" class="text-xl md:text-3xl text-gray-300 font-light italic">--</p>
                 </div>
             </div>
         </div>
 
         <!-- SLIDE 2B: STEELERS PREVIOUS -->
         <div id="slide-steelers-prev" class="slide-container bg-steelers">
-            <div class="w-full max-w-7xl px-8 opacity-90"> 
-                <div class="flex items-center gap-6 mb-12 border-b border-gray-700 pb-6">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-20 h-20 grayscale opacity-80" alt="Steelers">
+            <div class="w-full max-w-7xl px-4 md:px-8 opacity-90"> 
+                <div class="flex items-center gap-4 md:gap-6 mb-6 md:mb-12 border-b border-gray-700 pb-4 md:pb-6">
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-16 h-16 md:w-20 md:h-20 grayscale opacity-80" alt="Steelers">
                     <div>
-                        <h2 class="text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
-                        <p class="text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                        <h2 class="text-3xl md:text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
+                        <p class="text-lg md:text-xl text-gray-500 font-bold uppercase">Final Result</p>
                     </div>
                 </div>
-                <div class="flex items-center justify-between bg-black/40 rounded-3xl p-10 backdrop-blur-sm border border-white/10">
+                <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
                     <div class="text-center w-1/3">
-                        <div class="text-7xl font-black mb-2" id="steelers-prev-home-score">--</div>
-                        <div class="text-3xl font-bold mb-1" id="steelers-prev-home-name">--</div>
+                        <div class="text-5xl md:text-7xl font-black mb-1 md:mb-2" id="steelers-prev-home-score">--</div>
+                        <div class="text-2xl md:text-3xl font-bold mb-1" id="steelers-prev-home-name">--</div>
                     </div>
                     <div class="text-center w-1/3 flex flex-col justify-center h-full">
-                        <div class="text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
-                        <div id="steelers-prev-game-detail" class="text-lg text-gray-600">--</div>
+                        <div class="text-xl md:text-2xl text-gray-500 font-bold mb-1 md:mb-2 uppercase">FINAL</div>
+                        <div id="steelers-prev-game-detail" class="text-md md:text-lg text-gray-600">--</div>
                     </div>
                     <div class="text-center w-1/3">
-                        <div class="text-7xl font-black mb-2" id="steelers-prev-away-score">--</div>
-                        <div class="text-3xl font-bold mb-1" id="steelers-prev-away-name">--</div>
+                        <div class="text-5xl md:text-7xl font-black mb-1 md:mb-2" id="steelers-prev-away-score">--</div>
+                        <div class="text-2xl md:text-3xl font-bold mb-1" id="steelers-prev-away-name">--</div>
                     </div>
                 </div>
                 <div class="mt-8 text-center">
-                    <p id="steelers-prev-summary" class="text-2xl text-gray-400 font-light italic">--</p>
+                    <p id="steelers-prev-summary" class="text-xl md:text-2xl text-gray-400 font-light italic">--</p>
                 </div>
             </div>
         </div>
 
         <!-- SLIDE 3: PENGUINS (Next or Live) -->
         <div id="slide-penguins" class="slide-container bg-penguins">
-             <div class="w-full max-w-7xl px-8">
-                <div class="flex items-center gap-6 mb-12 border-b border-gray-800 pb-6">
-                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-24 h-24" alt="Penguins">
+             <div class="w-full max-w-7xl px-4 md:px-8">
+                <div class="flex items-center gap-4 md:gap-6 mb-6 md:mb-8 border-b border-gray-800 pb-4 md:pb-6">
+                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-16 h-16 md:w-24 md:h-24" alt="Penguins">
                     <div>
-                        <h2 class="text-6xl font-black text-white uppercase tracking-tighter">Penguins</h2>
-                        <p id="pens-status-text" class="text-2xl text-[#CFC493] font-bold uppercase">Loading...</p>
+                        <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Penguins</h2>
+                        <p id="pens-status-text" class="text-xl md:text-2xl text-[#CFC493] font-bold uppercase">Loading...</p>
                     </div>
                 </div>
-                <div class="flex items-center justify-between bg-white/5 rounded-3xl p-12 backdrop-blur-md relative overflow-hidden">
+                <div class="flex items-center justify-between bg-white/5 rounded-3xl p-4 md:p-12 backdrop-blur-md relative overflow-hidden">
                      <div id="pens-live-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse">LIVE</div>
                      <div class="text-center w-1/3">
-                        <div class="text-8xl font-black mb-2" id="pens-home-score">--</div>
-                        <div class="text-4xl font-bold text-gray-400 mb-1" id="pens-home-name">--</div>
-                        <div class="text-xl text-gray-500 font-mono" id="pens-home-record"></div>
+                        <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="pens-home-score">--</div>
+                        <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="pens-home-name">--</div>
+                        <div class="text-sm md:text-xl text-gray-500 font-mono" id="pens-home-record"></div>
                     </div>
                     <div class="text-center w-1/3 flex flex-col justify-center h-full">
-                        <div id="pens-game-clock" class="text-3xl text-gray-200 font-bold mb-2 uppercase">VS</div>
-                        <div id="pens-game-detail" class="text-xl text-gray-500">Loading...</div>
+                        <div id="pens-game-clock" class="text-xl md:text-3xl text-gray-200 font-bold mb-1 md:mb-2 uppercase">VS</div>
+                        <div id="pens-game-detail" class="text-lg md:text-xl text-gray-500">Loading...</div>
                     </div>
                     <div class="text-center w-1/3">
-                        <div class="text-8xl font-black mb-2" id="pens-away-score">--</div>
-                        <div class="text-4xl font-bold text-gray-400 mb-1" id="pens-away-name">--</div>
-                        <div class="text-xl text-gray-500 font-mono" id="pens-away-record"></div>
+                        <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="pens-away-score">--</div>
+                        <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="pens-away-name">--</div>
+                        <div class="text-sm md:text-xl text-gray-500 font-mono" id="pens-away-record"></div>
                     </div>
                 </div>
                  <div class="mt-8 text-center">
-                    <p id="pens-summary" class="text-3xl text-gray-300 font-light italic">--</p>
+                    <p id="pens-summary" class="text-xl md:text-3xl text-gray-300 font-light italic">--</p>
                 </div>
             </div>
         </div>
 
         <!-- SLIDE 3B: PENGUINS PREVIOUS -->
         <div id="slide-penguins-prev" class="slide-container bg-penguins">
-            <div class="w-full max-w-7xl px-8 opacity-90">
-               <div class="flex items-center gap-6 mb-12 border-b border-gray-700 pb-6">
-                   <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-20 h-20 grayscale opacity-80" alt="Penguins">
+            <div class="w-full max-w-7xl px-4 md:px-8 opacity-90">
+               <div class="flex items-center gap-4 md:gap-6 mb-6 md:mb-12 border-b border-gray-700 pb-4 md:pb-6">
+                   <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-16 h-16 md:w-20 md:h-20 grayscale opacity-80" alt="Penguins">
                    <div>
-                       <h2 class="text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
-                       <p class="text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                       <h2 class="text-3xl md:text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
+                       <p class="text-lg md:text-xl text-gray-500 font-bold uppercase">Final Result</p>
                    </div>
                </div>
-               <div class="flex items-center justify-between bg-black/40 rounded-3xl p-10 backdrop-blur-sm border border-white/10">
+               <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
                    <div class="text-center w-1/3">
-                       <div class="text-7xl font-black mb-2" id="pens-prev-home-score">--</div>
-                       <div class="text-3xl font-bold mb-1" id="pens-prev-home-name">--</div>
+                       <div class="text-5xl md:text-7xl font-black mb-1 md:mb-2" id="pens-prev-home-score">--</div>
+                       <div class="text-2xl md:text-3xl font-bold mb-1" id="pens-prev-home-name">--</div>
                    </div>
                    <div class="text-center w-1/3 flex flex-col justify-center h-full">
-                       <div class="text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
-                       <div id="pens-prev-game-detail" class="text-lg text-gray-600">--</div>
+                       <div class="text-xl md:text-2xl text-gray-500 font-bold mb-1 md:mb-2 uppercase">FINAL</div>
+                       <div id="pens-prev-game-detail" class="text-md md:text-lg text-gray-600">--</div>
                    </div>
                    <div class="text-center w-1/3">
-                       <div class="text-7xl font-black mb-2" id="pens-prev-away-score">--</div>
-                       <div class="text-3xl font-bold mb-1" id="pens-prev-away-name">--</div>
+                       <div class="text-5xl md:text-7xl font-black mb-1 md:mb-2" id="pens-prev-away-score">--</div>
+                       <div class="text-2xl md:text-3xl font-bold mb-1" id="pens-prev-away-name">--</div>
                    </div>
                </div>
                 <div class="mt-8 text-center">
-                   <p id="pens-prev-summary" class="text-2xl text-gray-400 font-light italic">--</p>
+                   <p id="pens-prev-summary" class="text-xl md:text-2xl text-gray-400 font-light italic">--</p>
                </div>
            </div>
        </div>
 
        <!-- SLIDE 4: PIRATES (Next or Live) -->
        <div id="slide-pirates" class="slide-container bg-pirates">
-        <div class="w-full max-w-7xl px-8">
-           <div class="flex items-center gap-6 mb-12 border-b border-gray-800 pb-6">
-               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-24 h-24" alt="Pirates">
+        <div class="w-full max-w-7xl px-4 md:px-8">
+           <div class="flex items-center gap-4 md:gap-6 mb-6 md:mb-8 border-b border-gray-800 pb-4 md:pb-6">
+               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-16 h-16 md:w-24 md:h-24" alt="Pirates">
                <div>
-                   <h2 class="text-6xl font-black text-white uppercase tracking-tighter">Pirates</h2>
-                   <p id="pirates-status-text" class="text-2xl text-[#FDB827] font-bold uppercase">Loading...</p>
+                   <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter">Pirates</h2>
+                   <p id="pirates-status-text" class="text-xl md:text-2xl text-[#FDB827] font-bold uppercase">Loading...</p>
                </div>
            </div>
-           <div class="flex items-center justify-between bg-white/5 rounded-3xl p-12 backdrop-blur-md relative overflow-hidden">
+           <div class="flex items-center justify-between bg-white/5 rounded-3xl p-4 md:p-12 backdrop-blur-md relative overflow-hidden">
                 <div id="pirates-live-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse">LIVE</div>
                 
                 <div class="text-center w-1/3">
-                   <div class="text-8xl font-black mb-2" id="pirates-home-score">--</div>
-                   <div class="text-4xl font-bold text-gray-400 mb-1" id="pirates-home-name">--</div>
-                   <div class="text-xl text-gray-500 font-mono" id="pirates-home-record"></div>
+                   <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="pirates-home-score">--</div>
+                   <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="pirates-home-name">--</div>
+                   <div class="text-sm md:text-xl text-gray-500 font-mono" id="pirates-home-record"></div>
                </div>
                
                <div class="text-center w-1/3 flex flex-col justify-center h-full">
-                   <div id="pirates-game-clock" class="text-3xl text-gray-200 font-bold mb-2 uppercase">VS</div>
-                   <div id="pirates-game-detail" class="text-xl text-gray-500">Loading...</div>
+                   <div id="pirates-game-clock" class="text-xl md:text-3xl text-gray-200 font-bold mb-1 md:mb-2 uppercase">VS</div>
+                   <div id="pirates-game-detail" class="text-lg md:text-xl text-gray-500">Loading...</div>
                </div>
                
                <div class="text-center w-1/3">
-                   <div class="text-8xl font-black mb-2" id="pirates-away-score">--</div>
-                   <div class="text-4xl font-bold text-gray-400 mb-1" id="pirates-away-name">--</div>
-                   <div class="text-xl text-gray-500 font-mono" id="pirates-away-record"></div>
+                   <div class="text-5xl md:text-8xl font-black mb-1 md:mb-2" id="pirates-away-score">--</div>
+                   <div class="text-2xl md:text-4xl font-bold text-gray-400 mb-1" id="pirates-away-name">--</div>
+                   <div class="text-sm md:text-xl text-gray-500 font-mono" id="pirates-away-record"></div>
                </div>
            </div>
             <div class="mt-8 text-center">
-               <p id="pirates-summary" class="text-3xl text-gray-300 font-light italic">--</p>
+               <p id="pirates-summary" class="text-xl md:text-3xl text-gray-300 font-light italic">--</p>
            </div>
        </div>
    </div>
 
    <!-- SLIDE 4B: PIRATES PREVIOUS -->
    <div id="slide-pirates-prev" class="slide-container bg-pirates">
-       <div class="w-full max-w-7xl px-8 opacity-90">
-          <div class="flex items-center gap-6 mb-12 border-b border-gray-700 pb-6">
-              <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-20 h-20 grayscale opacity-80" alt="Pirates">
+       <div class="w-full max-w-7xl px-4 md:px-8 opacity-90">
+          <div class="flex items-center gap-4 md:gap-6 mb-6 md:mb-12 border-b border-gray-700 pb-4 md:pb-6">
+              <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-16 h-16 md:w-20 md:h-20 grayscale opacity-80" alt="Pirates">
               <div>
-                  <h2 class="text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
-                  <p class="text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                  <h2 class="text-3xl md:text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
+                  <p class="text-lg md:text-xl text-gray-500 font-bold uppercase">Final Result</p>
               </div>
           </div>
-          <div class="flex items-center justify-between bg-black/40 rounded-3xl p-10 backdrop-blur-sm border border-white/10">
+          <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
               <div class="text-center w-1/3">
-                  <div class="text-7xl font-black mb-2" id="pirates-prev-home-score">--</div>
-                  <div class="text-3xl font-bold mb-1" id="pirates-prev-home-name">--</div>
+                  <div class="text-5xl md:text-7xl font-black mb-1 md:mb-2" id="pirates-prev-home-score">--</div>
+                  <div class="text-2xl md:text-3xl font-bold mb-1" id="pirates-prev-home-name">--</div>
               </div>
               <div class="text-center w-1/3 flex flex-col justify-center h-full">
-                  <div class="text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
-                  <div id="pirates-prev-game-detail" class="text-lg text-gray-600">--</div>
+                  <div class="text-xl md:text-2xl text-gray-500 font-bold mb-1 md:mb-2 uppercase">FINAL</div>
+                  <div id="pirates-prev-game-detail" class="text-md md:text-lg text-gray-600">--</div>
               </div>
               <div class="text-center w-1/3">
-                  <div class="text-7xl font-black mb-2" id="pirates-prev-away-score">--</div>
-                  <div class="text-3xl font-bold mb-1" id="pirates-prev-away-name">--</div>
+                  <div class="text-5xl md:text-7xl font-black mb-1 md:mb-2" id="pirates-prev-away-score">--</div>
+                  <div class="text-2xl md:text-3xl font-bold mb-1" id="pirates-prev-away-name">--</div>
               </div>
           </div>
            <div class="mt-8 text-center">
-              <p id="pirates-prev-summary" class="text-2xl text-gray-400 font-light italic">--</p>
+              <p id="pirates-prev-summary" class="text-xl md:text-2xl text-gray-400 font-light italic">--</p>
           </div>
       </div>
   </div>
@@ -486,9 +504,9 @@
         
         const API = {
             // IDs: NFL Steelers=23, NHL Penguins=5, MLB Pirates=23
-            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', color: 'text-steelers-win' },
-            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', color: 'text-penguins-win' },
-            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', color: 'text-pirates-win' }
+            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', id: '23', color: 'text-steelers-win' },
+            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', id: '5', color: 'text-penguins-win' },
+            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', id: '23', color: 'text-pirates-win' }
         };
 
         function init() {
@@ -573,7 +591,7 @@
                         </div>
                     `;
                 } else {
-                    container.innerHTML = `<i data-lucide="${info.icon}" class="w-48 h-48 ${info.color}"></i>`;
+                    container.innerHTML = `<i data-lucide="${info.icon}" class="w-32 h-32 md:w-48 md:h-48 ${info.color}"></i>`;
                 }
 
                 for(let i=1; i<=3; i++) {
@@ -594,7 +612,7 @@
                             </div>
                         `;
                     } else {
-                        fcContainer.innerHTML = `<i data-lucide="${fInfo.icon}" class="w-24 h-24 ${fInfo.color}"></i>`;
+                        fcContainer.innerHTML = `<i data-lucide="${fInfo.icon}" class="w-12 h-12 md:w-24 md:h-24 ${fInfo.color}"></i>`;
                     }
                 }
                 lucide.createIcons();
@@ -620,16 +638,25 @@
 
         async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId) {
             try {
-                // Prevent caching with timestamp
                 const res = await fetch(`${apiConfig.url}?t=${Date.now()}`);
                 const data = await res.json();
-                const events = data.events;
+                const allEvents = data.events;
 
-                if (!events || events.length === 0) throw new Error("No games found");
+                if (!allEvents || allEvents.length === 0) throw new Error("No games found");
 
-                // --- REMOVED STRICT NAME FILTERING TO PREVENT HIDING VALID GAMES ---
-                // We rely on the endpoint being team-specific.
-                
+                // Strict Type-Safe Filtering: Ensure specific Team ID is involved
+                const targetIdStr = String(apiConfig.id);
+                const events = allEvents.filter(e => {
+                    const comp = e.competitions[0];
+                    return comp.competitors.some(c => {
+                        const cId = String(c.id);
+                        const tId = c.team ? String(c.team.id) : '';
+                        return cId === targetIdStr || tId === targetIdStr;
+                    });
+                });
+
+                if (events.length === 0) throw new Error("No specific team games found");
+
                 // Sort by date
                 events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -767,16 +794,16 @@
             const hScoreEl = document.getElementById(`${elementPrefix}-home-score`);
             const aScoreEl = document.getElementById(`${elementPrefix}-away-score`);
             
-            hScoreEl.className = "text-8xl font-black mb-2 text-white";
-            aScoreEl.className = "text-8xl font-black mb-2 text-white";
+            hScoreEl.className = "text-5xl md:text-8xl font-black mb-1 md:mb-2 text-white";
+            aScoreEl.className = "text-5xl md:text-8xl font-black mb-1 md:mb-2 text-white";
 
             if (state === 'post' || (state === 'in' && (hScore > 0 || aScore > 0))) {
                 if (hScore > aScore) {
-                    hScoreEl.className = `text-8xl font-black mb-2 ${winColorClass}`;
-                    aScoreEl.className = "text-8xl font-black mb-2 text-gray-500 opacity-60";
+                    hScoreEl.className = `text-5xl md:text-8xl font-black mb-1 md:mb-2 ${winColorClass}`;
+                    aScoreEl.className = "text-5xl md:text-8xl font-black mb-1 md:mb-2 text-gray-500 opacity-60";
                 } else if (aScore > hScore) {
-                    aScoreEl.className = `text-8xl font-black mb-2 ${winColorClass}`;
-                    hScoreEl.className = "text-8xl font-black mb-2 text-gray-500 opacity-60";
+                    aScoreEl.className = `text-5xl md:text-8xl font-black mb-1 md:mb-2 ${winColorClass}`;
+                    hScoreEl.className = "text-5xl md:text-8xl font-black mb-1 md:mb-2 text-gray-500 opacity-60";
                 }
             }
 
