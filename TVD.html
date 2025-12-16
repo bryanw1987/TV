@@ -411,12 +411,12 @@
                                             {team.schedule?.next?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
                                         </div>
                                     </div>
-                                    <div className="text-center text-[2.5vh] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
-                                        <CalendarIcon size="2.5vh" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
                                     </div>
-                                    <div className="flex justify-center gap-[3vh]">
-                                        <div className="flex items-center gap-2 text-[2.5vh]"><Clock size="2.5vh" /> {team.schedule?.next?.time || 'Time TBD'}</div>
-                                        <div className="flex items-center gap-2 text-[2.5vh] opacity-70"><MapPin size="2.5vh" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -533,12 +533,12 @@
                                             {team.schedule?.next?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
                                         </div>
                                     </div>
-                                    <div className="text-center text-[2.5vh] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
-                                        <CalendarIcon size="2.5vh" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
                                     </div>
-                                    <div className="flex justify-center gap-[3vh]">
-                                        <div className="flex items-center gap-2 text-[2.5vmin]"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
-                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -703,6 +703,8 @@
                                         <CalendarIcon size="2.5vmin" /> {team.schedule?.prev?.date || 'Date Pending'}
                                     </div>
                                 </div>
+                                
+                                {/* Upcoming */}
                                 <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
                                     <div className="text-[1.5vmin] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
                                     <div className="flex items-center justify-between mb-[2vh]">
@@ -722,12 +724,12 @@
                                             {team.schedule?.next?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
                                         </div>
                                     </div>
-                                    <div className="text-center text-[2.5vh] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
-                                        <CalendarIcon size="2.5vh" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
                                     </div>
-                                    <div className="flex justify-center gap-[3vh]">
-                                        <div className="flex items-center gap-2 text-[2.5vmin]"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
-                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -941,7 +943,7 @@
                             state = zipData.places[0].state;
                         } catch (e) { lat = 40.71; lon = -74.00; city = "New York"; state = "NY"; }
 
-                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=6`);
+                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=8`);
                         if (!weatherRes.ok) throw new Error("Weather API Failed");
                         const wData = await weatherRes.json();
                         if (!wData.current) throw new Error("No current weather data");
