@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Updated Viewport for Mobile Safety -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sports & Smart Dashboard</title>
     
     <!-- Tailwind CSS -->
@@ -20,7 +21,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&display=swap');
         
-        body { font-family: 'Inter', sans-serif; background-color: #000; color: white; overflow: hidden; }
+        /* Updated Body to use Dynamic Viewport Height (dvh) */
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #000; 
+            color: white; 
+            overflow: hidden; 
+            height: 100dvh; 
+            width: 100vw;
+            touch-action: none; /* Prevents bounce scroll on mobile */
+        }
+        
         .font-courier { font-family: 'Courier Prime', monospace; }
         
         .field-lines {
@@ -644,29 +655,6 @@
         };
 
         const App = () => {
-            // --- HOOK FOR PERSISTENCE ---
-            const usePersistedState = (key, defaultValue) => {
-                const [state, setState] = useState(() => {
-                    try {
-                        const item = window.localStorage.getItem(key);
-                        return item ? JSON.parse(item) : defaultValue;
-                    } catch (error) {
-                        console.error(error);
-                        return defaultValue;
-                    }
-                });
-
-                useEffect(() => {
-                    try {
-                        window.localStorage.setItem(key, JSON.stringify(state));
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }, [key, state]);
-
-                return [state, setState];
-            };
-
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
             const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
@@ -684,7 +672,6 @@
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [isPaused, setIsPaused] = useState(false);
 
-            // Fetch Weather
             useEffect(() => {
                 const fetchWeather = async () => {
                     if(zipCode.length < 5) return;
@@ -721,7 +708,6 @@
                 fetchWeather();
             }, [zipCode]);
 
-            // Generic Fetcher for Sports
             const fetchSportData = async (sport, league, teamId) => {
                 try {
                     const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${teamId.toLowerCase()}/schedule`);
@@ -743,10 +729,8 @@
                             if (summaryData.header?.competitions?.[0]?.status?.type?.state === 'in') { liveGame = summaryData; }
                         }
 
-                        // Map Data based on Sport
                         let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', live: null, schedule: null };
                         
-                        // Schedule Mapping (Common)
                         mapped.schedule = {
                             prev: prevGame ? {
                                 opponent: prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'OPP',
@@ -785,9 +769,8 @@
                             } else if (league === 'mlb') {
                                 mapped.live = { ...liveBase, 
                                     inning: comp.status.period,
-                                    inningState: comp.status.type.detail, // Top/Bot 1st
+                                    inningState: comp.status.type.detail,
                                     balls: 0, strikes: 0, outs: 0, runners: { first: false, second: false, third: false }
-                                    // Note: detailed situation data for MLB is complex to mock safely without paid API, using placeholders
                                 };
                             }
                         }
@@ -797,7 +780,6 @@
                 return { [teamId]: null };
             };
 
-            // Loop fetch for all teams
             useEffect(() => {
                 nflTeamsSelected.forEach(id => fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d}))));
                 const nflInt = setInterval(() => nflTeamsSelected.forEach(id => fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))), 60000);
@@ -816,8 +798,6 @@
                 return () => clearInterval(mlbInt);
             }, [mlbTeamsSelected]);
 
-
-            // --- CAROUSEL CONSTRUCTION ---
             const allCards = useMemo(() => {
                 const cards = [
                     { id: 'weather', component: <WeatherCard weatherData={weatherData} /> },
@@ -844,7 +824,7 @@
             const closeSettings = () => { saveZip(); setIsSettingsOpen(false); };
 
             return (
-                <div className="w-full h-screen bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white">
+                <div className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
                     <div className="w-full h-full relative" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
                         {allCards.map((card, index) => (
                             <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === currentSlideIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
