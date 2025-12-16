@@ -411,6 +411,9 @@
                                             {team.schedule?.next?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
                                         </div>
                                     </div>
+                                    <div className="text-center text-[2.5vh] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    </div>
                                     <div className="flex justify-center gap-[3vh]">
                                         <div className="flex items-center gap-2 text-[2.5vh]"><Clock size="2.5vh" /> {team.schedule?.next?.time || 'Time TBD'}</div>
                                         <div className="flex items-center gap-2 text-[2.5vh] opacity-70"><MapPin size="2.5vh" /> {team.schedule?.next?.location || 'Location TBD'}</div>
@@ -529,6 +532,9 @@
                                             <div className="text-[3vmin] font-bold">{team.schedule?.next?.opponent}</div>
                                             {team.schedule?.next?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
                                         </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vh] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.next?.date || 'Date TBD'}
                                     </div>
                                     <div className="flex justify-center gap-[3vh]">
                                         <div className="flex items-center gap-2 text-[2.5vmin]"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
@@ -697,8 +703,6 @@
                                         <CalendarIcon size="2.5vmin" /> {team.schedule?.prev?.date || 'Date Pending'}
                                     </div>
                                 </div>
-                                
-                                {/* Upcoming */}
                                 <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
                                     <div className="text-[1.5vmin] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
                                     <div className="flex items-center justify-between mb-[2vh]">
@@ -717,6 +721,9 @@
                                             <div className="text-[3vmin] font-bold">{team.schedule?.next?.opponent}</div>
                                             {team.schedule?.next?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
                                         </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vh] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.next?.date || 'Date TBD'}
                                     </div>
                                     <div className="flex justify-center gap-[3vh]">
                                         <div className="flex items-center gap-2 text-[2.5vmin]"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
@@ -1061,9 +1068,10 @@
                                 opponent: nextGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'TBD',
                                 opponentLogo: nextOppLogo,
                                 opponentRecord: nextOppRecord,
+                                date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
                                 time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                                 location: nextGame.competitions[0].venue?.fullName || 'TBD'
-                            } : { opponent: 'Season End', time: '-', location: '-' }
+                            } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
                         };
 
                         if (liveGame) {
