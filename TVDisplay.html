@@ -782,6 +782,11 @@
                             // Update Status (Clock, Quarter)
                             mainGame.competitions[0].status = freshComp.status;
                             
+                            // IMPORTANT: Update 'mainState' if the game just turned live!
+                            if (freshComp.status.type.state === 'in') {
+                                mainState = 'in';
+                            }
+                            
                             // Update Competitors (Records are usually better here)
                             mainGame.competitions[0].competitors = freshComp.competitors;
                             
@@ -863,8 +868,9 @@
                     const sit = comp.situation;
                     
                     // SAFE ACCESS with fallbacks
-                    const downStr = sit.down ? `${sit.down}${getOrdinal(sit.down)}` : '1st';
-                    const distStr = sit.distance ? ` & ${sit.distance}` : ' & 10';
+                    const downVal = sit.down > 0 ? sit.down : 1;
+                    const downStr = sit.down > 0 ? `${sit.down}${getOrdinal(sit.down)}` : '1st';
+                    const distStr = sit.distance > 0 ? ` & ${sit.distance}` : ' & 10';
                     document.getElementById('steelers-down-dist').innerText = downStr + distStr;
                     
                     let posTeam = "Ball";
@@ -882,20 +888,31 @@
                         isSteelersBall = (away.team.abbreviation === 'PIT');
                     }
                     
-                    // Ball On
+                    // Ball On / Yardline Logic
+                    // ESPN typically returns yardLine 1-100.
+                    // < 50 is Own Territory. > 50 is Opp Territory. 50 is Midfield.
+                    // The bar should simply reflect this 1-100 value as a progress bar.
+                    let yardText = "--";
+                    let pct = 50;
+
                     if(sit.yardLine !== undefined) {
-                        let yardText = sit.yardLine > 50 ? `OPP ${100-sit.yardLine}` : `${posTeamAbbrev} ${sit.yardLine}`;
-                        if(sit.yardLine === 50) yardText = "MIDFIELD";
+                        pct = sit.yardLine;
+                        if(pct < 0) pct = 0;
+                        if(pct > 100) pct = 100;
+
+                        if (sit.yardLine === 50) {
+                            yardText = "MIDFIELD";
+                        } else if (sit.yardLine < 50) {
+                            yardText = `${posTeamAbbrev} ${sit.yardLine}`;
+                        } else {
+                            yardText = `OPP ${100 - sit.yardLine}`;
+                        }
                         document.getElementById('steelers-ball-on').innerText = yardText;
                     } else {
                          document.getElementById('steelers-ball-on').innerText = "--";
                     }
                     
                     // Drive Bar & Arrow
-                    let pct = sit.yardLine || 50;
-                    if(pct < 0) pct = 0;
-                    if(pct > 100) pct = 100;
-
                     const container = document.getElementById('steelers-drive-container');
                     const bar = document.getElementById('steelers-drive-bar');
                     const arrowPath = document.getElementById('steelers-drive-head-path');
@@ -914,6 +931,7 @@
                             arrowPath.setAttribute('fill', '#008E97');
                             container.style.filter = 'drop-shadow(0 0 10px rgba(0,142,151,0.5))';
                         } else {
+                            // Generic Opponent
                             bar.style.backgroundColor = '#ffffff'; 
                             arrowPath.setAttribute('fill', '#ffffff');
                             container.style.filter = 'drop-shadow(0 0 10px rgba(255,255,255,0.5))';
