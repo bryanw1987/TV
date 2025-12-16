@@ -524,10 +524,10 @@
         let liveGameActive = false;
         
         const API = {
-            // IDs: NFL Steelers=23, NHL Penguins=5, MLB Pirates=23
-            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', id: '23', color: 'text-steelers-win' },
-            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', id: '5', color: 'text-penguins-win' },
-            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', id: '23', color: 'text-pirates-win' }
+            // Updated IDs for safety, but primary filtering is now by NAME
+            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', name: 'Steelers', color: 'text-steelers-win' },
+            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', name: 'Penguins', color: 'text-penguins-win' },
+            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', name: 'Pirates', color: 'text-pirates-win' }
         };
 
         function init() {
@@ -681,20 +681,23 @@
 
         async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId, registerCallback) {
             try {
+                // Prevent caching with timestamp
                 const res = await fetch(`${apiConfig.url}?t=${Date.now()}`);
                 const data = await res.json();
                 const allEvents = data.events;
 
                 if (!allEvents || allEvents.length === 0) throw new Error("No games found");
 
-                // Strict Type-Safe Filtering: Ensure specific Team ID is involved
-                const targetIdStr = String(apiConfig.id);
+                // --- TEXT-BASED FILTERING (More Robust) ---
+                // We check if the Team Name (e.g. "Penguins") is inside the competitor list.
+                // This avoids ID mismatches and filters out random league games.
+                const targetName = apiConfig.name.toLowerCase(); 
+                
                 const events = allEvents.filter(e => {
                     const comp = e.competitions[0];
                     return comp.competitors.some(c => {
-                        const cId = String(c.id);
-                        const tId = c.team ? String(c.team.id) : '';
-                        return cId === targetIdStr || tId === targetIdStr;
+                        const name = (c.team.displayName || c.team.name || "").toLowerCase();
+                        return name.includes(targetName);
                     });
                 });
 
@@ -744,16 +747,36 @@
                     if (diff > TWO_WEEKS_MS) mainGame = null; 
                 }
 
+                const updateActiveSlides = (id, shouldShow) => {
+                    const idx = activeSlides.indexOf(id);
+                    if (shouldShow && idx === -1) activeSlides.push(id);
+                    if (!shouldShow && idx > -1) activeSlides.splice(idx, 1);
+                };
+
+                // Slide Logic
+                if (mainState === 'in') {
+                    // If live, hide previous
+                    updateActiveSlides(prevSlideId, false);
+                } else {
+                    if (prevGame) updateActiveSlides(prevSlideId, true);
+                    else updateActiveSlides(prevSlideId, false);
+                }
+
                 if (mainGame) {
                     renderGame(prefix, mainGame, mainState, apiConfig.color);
+                    updateActiveSlides(mainSlideId, true);
                     // Register main slide. If Live, mark as live.
                     registerCallback(mainSlideId, mainState === 'in');
+                } else {
+                    updateActiveSlides(mainSlideId, false);
                 }
 
                 if(prevGame) {
                      renderGame(prefix + '-prev', prevGame, 'post', apiConfig.color);
                      // Prev game is never live (by definition above logic), so isLive=false
                      registerCallback(prevSlideId, false);
+                } else {
+                    updateActiveSlides(prevSlideId, false);
                 }
 
             } catch (e) {
