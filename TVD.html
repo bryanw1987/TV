@@ -434,7 +434,7 @@
 
             if (!team) return null;
             const isLive = team.status === 'LIVE' || team.status === 'IN';
-            const containerStyle = { background: 'radial-gradient(circle at center, #1e293b 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` };
+            const containerStyle = { background: 'radial-gradient(circle at center, #334155 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` };
 
             return (
                 <div className="h-full w-full flex flex-col relative overflow-hidden text-white font-sans" style={containerStyle}>
@@ -468,7 +468,11 @@
                                     {/* Right Team */}
                                     <div className="flex flex-1 items-center justify-start gap-[2vh]">
                                          <div className="text-[20vmin] font-black leading-none text-white text-left tabular-nums">{team.live.score.oppScore}</div>
-                                         {team.live.opponentLogo && <img src={team.live.opponentLogo} className="h-[12vmin] w-[12vmin] object-contain" />}
+                                         {team.live.opponentLogo && (
+                                            <div className="bg-white/15 rounded-full p-[1.5vmin] backdrop-blur-md">
+                                                <img src={team.live.opponentLogo} className="h-[10vmin] w-[10vmin] object-contain" />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="mt-[2vh] text-[3vh] font-bold text-gray-400">{team.id} vs {team.live.opponent}</div>
@@ -998,26 +1002,6 @@
                             const summaryData = await summaryRes.json();
                             if (summaryData.header?.competitions?.[0]?.status?.type?.state === 'in') { liveGame = summaryData; }
                         }
-
-                        // SIMULATION FOR PITTSBURGH TEAMS
-                        if (teamId === 'PIT') {
-                            if (league === 'nfl') {
-                                liveGame = {
-                                    header: { competitions: [{ status: { type: { state: 'in' }, period: 4, displayClock: '2:00' }, competitors: [{ team: { abbreviation: 'PIT' }, homeAway: 'home', score: '24' }, { team: { abbreviation: 'BAL' }, homeAway: 'away', score: '21' }] }] },
-                                    drives: { current: { team: { abbreviation: 'BAL' }, plays: [{ end: { down: 2, distance: 5, yardLine: 70 }, text: "N. Harris rush to right tackle for 5 yards" }] } }
-                                };
-                            } else if (league === 'nhl') {
-                                liveGame = {
-                                    header: { competitions: [{ status: { type: { state: 'in' }, period: 3, displayClock: '12:30' }, competitors: [{ team: { abbreviation: 'PIT' }, homeAway: 'home', score: '3' }, { team: { abbreviation: 'WSH' }, homeAway: 'away', score: '2' }] }] }
-                                };
-                            } else if (league === 'mlb') {
-                                liveGame = {
-                                    header: { competitions: [{ status: { type: { state: 'in', detail: 'Bot 7th' }, period: 7, displayClock: '' }, competitors: [{ team: { abbreviation: 'PIT' }, homeAway: 'home', score: '4' }, { team: { abbreviation: 'STL' }, homeAway: 'away', score: '1' }] }] },
-                                    situation: { balls: 2, strikes: 1, outs: 2, onFirst: true, onSecond: false, onThird: true }
-                                };
-                            }
-                        }
-                        // -------------------------------------
 
                         // Helper to fetch opponent record if not directly available
                         const fetchOpponentRecord = async (oppId, oppAbbrev) => {
