@@ -676,18 +676,18 @@
                             <div className="h-full flex flex-col justify-center gap-[4vh]">
                                 {/* Last Game */}
                                 <div className="bg-black/20 rounded-3xl p-[4vh] border border-white/10 backdrop-blur-sm relative overflow-hidden">
-                                    <div className="text-[1.5vmin] opacity-50 font-bold mb-[2vh] uppercase tracking-widest text-center">Last Game</div>
+                                    <div className="text-[1.5vh] opacity-50 font-bold mb-[2vh] uppercase tracking-widest text-center">Last Game</div>
                                     <div className="flex items-center justify-between mb-[2vh]">
                                         <div className="flex flex-col items-center w-[30%]">
                                             <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
-                                            <div className="text-[3vmin] font-bold">{team.id}</div>
-                                            <div className="text-[2vmin] text-gray-400 font-mono">{team.record}</div>
+                                            <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
                                         </div>
                                         <div className="flex flex-col items-center w-[40%]">
-                                            <div className={`text-[7vmin] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
+                                            <div className={`text-[5vh] md:text-[7vh] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
                                                 {team.schedule?.prev?.score || '-'}
                                             </div>
-                                            <div className="text-[3vmin] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
+                                            <div className="text-[3vh] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
                                         </div>
                                         <div className="flex flex-col items-center w-[30%]">
                                             {team.schedule?.prev?.opponentLogo ? (
@@ -695,41 +695,39 @@
                                             ) : (
                                                 <div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.prev?.opponent}</div>
                                             )}
-                                            <div className="text-[3vmin] font-bold">{team.schedule?.prev?.opponent}</div>
-                                            {team.schedule?.prev?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.prev.opponentRecord}</div>}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.prev?.opponent}</div>
+                                            {team.schedule?.prev?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.prev.opponentRecord}</div>}
                                         </div>
                                     </div>
-                                    <div className="text-center text-[2.5vmin] opacity-60 flex items-center justify-center gap-2">
-                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.prev?.date || 'Date Pending'}
+                                    <div className="text-center text-[2.5vh] opacity-60 flex items-center justify-center gap-2">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.prev?.date || 'Date Pending'}
                                     </div>
                                 </div>
-                                
-                                {/* Upcoming */}
                                 <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
-                                    <div className="text-[1.5vmin] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
+                                    <div className="text-[1.5vh] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
                                     <div className="flex items-center justify-between mb-[2vh]">
                                         <div className="flex flex-col items-center w-[30%]">
                                             <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
-                                            <div className="text-[3vmin] font-bold">{team.id}</div>
-                                            <div className="text-[2vmin] text-gray-400 font-mono">{team.record}</div>
+                                            <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
                                         </div>
-                                        <div className="text-[6vmin] font-bold text-gray-500 w-[40%] text-center">VS</div>
+                                        <div className="text-[6vh] font-bold text-gray-500 w-[40%] text-center">VS</div>
                                         <div className="flex flex-col items-center w-[30%]">
                                             {team.schedule?.next?.opponentLogo ? (
                                                 <img src={team.schedule.next.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
                                             ) : (
                                                 <div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.next?.opponent}</div>
                                             )}
-                                            <div className="text-[3vmin] font-bold">{team.schedule?.next?.opponent}</div>
-                                            {team.schedule?.next?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.next?.opponent}</div>
+                                            {team.schedule?.next?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
                                         </div>
                                     </div>
-                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
-                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    <div className="text-center text-[2.5vh] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.next?.date || 'Date TBD'}
                                     </div>
                                     <div className="flex justify-center gap-[3vh] flex-wrap">
-                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
-                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vh] whitespace-nowrap"><Clock size="2.5vh" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vh] opacity-70 whitespace-nowrap"><MapPin size="2.5vh" /> {team.schedule?.next?.location || 'Location TBD'}</div>
                                     </div>
                                 </div>
                             </div>
@@ -794,8 +792,12 @@
             if (daily && daily.time) {
                 for (let i = 1; i <= limit; i++) {
                     if (daily.time[i]) {
+                        // Fix for timezone offset issue: Parse YYYY-MM-DD explicitly
+                        const parts = daily.time[i].split('-');
+                        const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                        
                         forecastItems.push({
-                            date: new Date(daily.time[i]),
+                            date: localDate,
                             max: Math.round(daily.temperature_2m_max[i]),
                             min: Math.round(daily.temperature_2m_min[i]),
                             code: daily.weather_code[i]
