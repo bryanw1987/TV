@@ -228,17 +228,17 @@
                     <div class="flex items-center justify-between w-full h-full">
                         <!-- Home -->
                         <div class="text-center w-1/3 flex flex-col items-center justify-center h-full">
-                            <div class="flex flex-col md:flex-row items-center justify-center gap-2 mb-2 w-full flex-1">
-                                <div id="steelers-home-possession" class="hidden possession-icon mb-1 md:mb-0">
-                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-6 h-6 md:w-10 md:h-10 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
-                                </div>
-                                <div class="svg-score-container flex-1">
-                                    <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
-                                        <text id="steelers-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                                    </svg>
-                                </div>
+                            <div class="svg-score-container flex-1 mb-2 w-full">
+                                <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
+                                    <text id="steelers-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
+                                </svg>
                             </div>
-                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="steelers-home-name">--</div>
+                            <div class="flex items-center justify-center gap-2 w-full mb-1">
+                                <div id="steelers-home-possession" class="hidden possession-icon">
+                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-5 h-5 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
+                                </div>
+                                <div class="text-xl md:text-4xl font-bold text-gray-400 truncate" id="steelers-home-name">--</div>
+                            </div>
                             <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-home-record"></div>
                         </div>
                         
@@ -250,17 +250,17 @@
                         
                         <!-- Away -->
                         <div class="text-center w-1/3 flex flex-col items-center justify-center h-full">
-                             <div class="flex flex-col md:flex-row-reverse items-center justify-center gap-2 mb-2 w-full flex-1">
-                                <div id="steelers-away-possession" class="hidden possession-icon mb-1 md:mb-0">
-                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-6 h-6 md:w-10 md:h-10 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
-                                </div>
-                                <div class="svg-score-container flex-1">
-                                    <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
-                                        <text id="steelers-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
-                                    </svg>
+                             <div class="svg-score-container flex-1 mb-2 w-full">
+                                <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible" preserveAspectRatio="xMidYMid meet">
+                                    <text id="steelers-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
+                                </svg>
+                            </div>
+                            <div class="flex items-center justify-center gap-2 w-full mb-1">
+                                <div class="text-xl md:text-4xl font-bold text-gray-400 truncate" id="steelers-away-name">--</div>
+                                <div id="steelers-away-possession" class="hidden possession-icon">
+                                    <svg width="24" height="36" viewBox="0 0 100 100" class="w-5 h-5 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
                                 </div>
                             </div>
-                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="steelers-away-name">--</div>
                             <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-away-record"></div>
                         </div>
                     </div>
