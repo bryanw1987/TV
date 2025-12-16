@@ -239,7 +239,7 @@
                                 <div id="steelers-home-possession" class="hidden possession-icon">
                                     <svg width="24" height="36" viewBox="0 0 100 100" class="w-5 h-5 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
                                 </div>
-                                <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-home-name">--</div>
+                                <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-home-name">--</div>
                             </div>
                             <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-home-record"></div>
                         </div>
@@ -247,7 +247,7 @@
                         <!-- Center -->
                         <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
                             <!-- Removed LIVE badge from here to save space -->
-                            <div id="steelers-game-clock" class="text-[clamp(1.5rem,4vw,3rem)] text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
+                            <div id="steelers-game-clock" class="text-[clamp(1.5rem,min(4vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
                             <div id="steelers-game-detail" class="text-sm md:text-xl text-gray-500 whitespace-nowrap">Loading...</div>
                         </div>
                         
@@ -259,7 +259,7 @@
                                 </svg>
                             </div>
                             <div class="flex items-center justify-center gap-2 w-full mb-1">
-                                <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-away-name">--</div>
+                                <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight" id="steelers-away-name">--</div>
                                 <div id="steelers-away-possession" class="hidden possession-icon">
                                     <svg width="24" height="36" viewBox="0 0 100 100" class="w-5 h-5 md:w-8 md:h-8 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
                                 </div>
@@ -305,12 +305,9 @@
                              <!-- Drive Container (Overlaid) -->
                              <!-- Width is 0-100% of this middle section -->
                              <div id="steelers-drive-container" class="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style="width: 0%;">
-                                <div id="steelers-drive-bar" class="h-[60%] flex-grow bg-[#FFB612] rounded-sm shadow-[0_0_10px_rgba(255,182,18,0.6)]"></div>
-                                <!-- MODIFIED: dynamic width for arrow head to ~5 yards (approx 1.2vw) -->
-                                <div id="steelers-drive-head-wrapper" class="h-[80%] w-[1.2vw] max-w-full relative -ml-[1px]"> 
-                                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="h-full w-auto block filter drop-shadow-md">
-                                        <path d="M0,0 L100,50 L0,100 Z" id="steelers-drive-head-path" fill="#FFB612" />
-                                    </svg>
+                                <div id="steelers-drive-bar" class="h-[60%] flex-grow bg-[#FFB612] rounded-sm shadow-[0_0_10px_rgba(255,182,18,0.6)] relative">
+                                    <!-- Internal Arrow Icon -->
+                                    <div id="steelers-drive-arrow" class="absolute top-1/2 -translate-y-1/2 text-black/60 w-4 h-4 md:w-6 md:h-6"></div>
                                 </div>
                              </div>
                          </div>
@@ -327,7 +324,7 @@
                     </div>
                 </div>
                 <div class="text-center pb-2 flex-none">
-                    <p id="steelers-summary" class="text-[clamp(0.8rem,2vh,1.5rem)] text-gray-300 font-light italic truncate">--</p>
+                    <p id="steelers-summary" class="text-[clamp(0.8rem,min(2vw,2.5vh),1.5rem)] text-gray-300 font-light italic truncate">--</p>
                 </div>
             </div>
         </div>
@@ -349,7 +346,7 @@
                                 <text id="steelers-prev-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                             </svg>
                         </div>
-                        <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="steelers-prev-home-name">--</div>
+                        <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="steelers-prev-home-name">--</div>
                     </div>
                     <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
                         <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
@@ -361,7 +358,7 @@
                                 <text id="steelers-prev-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                             </svg>
                         </div>
-                        <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="steelers-prev-away-name">--</div>
+                        <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="steelers-prev-away-name">--</div>
                     </div>
                 </div>
                 <div class="mt-8 text-center"><p id="steelers-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
@@ -387,11 +384,11 @@
                                     <text id="pens-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                                 </svg>
                             </div>
-                            <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight w-full mb-1" id="pens-home-name">--</div>
+                            <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight w-full mb-1" id="pens-home-name">--</div>
                             <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pens-home-record"></div>
                         </div>
                         <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
-                            <div id="pens-game-clock" class="text-[clamp(1.5rem,4vw,3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
+                            <div id="pens-game-clock" class="text-[clamp(1.5rem,min(4vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
                             <div id="pens-game-detail" class="text-sm md:text-xl text-gray-500">Loading...</div>
                         </div>
                         <div class="text-center w-1/3 flex flex-col items-center">
@@ -400,7 +397,7 @@
                                     <text id="pens-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                                 </svg>
                              </div>
-                            <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight w-full mb-1" id="pens-away-name">--</div>
+                            <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight w-full mb-1" id="pens-away-name">--</div>
                             <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pens-away-record"></div>
                         </div>
                     </div>
@@ -426,7 +423,7 @@
                                <text id="pens-prev-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                            </svg>
                        </div>
-                       <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="pens-prev-home-name">--</div>
+                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="pens-prev-home-name">--</div>
                    </div>
                    <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
                        <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
@@ -438,7 +435,7 @@
                                 <text id="pens-prev-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                             </svg>
                         </div>
-                       <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="pens-prev-away-name">--</div>
+                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full text-center" id="pens-prev-away-name">--</div>
                    </div>
                </div>
                 <div class="mt-8 text-center"><p id="pens-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
@@ -464,11 +461,11 @@
                                 <text id="pirates-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                             </svg>
                         </div>
-                       <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-home-name">--</div>
+                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-home-name">--</div>
                        <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pirates-home-record"></div>
                    </div>
                    <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
-                       <div id="pirates-game-clock" class="text-[clamp(1.5rem,4vw,3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
+                       <div id="pirates-game-clock" class="text-[clamp(1.5rem,min(4vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
                        <div id="pirates-game-detail" class="text-lg md:text-xl text-gray-500">Loading...</div>
                    </div>
                    <div class="text-center w-1/3 flex flex-col items-center">
@@ -477,7 +474,7 @@
                                 <text id="pirates-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                             </svg>
                         </div>
-                       <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-away-name">--</div>
+                       <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-away-name">--</div>
                        <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pirates-away-record"></div>
                    </div>
                </div>
@@ -503,7 +500,7 @@
                           <text id="pirates-prev-home-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                       </svg>
                   </div>
-                  <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-prev-home-name">--</div>
+                  <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-prev-home-name">--</div>
               </div>
               <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
                   <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
@@ -515,7 +512,7 @@
                           <text id="pirates-prev-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                       </svg>
                   </div>
-                  <div class="text-[clamp(1rem,2.5vw,2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-prev-away-name">--</div>
+                  <div class="text-[clamp(1rem,min(2.5vw,4vh),2.5rem)] font-bold text-gray-400 truncate leading-tight mb-1 w-full" id="pirates-prev-away-name">--</div>
               </div>
           </div>
            <div class="mt-8 text-center"><p id="pirates-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
@@ -885,30 +882,39 @@
                     
                     // BAR RENDER
                     const container = document.getElementById('steelers-drive-container');
-                    const bar = document.getElementById('steelers-drive-bar');
-                    const arrowWrapper = document.getElementById('steelers-drive-head-wrapper');
-                    const arrowPath = document.getElementById('steelers-drive-head-path');
+                    const arrowIcon = document.getElementById('steelers-drive-arrow');
                     
                     // Reset classes
                     container.classList.remove('left-0', 'right-0', 'flex-row-reverse');
-                    arrowWrapper.classList.remove('rotate-180');
+                    arrowIcon.innerHTML = ''; // Clear icon
 
                     if (isAwayPossession) {
                         // Anchored Right. 
                         const barLength = 100 - absoluteYardLine;
                         container.style.width = `${barLength}%`;
                         container.classList.add('right-0', 'flex-row-reverse');
-                        arrowWrapper.classList.add('rotate-180');
+                        
+                        // Arrow inside left edge, pointing Left
+                        arrowIcon.classList.remove('right-0');
+                        arrowIcon.classList.add('left-0');
+                        arrowIcon.innerHTML = `<i data-lucide="chevron-left" class="w-full h-full text-black/60 stroke-[4]"></i>`;
                     } else {
                         // Anchored Left.
                         const barLength = absoluteYardLine;
                         container.style.width = `${barLength}%`;
                         container.classList.add('left-0');
+                        
+                        // Arrow inside right edge, pointing Right
+                        arrowIcon.classList.remove('left-0');
+                        arrowIcon.classList.add('right-0');
+                        arrowIcon.innerHTML = `<i data-lucide="chevron-right" class="w-full h-full text-black/60 stroke-[4]"></i>`;
                     }
-
+                    
                     const teamColor = isSteelersBall ? '#FFB612' : (posTeamAbbrev === 'MIA' ? '#008E97' : '#ffffff');
+                    const bar = document.getElementById('steelers-drive-bar');
                     bar.style.backgroundColor = teamColor;
-                    arrowPath.setAttribute('fill', teamColor);
+                    
+                    lucide.createIcons();
                     
                 } else {
                     vizContainer.classList.add('hidden');
