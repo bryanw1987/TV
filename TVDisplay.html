@@ -35,7 +35,9 @@
             height: 100%;
             opacity: 0;
             transition: opacity 1.2s ease-in-out;
-            pointer-events: none;
+            /* Allow scrolling if content is too tall */
+            overflow-y: auto; 
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -564,7 +566,7 @@
         
         const API = {
             NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', id: '23', name: 'Steelers', fillClass: 'fill-steelers-win', leaguePath: 'football/nfl' },
-            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', id: '5', name: 'Penguins', fillClass: 'fill-penguins-win', leaguePath: 'hockey/nhl' },
+            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/14/schedule', id: '14', name: 'Penguins', fillClass: 'fill-penguins-win', leaguePath: 'hockey/nhl' },
             MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', id: '23', name: 'Pirates', fillClass: 'fill-pirates-win', leaguePath: 'baseball/mlb' }
         };
 
@@ -705,7 +707,15 @@
                 const data = await res.json();
                 const allEvents = data.events || [];
                 const targetName = apiConfig.name.toLowerCase(); 
-                const events = allEvents.filter(e => e.competitions[0].competitors.some(c => (c.team.displayName || c.team.name || "").toLowerCase().includes(targetName)));
+                
+                // --- ROBUST FILTERING ---
+                // Match primarily by ID, fall back to name check
+                const events = allEvents.filter(e => 
+                    e.competitions[0].competitors.some(c => 
+                        c.id === apiConfig.id || 
+                        (c.team.displayName || c.team.name || "").toLowerCase().includes(targetName)
+                    )
+                );
                 
                 if (events.length === 0) return; 
                 events.sort((a, b) => new Date(a.date) - new Date(b.date));
