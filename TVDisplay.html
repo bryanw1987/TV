@@ -72,7 +72,7 @@
         .text-snow { color: #E0F2FE; }
         .text-thunder { color: #C084FC; }
 
-        /* Custom Stacked Icon for Partly Cloudy - Offset Logic */
+        /* Custom Stacked Icon for Partly Cloudy - Improved Separation */
         .icon-stack { 
             position: relative; 
             width: 14rem; 
@@ -81,8 +81,8 @@
         }
         .icon-stack .sun-layer { 
             position: absolute; 
-            top: 0; 
-            right: 0; 
+            top: -10px; 
+            right: -10px; 
             z-index: 1; 
             color: #FACC15; 
             width: 9rem; 
@@ -109,8 +109,8 @@
         }
         .icon-stack-small .sun-layer { 
             position: absolute; 
-            top: 0; 
-            right: 0; 
+            top: -2px; 
+            right: -2px; 
             z-index: 1; 
             color: #FACC15; 
             width: 3.5rem; 
@@ -118,8 +118,8 @@
         }
         .icon-stack-small .cloud-layer { 
             position: absolute; 
-            bottom: 0; 
-            left: 0; 
+            bottom: 2px; 
+            left: 2px; 
             z-index: 2; 
             color: #9CA3AF; 
             width: 4rem; 
@@ -413,10 +413,12 @@
                    <div class="text-4xl font-bold text-gray-400 mb-1" id="pirates-home-name">--</div>
                    <div class="text-xl text-gray-500 font-mono" id="pirates-home-record"></div>
                </div>
+               
                <div class="text-center w-1/3 flex flex-col justify-center h-full">
                    <div id="pirates-game-clock" class="text-3xl text-gray-200 font-bold mb-2 uppercase">VS</div>
                    <div id="pirates-game-detail" class="text-xl text-gray-500">Loading...</div>
                </div>
+               
                <div class="text-center w-1/3">
                    <div class="text-8xl font-black mb-2" id="pirates-away-score">--</div>
                    <div class="text-4xl font-bold text-gray-400 mb-1" id="pirates-away-name">--</div>
@@ -483,10 +485,10 @@
         let liveGameActive = false;
         
         const API = {
-            // Updated IDs for safety, but primary filtering is now by NAME
-            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', name: 'Steelers', color: 'text-steelers-win' },
-            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', name: 'Penguins', color: 'text-penguins-win' },
-            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', name: 'Pirates', color: 'text-pirates-win' }
+            // IDs: NFL Steelers=23, NHL Penguins=5, MLB Pirates=23
+            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', color: 'text-steelers-win' },
+            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', color: 'text-penguins-win' },
+            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', color: 'text-pirates-win' }
         };
 
         function init() {
@@ -618,24 +620,17 @@
 
         async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId) {
             try {
+                // Prevent caching with timestamp
                 const res = await fetch(`${apiConfig.url}?t=${Date.now()}`);
                 const data = await res.json();
-                const allEvents = data.events;
+                const events = data.events;
 
-                if (!allEvents || allEvents.length === 0) throw new Error("No games");
+                if (!events || events.length === 0) throw new Error("No games found");
 
-                // --- BRUTE FORCE FILTER: CHECK NAMES ---
-                // We convert everything to strings and look for the team name
-                // "Penguins", "Steelers", "Pirates"
-                const events = allEvents.filter(e => {
-                    const str = JSON.stringify(e).toLowerCase();
-                    return str.includes(apiConfig.name.toLowerCase());
-                });
-
-                if (events.length === 0) throw new Error("No specific team games found");
-
-                // --- ROBUST PREV/NEXT LOGIC ---
-                // Sort EVERYTHING by date
+                // --- REMOVED STRICT NAME FILTERING TO PREVENT HIDING VALID GAMES ---
+                // We rely on the endpoint being team-specific.
+                
+                // Sort by date
                 events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 const now = new Date();
@@ -649,37 +644,31 @@
                 if (nextGameIndex === -1) {
                     // All games are in the past
                     prevGame = events[events.length - 1];
-                    // "Main" game could be the last game shown as "Final" if close enough
                     mainGame = null; 
                 } else if (nextGameIndex === 0) {
                     // All games are in the future
                     mainGame = events[0];
                     mainState = 'pre';
-                    // Check if there was a game *before* the schedule start? (API limit)
-                    // If API only returns future, we have no prev.
                 } else {
-                    // We are in the middle of schedule
+                    // Middle of schedule
                     prevGame = events[nextGameIndex - 1];
                     mainGame = events[nextGameIndex];
                     mainState = 'pre';
                 }
                 
-                // CHECK IF "PREV" GAME IS ACTUALLY LIVE
+                // Special Check: Is the "Previous" game actually LIVE right now?
                 if (prevGame && prevGame.competitions[0].status.type.state === 'in') {
-                    // It's actually LIVE, so it becomes MAIN
                     mainGame = prevGame;
                     mainState = 'in';
-                    prevGame = (nextGameIndex > 1) ? events[nextGameIndex - 2] : null; // Game before the live one
+                    prevGame = (nextGameIndex > 1) ? events[nextGameIndex - 2] : null; 
                     if(prefix === 'steelers') liveGameActive = true;
                 }
 
                 // --- HIDE RULES ---
-                // 1. If Prev Game is > 14 days old, Hide it.
                 if (prevGame) {
                     const diff = now - new Date(prevGame.date);
                     if (diff > TWO_WEEKS_MS) prevGame = null; 
                 }
-                // 2. If Next Game is > 14 days away, Hide it.
                 if (mainGame && mainState === 'pre') {
                     const diff = new Date(mainGame.date) - now;
                     if (diff > TWO_WEEKS_MS) mainGame = null; 
@@ -691,7 +680,7 @@
                     if (!shouldShow && idx > -1) activeSlides.splice(idx, 1);
                 };
 
-                // Logic for Slide Activation
+                // Slide Logic
                 if (mainState === 'in') {
                     // If live, hide previous
                     updateActiveSlides(prevSlideId, false);
@@ -707,7 +696,6 @@
                     updateActiveSlides(mainSlideId, false);
                 }
 
-                // If Prev exists, render it
                 if(prevGame) {
                      renderGame(prefix + '-prev', prevGame, 'post', apiConfig.color);
                 }
