@@ -917,21 +917,38 @@
                              return opp?.record?.[0]?.summary || opp?.records?.[0]?.summary || null;
                         };
 
-                        // Try to get Opponent info for Prev and Next games
-                        let prevOpponentLogo = null;
-                        let nextOpponentLogo = null;
+                        // Helper to fetch opponent record if not directly available
+                        const fetchOpponentRecord = async (oppId, oppAbbrev) => {
+                            if (!oppId) return null;
+                            try {
+                                const oppRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}/schedule`);
+                                const oppData = await oppRes.json();
+                                return calculateRecord(oppData.events || [], oppAbbrev, league);
+                            } catch (e) { return null; }
+                        };
+
+                        let prevOppRecord = null;
+                        let nextOppRecord = null;
+                        let prevOppLogo = null;
+                        let nextOppLogo = null;
 
                         if (prevGame) {
                             const prevComp = prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId);
-                            if (prevComp && prevComp.team.logos && prevComp.team.logos.length > 0) {
-                                prevOpponentLogo = prevComp.team.logos[0].href;
+                            if (prevComp) {
+                                if (prevComp.team.logos && prevComp.team.logos.length > 0) {
+                                    prevOppLogo = prevComp.team.logos[0].href;
+                                }
+                                prevOppRecord = await fetchOpponentRecord(prevComp.team.id, prevComp.team.abbreviation);
                             }
                         }
 
                         if (nextGame) {
                             const nextComp = nextGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId);
-                            if (nextComp && nextComp.team.logos && nextComp.team.logos.length > 0) {
-                                nextOpponentLogo = nextComp.team.logos[0].href;
+                            if (nextComp) {
+                                if (nextComp.team.logos && nextComp.team.logos.length > 0) {
+                                    nextOppLogo = nextComp.team.logos[0].href;
+                                }
+                                nextOppRecord = await fetchOpponentRecord(nextComp.team.id, nextComp.team.abbreviation);
                             }
                         }
 
@@ -940,16 +957,16 @@
                         mapped.schedule = {
                             prev: prevGame ? {
                                 opponent: prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'OPP',
-                                opponentLogo: prevOpponentLogo,
-                                opponentRecord: getOpponentRecord(prevGame),
+                                opponentLogo: prevOppLogo,
+                                opponentRecord: prevOppRecord,
                                 score: (prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.score?.value || '0') + "-" + (prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.score?.value || '0'),
                                 result: prevGame.competitions[0].status.type.completed ? (prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.winner ? 'W' : 'L') + " " + prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.score?.value + "-" + prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.score?.value : 'TBD',
                                 date: new Date(prevGame.date).toLocaleDateString()
                             } : { opponent: 'None', result: '-', date: '-' },
                             next: nextGame ? {
                                 opponent: nextGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'TBD',
-                                opponentLogo: nextOpponentLogo,
-                                opponentRecord: getOpponentRecord(nextGame),
+                                opponentLogo: nextOppLogo,
+                                opponentRecord: nextOppRecord,
                                 time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                                 location: nextGame.competitions[0].venue?.fullName || 'TBD'
                             } : { opponent: 'Season End', time: '-', location: '-' }
