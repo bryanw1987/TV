@@ -727,24 +727,46 @@
                     
                     // BALL ON / YARDLINE LOGIC
                     let yardText = "--";
-                    let pct = 50; 
+                    let absoluteYardLine = 50; 
 
                     if(sit.yardLine != null) {
-                        pct = Number(sit.yardLine);
-                        if(isNaN(pct)) pct = 50;
-                        if(pct < 0) pct = 0; if(pct > 100) pct = 100;
+                        absoluteYardLine = Number(sit.yardLine);
+                        if(isNaN(absoluteYardLine)) absoluteYardLine = 50;
+                        if(absoluteYardLine < 0) absoluteYardLine = 0; 
+                        if(absoluteYardLine > 100) absoluteYardLine = 100;
                         
-                        // Determine visual label
-                        // API usually gives 1-100 relative to offense.
-                        // 1-50: Own Side. 51-99: Opponent Side.
-                        let possessionTeamObj = (possID === String(home.id)) ? home : away;
-                        let defenseTeamObj = (possID === String(home.id)) ? away : home;
+                        // TEXT LOGIC
+                        // Home attacks -> 100. Away attacks -> 0.
+                        // If Home Poss: <50 is Own, >50 is Opp.
+                        // If Away Poss: >50 is Own, <50 is Opp.
                         
-                        let side = (pct <= 50) ? possessionTeamObj.team.abbreviation : defenseTeamObj.team.abbreviation;
-                        let line = (pct <= 50) ? Math.round(pct) : 100 - Math.round(pct);
+                        let labelTeam = "";
+                        let labelLine = 0;
                         
-                        if (pct === 50) yardText = "MIDFIELD";
-                        else yardText = `${side} ${line}`;
+                        if (absoluteYardLine === 50) {
+                            yardText = "MIDFIELD";
+                        } else {
+                            if (isAwayPossession) {
+                                // Away attacks 0. Own EZ is 100.
+                                if (absoluteYardLine > 50) {
+                                    labelTeam = away.team.abbreviation; // Own
+                                    labelLine = 100 - absoluteYardLine;
+                                } else {
+                                    labelTeam = home.team.abbreviation; // Opp
+                                    labelLine = absoluteYardLine;
+                                }
+                            } else {
+                                // Home attacks 100. Own EZ is 0.
+                                if (absoluteYardLine < 50) {
+                                    labelTeam = home.team.abbreviation; // Own
+                                    labelLine = absoluteYardLine;
+                                } else {
+                                    labelTeam = away.team.abbreviation; // Opp
+                                    labelLine = 100 - absoluteYardLine;
+                                }
+                            }
+                            yardText = `${labelTeam} ${labelLine}`;
+                        }
                         
                         document.getElementById('steelers-ball-on').innerText = yardText;
                     } else if (sit.downDistanceText) {
@@ -757,7 +779,6 @@
                             document.getElementById('steelers-ball-on').innerText = "--";
                         }
                     } else {
-                         // Keep previous text if possible or show dash
                          document.getElementById('steelers-ball-on').innerText = "--";
                     }
                     
@@ -767,14 +788,24 @@
                     const arrowWrapper = document.getElementById('steelers-drive-head-wrapper');
                     const arrowPath = document.getElementById('steelers-drive-head-path');
                     
-                    container.style.width = `${pct}%`;
+                    // Reset classes
                     container.classList.remove('left-0', 'right-0', 'flex-row-reverse');
                     arrowWrapper.classList.remove('rotate-180');
 
                     if (isAwayPossession) {
+                        // Anchored Right. 
+                        // Visual Length = Distance from 100.
+                        // If at 65 (Own 35), length is 35.
+                        // If at 35 (Opp 35), length is 65.
+                        const barLength = 100 - absoluteYardLine;
+                        container.style.width = `${barLength}%`;
                         container.classList.add('right-0', 'flex-row-reverse');
                         arrowWrapper.classList.add('rotate-180');
                     } else {
+                        // Anchored Left.
+                        // Visual Length = Distance from 0.
+                        const barLength = absoluteYardLine;
+                        container.style.width = `${barLength}%`;
                         container.classList.add('left-0');
                     }
 
