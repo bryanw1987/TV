@@ -755,8 +755,16 @@
                     <h1 className="text-[15vh] font-bold mb-[1vh] tracking-tighter leading-none">{Math.round(temp)}°</h1>
                     <p className="text-[3vh] font-light opacity-90">{getConditionText(condition)}</p>
                     {high !== undefined && low !== undefined && (
-                        <div className="text-[2vh] font-medium mt-[1vh] opacity-80">
-                            H: {Math.round(high)}° L: {Math.round(low)}°
+                        <div className="flex items-center gap-[4vh] mt-[2vh]">
+                            <div className="flex flex-col items-center">
+                                <span className="text-[1.5vh] font-bold uppercase tracking-widest opacity-80 mb-[0.5vh]">High</span>
+                                <span className="text-[6vh] font-black leading-none">{Math.round(high)}°</span>
+                            </div>
+                            <div className="w-[1px] h-[6vh] bg-white/30 rounded-full"></div>
+                            <div className="flex flex-col items-center">
+                                <span className="text-[1.5vh] font-bold uppercase tracking-widest opacity-80 mb-[0.5vh]">Low</span>
+                                <span className="text-[6vh] font-black leading-none text-white/90">{Math.round(low)}°</span>
+                            </div>
                         </div>
                     )}
                     <div className="mt-[4vh] grid grid-cols-2 gap-[5vh] text-center w-full max-w-[50vh] bg-white/20 p-[3vh] rounded-3xl backdrop-blur-md">
