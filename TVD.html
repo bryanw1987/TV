@@ -347,7 +347,7 @@
                                             <div className="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style={{ left: team.live.possession === 'myTeam' ? 0 : 'auto', right: team.live.possession === 'myTeam' ? 'auto' : 0, width: `${team.live.possession === 'myTeam' ? team.live.yardLine : (100 - team.live.yardLine)}%`, flexDirection: team.live.possession === 'myTeam' ? 'row' : 'row-reverse' }}>
                                                <div className="h-[60%] flex-grow rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] relative flex items-center overflow-visible" style={{ backgroundColor: team.live.possession === 'myTeam' ? team.color : (team.live.opponentColor || '#fff') }}>
                                                     {/* Possession Logo on the Drive Line */}
-                                                    <div className="absolute h-[160%] w-auto aspect-square z-20" style={{ right: team.live.possession === 'myTeam' ? '-1vh' : 'auto', left: team.live.possession === 'myTeam' ? 'auto' : '-1vh', top: '50%', transform: 'translateY(-50%)' }}>
+                                                    <div className="absolute h-[5vh] w-[5vh] md:h-[6vh] md:w-[6vh] aspect-square z-20 flex items-center justify-center" style={{ right: team.live.possession === 'myTeam' ? '0' : 'auto', left: team.live.possession === 'myTeam' ? 'auto' : '0', top: '50%', transform: 'translateY(-50%)' }}>
                                                         <img 
                                                             src={team.live.possession === 'myTeam' ? team.logo : (team.live.opponentLogo || 'https://via.placeholder.com/50')} 
                                                             className="w-full h-full object-contain drop-shadow-md"
@@ -373,7 +373,7 @@
                                             <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
                                         </div>
                                         <div className="flex flex-col items-center w-[40%]">
-                                            <div className={`text-[7vh] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
+                                            <div className={`text-[5vh] md:text-[7vh] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
                                                 {team.schedule?.prev?.score || '-'}
                                             </div>
                                             <div className="text-[3vh] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
