@@ -309,18 +309,26 @@
                              <div id="steelers-ball-on" class="text-2xl md:text-4xl font-black text-[#FFB612] mt-1">OPP 40</div>
                         </div>
                     </div>
-                    <div class="relative h-6 md:h-10 bg-green-900/60 rounded-full border border-white/20 w-full field-bar mt-2">
-                         <!-- Drive Bar -->
-                         <div id="steelers-drive-bar" class="absolute top-0 left-0 h-full bg-[#FFB612] transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(255,182,18,0.5)]" style="width: 0%;"></div>
+                    <!-- New Arrow Style Drive Bar -->
+                    <div class="relative h-10 md:h-14 bg-green-900/60 rounded-full border border-white/20 w-full field-bar mt-2 overflow-visible">
                          <!-- Markers -->
-                         <div class="absolute top-0 left-[25%] h-full w-0.5 bg-white/10"></div>
-                         <div class="absolute top-0 left-[50%] h-full w-0.5 bg-white/30"></div>
-                         <div class="absolute top-0 left-[75%] h-full w-0.5 bg-white/10"></div>
-                         <!-- Arrow -->
-                         <div id="steelers-drive-arrow" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 transition-all duration-1000 ease-out z-20 flex items-center justify-center" style="left: 0%;">
-                            <i data-lucide="arrow-right" class="w-6 h-6 md:w-8 md:h-8 text-white drop-shadow-md"></i>
+                         <div class="absolute top-0 left-[25%] h-full w-0.5 bg-white/10 z-0"></div>
+                         <div class="absolute top-0 left-[50%] h-full w-0.5 bg-white/30 z-0"></div>
+                         <div class="absolute top-0 left-[75%] h-full w-0.5 bg-white/10 z-0"></div>
+                         
+                         <!-- Drive Container -->
+                         <div id="steelers-drive-container" class="absolute top-0 left-0 h-full flex items-center transition-all duration-1000 ease-out z-10 drop-shadow-[0_0_15px_rgba(255,182,18,0.4)]" style="width: 0%;">
+                            <!-- Rectangular Tail -->
+                            <div id="steelers-drive-bar" class="h-full flex-grow bg-[#FFB612]"></div>
+                            <!-- Arrow Head (SVG) -->
+                            <div class="h-full aspect-[1/2] relative -ml-[1px]"> <!-- negative margin to prevent gap -->
+                                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="h-full w-auto block">
+                                    <path d="M0,0 L100,50 L0,100 Z" id="steelers-drive-head-path" fill="#FFB612" />
+                                </svg>
+                            </div>
                          </div>
                     </div>
+                    
                     <div class="flex justify-between text-xs text-gray-400 mt-2 px-1 font-mono uppercase">
                         <span>Own 20</span>
                         <span>50</span>
@@ -821,28 +829,28 @@
                         if(pct < 0) pct = 0;
                         if(pct > 100) pct = 100;
 
+                        const container = document.getElementById('steelers-drive-container');
                         const bar = document.getElementById('steelers-drive-bar');
-                        const arrow = document.getElementById('steelers-drive-arrow');
+                        const arrowPath = document.getElementById('steelers-drive-head-path');
                         
-                        bar.style.width = `${pct}%`;
-                        arrow.style.left = `${pct}%`;
+                        container.style.width = `${pct}%`;
 
                         if (isSteelersBall) {
                             // Steelers Colors
                             bar.style.backgroundColor = '#FFB612';
-                            bar.style.boxShadow = '0 0 15px rgba(255,182,18,0.5)';
-                            arrow.style.color = '#FFB612';
+                            container.style.filter = 'drop-shadow(0 0 10px rgba(255,182,18,0.5))';
+                            arrowPath.setAttribute('fill', '#FFB612');
                         } else {
                             // Opponent Colors
                             // Check for MIA specific teal, else white
                             if(posTeamAbbrev === 'MIA') {
                                 bar.style.backgroundColor = '#008E97';
-                                arrow.style.color = '#008E97';
-                                bar.style.boxShadow = '0 0 15px rgba(0,142,151,0.5)';
+                                arrowPath.setAttribute('fill', '#008E97');
+                                container.style.filter = 'drop-shadow(0 0 10px rgba(0,142,151,0.5))';
                             } else {
                                 bar.style.backgroundColor = '#ffffff'; 
-                                arrow.style.color = '#ffffff';
-                                bar.style.boxShadow = '0 0 15px rgba(255,255,255,0.5)';
+                                arrowPath.setAttribute('fill', '#ffffff');
+                                container.style.filter = 'drop-shadow(0 0 10px rgba(255,255,255,0.5))';
                             }
                         }
                     }
