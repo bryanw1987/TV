@@ -41,7 +41,6 @@
             align-items: center;
             justify-content: center;
             z-index: 0;
-            /* Reduced vertical padding to prevent cutoff */
             padding: 2vh 2vw 1vh 2vw; 
             box-sizing: border-box;
         }
@@ -287,20 +286,29 @@
                 </div>
 
                 <!-- LIVE FIELD VISUALIZATION (Flex None - Fixed height relative to viewport) -->
-                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-xl p-2 backdrop-blur-md mt-auto mb-1 border border-white/10 flex-none">
-                    <div class="flex justify-between items-end mb-1 px-2">
-                        <div>
+                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-xl p-2 backdrop-blur-md mt-auto mb-2 border border-white/10 flex-none">
+                    <!-- Updated Top Row: Down | Summary | Ball On -->
+                    <div class="flex items-end justify-between mb-1 px-2 gap-2">
+                        <!-- Left: Down & Dist -->
+                        <div class="flex-none min-w-[20%]">
                              <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
-                             <div id="steelers-down-dist" class="text-[clamp(1rem,3vh,2rem)] font-black text-white mt-1 leading-none">--</div>
+                             <div id="steelers-down-dist" class="text-[clamp(1rem,3vh,2rem)] font-black text-white mt-1 leading-none whitespace-nowrap">--</div>
                         </div>
-                        <div class="text-right">
+
+                        <!-- Center: Summary Text (Moved from bottom) -->
+                        <div class="flex-1 text-center flex flex-col justify-end pb-1 overflow-hidden">
+                             <p id="steelers-summary" class="text-[clamp(0.8rem,min(2vw,2vh),1.5rem)] text-gray-300 font-light italic truncate w-full">--</p>
+                        </div>
+
+                        <!-- Right: Ball On -->
+                        <div class="flex-none min-w-[20%] text-right">
                              <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
-                             <div id="steelers-ball-on" class="text-[clamp(1rem,3vh,2rem)] font-black text-[#FFB612] mt-1 leading-none">--</div>
+                             <div id="steelers-ball-on" class="text-[clamp(1rem,3vh,2rem)] font-black text-[#FFB612] mt-1 leading-none whitespace-nowrap">--</div>
                         </div>
                     </div>
                     
                     <!-- THE FIELD -->
-                    <div class="relative h-[12vh] field-turf rounded w-full mt-1 overflow-hidden flex">
+                    <div class="relative h-[14vh] field-turf rounded w-full mt-1 overflow-hidden flex">
                          <!-- Left Endzone (Home) -->
                          <div class="h-full w-[8%] bg-black/40 flex items-center justify-center border-r-2 border-white/50 z-0 relative flex-shrink-0">
                              <span id="ez-text-left" class="text-[clamp(0.6rem,1.5vh,1rem)] font-black -rotate-90 whitespace-nowrap absolute">HOME</span>
@@ -339,10 +347,6 @@
                     </div>
                 </div>
                 
-                <!-- Summary (Flex None - Small text for wide/short screens) -->
-                <div class="text-center pb-1 flex-none min-h-[2vh]">
-                    <p id="steelers-summary" class="text-[clamp(0.7rem,min(1.8vw,2vh),1.5rem)] text-gray-300 font-light italic truncate">--</p>
-                </div>
             </div>
         </div>
 
@@ -370,7 +374,7 @@
                         <div id="steelers-prev-game-detail" class="text-sm md:text-lg text-gray-600">--</div>
                     </div>
                     <div class="text-center w-1/3 flex flex-col items-center">
-                        <div class="svg-score-container">
+                         <div class="svg-score-container">
                              <svg viewBox="0 0 100 60" class="w-full h-full overflow-visible">
                                 <text id="steelers-prev-away-score" x="50" y="32" text-anchor="middle" dominant-baseline="central" class="font-black fill-white" style="font-family: 'Inter'; font-size: 50px;">--</text>
                             </svg>
@@ -769,6 +773,60 @@
             }
         }
 
+        // --- HELPER TO GET TEAM COLORS ---
+        const getTeamColor = (abbrev) => {
+            if(abbrev === 'PIT') return '#FFB612';
+            // NFL
+            if(abbrev === 'MIA') return '#008E97';
+            if(abbrev === 'BAL') return '#241773';
+            if(abbrev === 'CIN') return '#FB4F14';
+            if(abbrev === 'CLE') return '#FF3C00';
+            if(abbrev === 'KC') return '#E31837';
+            if(abbrev === 'BUF') return '#00338D';
+            if(abbrev === 'NE') return '#002244';
+            if(abbrev === 'NYJ') return '#125740';
+            if(abbrev === 'TEN') return '#4B92DB';
+            if(abbrev === 'IND') return '#002C5F';
+            if(abbrev === 'HOU') return '#03202F';
+            if(abbrev === 'JAX') return '#006778';
+            if(abbrev === 'LV') return '#A5ACAF';
+            if(abbrev === 'LAC') return '#0080C6';
+            if(abbrev === 'DEN') return '#FB4F14';
+            if(abbrev === 'DAL') return '#003594';
+            if(abbrev === 'PHI') return '#004C54';
+            if(abbrev === 'WAS') return '#5A1414';
+            if(abbrev === 'NYG') return '#0B2265';
+            if(abbrev === 'GB') return '#203731';
+            if(abbrev === 'MIN') return '#4F2683';
+            if(abbrev === 'DET') return '#0076B6';
+            if(abbrev === 'CHI') return '#C83803';
+            if(abbrev === 'TB') return '#D50A0A';
+            if(abbrev === 'NO') return '#D3BC8D';
+            if(abbrev === 'ATL') return '#a71930';
+            if(abbrev === 'CAR') return '#0085CA';
+            if(abbrev === 'SF') return '#AA0000';
+            if(abbrev === 'SEA') return '#69BE28';
+            if(abbrev === 'LAR') return '#003594';
+            if(abbrev === 'ARI') return '#97233F';
+            
+            // NHL
+            if(abbrev === 'WSH') return '#C8102E';
+            if(abbrev === 'PHI') return '#F74902';
+            if(abbrev === 'NYR') return '#0038A8';
+            if(abbrev === 'NYI') return '#F26924';
+            if(abbrev === 'NJD') return '#CE1126';
+            if(abbrev === 'CBJ') return '#002654';
+            if(abbrev === 'CAR') return '#CC0000';
+            
+            // MLB
+            if(abbrev === 'CIN') return '#C6011F';
+            if(abbrev === 'MIL') return '#12284B';
+            if(abbrev === 'CHC') return '#0E3386';
+            if(abbrev === 'STL') return '#C41E3A';
+            
+            return '#ffffff';
+        };
+
         function renderGame(elementPrefix, game, state, winFillClass) {
             const comp = game.competitions?.[0];
             if (!comp) return;
@@ -783,7 +841,6 @@
             
             // FIXED SCORE ACCESS
             const getScore = (c) => (c.score && c.score.value) ? c.score.value : (c.score || '0');
-            // Update SVG Text Content
             setTxt('home-score', getScore(home)); 
             setTxt('away-score', getScore(away));
             
@@ -792,13 +849,12 @@
             const summary = document.getElementById(`${elementPrefix}-summary`);
             const gameClock = document.getElementById(`${elementPrefix}-game-clock`);
             const gameDetail = document.getElementById(`${elementPrefix}-game-detail`);
-            const liveBadge = document.getElementById(`${elementPrefix}-live-badge`); // Old location reference
-            const liveBadgeHeader = document.getElementById(`${elementPrefix}-live-badge-header`); // New location reference
+            const liveBadge = document.getElementById(`${elementPrefix}-live-badge`); 
+            const liveBadgeHeader = document.getElementById(`${elementPrefix}-live-badge-header`);
             const statusText = document.getElementById(`${elementPrefix}-status-text`);
             const homePossIcon = document.getElementById(`${elementPrefix}-home-possession`);
             const awayPossIcon = document.getElementById(`${elementPrefix}-away-possession`);
 
-            // Always hide old badge location if it exists
             if (liveBadge) liveBadge.classList.add('hidden');
             if (homePossIcon) homePossIcon.classList.add('hidden');
             if (awayPossIcon) awayPossIcon.classList.add('hidden');
@@ -829,7 +885,6 @@
                     let isSteelersBall = false;
                     let posTeamAbbrev = "";
 
-                    // Safe Possession Check
                     const possID = sit.possession ? String(sit.possession) : null;
                     if(possID) {
                         if(possID === String(home.id)) {
@@ -844,23 +899,7 @@
                         }
                     }
                     
-                    // ENDZONE CUSTOMIZATION
-                    const getTeamColor = (abbrev) => {
-                        // FORCE OVERRIDE FOR STEELERS TO YELLOW
-                        if(abbrev === 'PIT') return '#FFB612';
-                        
-                        // Dynamic lookup from API data first
-                        if (home && home.team.abbreviation === abbrev && home.team.color) return `#${home.team.color}`;
-                        if (away && away.team.abbreviation === abbrev && away.team.color) return `#${away.team.color}`;
-                        
-                        // Fallbacks
-                        if(abbrev === 'MIA') return '#008E97';
-                        if(abbrev === 'BAL') return '#241773';
-                        if(abbrev === 'CIN') return '#FB4F14';
-                        if(abbrev === 'CLE') return '#FF3C00';
-                        return '#ffffff';
-                    };
-
+                    // ENDZONE & BALL ON LOGIC
                     const ezLeft = document.getElementById('ez-text-left');
                     const ezRight = document.getElementById('ez-text-right');
                     
@@ -875,10 +914,10 @@
                         ezRight.style.opacity = '1';
                     }
 
-                    // BALL ON / YARDLINE LOGIC
+                    // BALL ON
                     let yardText = "--";
                     let absoluteYardLine = 50; 
-                    let ballOnColor = '#ffffff'; // Default
+                    let ballOnColor = '#ffffff';
 
                     if(sit.yardLine != null) {
                         absoluteYardLine = Number(sit.yardLine);
@@ -886,7 +925,6 @@
                         if(absoluteYardLine < 0) absoluteYardLine = 0; 
                         if(absoluteYardLine > 100) absoluteYardLine = 100;
                         
-                        // TEXT LOGIC
                         let labelTeam = "";
                         let labelLine = 0;
                         
@@ -895,7 +933,6 @@
                             ballOnColor = "#ffffff";
                         } else {
                             if (isAwayPossession) {
-                                // Away attacks 0. Own EZ is 100.
                                 if (absoluteYardLine > 50) {
                                     labelTeam = away.team.abbreviation; // Own
                                     labelLine = 100 - absoluteYardLine;
@@ -904,7 +941,6 @@
                                     labelLine = absoluteYardLine;
                                 }
                             } else {
-                                // Home attacks 100. Own EZ is 0.
                                 if (absoluteYardLine < 50) {
                                     labelTeam = home.team.abbreviation; // Own
                                     labelLine = absoluteYardLine;
@@ -922,14 +958,11 @@
                         ballOnEl.style.color = ballOnColor;
                         
                     } else if (sit.downDistanceText) {
-                        // Fallback text parser "2nd & 5 at PIT 40"
                         const parts = sit.downDistanceText.split(' at ');
                         if (parts.length > 1) {
                             yardText = parts[1];
                             const ballOnEl = document.getElementById('steelers-ball-on');
                             ballOnEl.innerText = yardText;
-                            
-                            // Try to parse team from text
                             const possibleTeam = yardText.split(' ')[0];
                             if(possibleTeam && possibleTeam.length <= 3) {
                                 ballOnEl.style.color = getTeamColor(possibleTeam);
@@ -945,33 +978,26 @@
                     const container = document.getElementById('steelers-drive-container');
                     const arrowIcon = document.getElementById('steelers-drive-arrow');
                     
-                    // Reset classes
                     container.classList.remove('left-0', 'right-0', 'flex-row-reverse');
-                    arrowIcon.innerHTML = ''; // Clear icon
+                    arrowIcon.innerHTML = ''; 
 
                     if (isAwayPossession) {
-                        // Anchored Right. 
                         const barLength = 100 - absoluteYardLine;
                         container.style.width = `${barLength}%`;
                         container.classList.add('right-0', 'flex-row-reverse');
-                        
-                        // Arrow inside left edge, pointing Left
                         arrowIcon.classList.remove('right-0');
                         arrowIcon.classList.add('left-0');
                         arrowIcon.innerHTML = `<i data-lucide="chevron-left" class="w-full h-full text-black/60 stroke-[4]"></i>`;
                     } else {
-                        // Anchored Left.
                         const barLength = absoluteYardLine;
                         container.style.width = `${barLength}%`;
                         container.classList.add('left-0');
-                        
-                        // Arrow inside right edge, pointing Right
                         arrowIcon.classList.remove('left-0');
                         arrowIcon.classList.add('right-0');
                         arrowIcon.innerHTML = `<i data-lucide="chevron-right" class="w-full h-full text-black/60 stroke-[4]"></i>`;
                     }
                     
-                    const teamColor = isSteelersBall ? '#FFB612' : (posTeamAbbrev === 'MIA' ? '#008E97' : '#ffffff');
+                    const teamColor = isSteelersBall ? '#FFB612' : getTeamColor(posTeamAbbrev);
                     const bar = document.getElementById('steelers-drive-bar');
                     bar.style.backgroundColor = teamColor;
                     
@@ -979,15 +1005,13 @@
                     
                 } else {
                     vizContainer.classList.add('hidden');
-                    // Header fallback if not live in 'in' state (shouldn't happen but safe)
                     if(liveBadgeHeader) liveBadgeHeader.classList.add('hidden');
                     if(statusText) statusText.classList.remove('hidden');
                 }
             } else {
-                // Non-Steelers slides logic or non-live
                 if(liveBadgeHeader) liveBadgeHeader.classList.add('hidden');
                 if(statusText) statusText.classList.remove('hidden');
-                if(state === 'in' && liveBadge) liveBadge.classList.remove('hidden'); // For other sports
+                if(state === 'in' && liveBadge) liveBadge.classList.remove('hidden'); 
             }
 
             // Scores Color Logic (SVG Fill)
@@ -996,21 +1020,44 @@
             const hScoreEl = document.getElementById(`${elementPrefix}-home-score`);
             const aScoreEl = document.getElementById(`${elementPrefix}-away-score`);
             
-            // Base class for SVG text elements
             const baseSvgClass = "font-black leading-none";
-            const fontStyle = `font-family: 'Inter'; font-size: 50px;`;
-
-            // Reset
-            hScoreEl.setAttribute('class', `${baseSvgClass} fill-white`);
-            aScoreEl.setAttribute('class', `${baseSvgClass} fill-white`);
             
-            if (state === 'post' || (state === 'in' && (hScore > 0 || aScore > 0))) {
-                if (hScore > aScore) {
-                    hScoreEl.setAttribute('class', `${baseSvgClass} ${winFillClass}`);
-                    aScoreEl.setAttribute('class', `${baseSvgClass} fill-gray`);
-                } else if (aScore > hScore) {
-                    aScoreEl.setAttribute('class', `${baseSvgClass} ${winFillClass}`);
-                    hScoreEl.setAttribute('class', `${baseSvgClass} fill-gray`);
+            // DYNAMIC COLOR OVERRIDE
+            // Apply team specific color logic primarily for Steelers slide, or all if preferred.
+            // Requested: "Make the opp score their team color"
+            
+            if (elementPrefix === 'steelers' || elementPrefix === 'steelers-prev') {
+                 // Steelers Logic: PIT score always Gold. Opponent score always Team Color.
+                 // We don't use the win-fill class here anymore, we use direct style fill
+                 
+                 // Reset classes first
+                 hScoreEl.setAttribute('class', baseSvgClass);
+                 aScoreEl.setAttribute('class', baseSvgClass);
+                 
+                 const homeColor = getTeamColor(home.team.abbreviation);
+                 const awayColor = getTeamColor(away.team.abbreviation);
+                 
+                 hScoreEl.style.fill = homeColor;
+                 aScoreEl.style.fill = awayColor;
+                 
+                 // Add dropshadow filter for readability
+                 hScoreEl.style.filter = `drop-shadow(0 0 10px ${homeColor}66)`;
+                 aScoreEl.style.filter = `drop-shadow(0 0 10px ${awayColor}66)`;
+                 
+            } else {
+                // Fallback for other sports (using win logic)
+                hScoreEl.setAttribute('class', `${baseSvgClass} fill-white`);
+                aScoreEl.setAttribute('class', `${baseSvgClass} fill-white`);
+                hScoreEl.style.fill = ''; aScoreEl.style.fill = ''; // Clear inline styles
+                
+                if (state === 'post' || (state === 'in' && (hScore > 0 || aScore > 0))) {
+                    if (hScore > aScore) {
+                        hScoreEl.setAttribute('class', `${baseSvgClass} ${winFillClass}`);
+                        aScoreEl.setAttribute('class', `${baseSvgClass} fill-gray`);
+                    } else if (aScore > hScore) {
+                        aScoreEl.setAttribute('class', `${baseSvgClass} ${winFillClass}`);
+                        hScoreEl.setAttribute('class', `${baseSvgClass} fill-gray`);
+                    }
                 }
             }
 
@@ -1034,13 +1081,13 @@
                 if(gameClock) gameClock.innerText = "FINAL"; 
                 if (gameDetail) gameDetail.innerText = new Date(game.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 if (summary) summary.innerText = `${game.shortName || 'Game'} - ${hScore > aScore ? home.team.displayName : away.team.displayName} wins.`;
-                if(statusText) statusText.innerText = "Final Result"; // Ensure Header updates
+                if(statusText) statusText.innerText = "Final Result"; 
             } else {
                 const isToday = new Date().toDateString() === new Date(game.date).toDateString();
                 if (gameClock) gameClock.innerText = isToday ? "TODAY" : new Date(game.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 if (gameDetail) gameDetail.innerText = new Date(game.date).toLocaleTimeString('en-US', { hour: 'numeric', minute:'2-digit' });
                 if (summary) summary.innerText = `Upcoming at ${comp.venue?.fullName || 'Stadium'}`;
-                if(statusText) statusText.innerText = "Upcoming Game"; // Ensure Header updates
+                if(statusText) statusText.innerText = "Upcoming Game"; 
             }
         }
         
@@ -1049,7 +1096,6 @@
         function startCarousel() {
             let startTime = Date.now();
             function updateProgress() {
-                // If we have 1 or 0 slides, don't rotate
                 if (activeSlides.length <= 1) {
                     requestAnimationFrame(updateProgress);
                     return;
@@ -1074,7 +1120,7 @@
                         if(nextEl) nextEl.classList.add('active');
                     }
                     startTime = Date.now();
-                    if (currentSlideIndex === 0 && !liveGameActive) { fetchWeather(); } // Weather separate, only if not exclusively live
+                    if (currentSlideIndex === 0 && !liveGameActive) { fetchWeather(); } 
                 }
                 requestAnimationFrame(updateProgress);
             }
