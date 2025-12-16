@@ -40,8 +40,8 @@
             align-items: center;
             justify-content: center;
             z-index: 0;
-            /* Reduced padding to fit more on landscape screens */
-            padding: 5vh 4vw 1vh 4vw; 
+            /* Tighter padding for landscape fit */
+            padding: 4vh 2vw 1vh 2vw; 
             box-sizing: border-box;
         }
 
@@ -130,7 +130,6 @@
 
     <!-- CLOCK WIDGET -->
     <div class="absolute top-4 right-4 md:top-6 md:right-8 z-50 text-right pointer-events-none">
-        <!-- Responsive scaling using min(vw, vh) to prevent oversized text on wide displays -->
         <div id="clock-time" class="text-[clamp(1.5rem,min(5vw,5vh),4rem)] font-black tracking-tighter text-gray-100">--:--</div>
         <div id="clock-date" class="text-[clamp(0.8rem,min(2vw,2vh),1.5rem)] text-gray-400 font-medium mt-1">Loading...</div>
     </div>
@@ -214,11 +213,11 @@
         <!-- SLIDE 2: STEELERS (Next or Live) -->
         <div id="slide-steelers" class="slide-container bg-steelers">
             <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
-                <div class="flex items-center gap-4 md:gap-6 mb-2 border-b border-gray-800 pb-2 flex-none">
+                <!-- Header (Flex None) -->
+                <div class="flex items-center gap-4 md:gap-6 mb-1 border-b border-gray-800 pb-1 flex-none">
                     <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Steelers">
                     <div class="overflow-hidden flex flex-col justify-center">
                         <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-black text-white uppercase tracking-tighter truncate leading-none">Steelers</h2>
-                        <!-- Replaced status text with a container for either text OR live badge -->
                         <div id="steelers-header-status" class="mt-1">
                             <p id="steelers-status-text" class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-[#FFB612] font-bold uppercase truncate leading-none">Loading...</p>
                             <div id="steelers-live-badge-header" class="hidden inline-block bg-red-600 px-3 py-0.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider live-pulse text-white">LIVE</div>
@@ -226,8 +225,8 @@
                     </div>
                 </div>
                 
-                <!-- Main Scoreboard: Reduced vertical padding -->
-                <div class="bg-white/5 rounded-3xl p-2 md:p-6 backdrop-blur-md relative overflow-hidden mb-2 border border-white/5 flex flex-col justify-center flex-1 min-h-0">
+                <!-- Main Scoreboard (Flex 1 - Shrinks if needed) -->
+                <div class="bg-white/5 rounded-3xl p-2 backdrop-blur-md relative overflow-hidden mb-1 border border-white/5 flex flex-col justify-center flex-1 min-h-0">
                     <div class="flex items-center justify-between w-full h-full">
                         <!-- Home -->
                         <div class="text-center w-1/3 flex flex-col items-center justify-center h-full">
@@ -247,7 +246,6 @@
                         
                         <!-- Center -->
                         <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
-                            <!-- Removed LIVE badge from here to save space -->
                             <div id="steelers-game-clock" class="text-[clamp(1.5rem,min(4vw,5vh),3rem)] text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
                             <div id="steelers-game-detail" class="text-sm md:text-xl text-gray-500 whitespace-nowrap">Loading...</div>
                         </div>
@@ -270,8 +268,8 @@
                     </div>
                 </div>
 
-                <!-- LIVE FIELD VISUALIZATION: Uses VH for height -->
-                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-3xl p-2 md:p-6 backdrop-blur-md mt-auto mb-2 border border-white/10 flex-none">
+                <!-- LIVE FIELD VISUALIZATION (Flex None - Fixed height relative to viewport) -->
+                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-3xl p-2 md:p-6 backdrop-blur-md mt-auto mb-1 border border-white/10 flex-none">
                     <div class="flex justify-between items-end mb-1 px-2">
                         <div>
                              <div class="text-xs md:text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
@@ -283,11 +281,11 @@
                         </div>
                     </div>
                     
-                    <!-- THE FIELD: Height is relative to viewport height -->
+                    <!-- THE FIELD -->
                     <div class="relative h-[15vh] field-turf rounded w-full mt-1 overflow-hidden flex">
-                         <!-- Left Endzone (Goal) -->
-                         <div class="h-full w-[8%] bg-red-900/30 flex items-center justify-center border-r-2 border-white/50 z-0">
-                             <span class="text-[0.6rem] md:text-sm font-bold text-white/50 -rotate-90">GOAL</span>
+                         <!-- Left Endzone (Home) -->
+                         <div class="h-full w-[8%] bg-black/40 flex items-center justify-center border-r-2 border-white/50 z-0 relative">
+                             <span id="ez-text-left" class="text-[clamp(0.6rem,1.5vh,1rem)] font-black -rotate-90 whitespace-nowrap absolute">HOME</span>
                          </div>
                          
                          <!-- Playing Field (100 yards) -->
@@ -303,19 +301,17 @@
                              <div class="absolute left-[80%] h-full w-[1px] bg-white/30"></div><span class="yard-number left-[80%]">20</span>
                              <div class="absolute left-[90%] h-full w-[1px] bg-white/30"></div><span class="yard-number left-[90%]">10</span>
 
-                             <!-- Drive Container (Overlaid) -->
-                             <!-- Width is 0-100% of this middle section -->
+                             <!-- Drive Container -->
                              <div id="steelers-drive-container" class="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style="width: 0%;">
                                 <div id="steelers-drive-bar" class="h-[60%] flex-grow bg-[#FFB612] rounded-sm shadow-[0_0_10px_rgba(255,182,18,0.6)] relative">
-                                    <!-- Internal Arrow Icon -->
                                     <div id="steelers-drive-arrow" class="absolute top-1/2 -translate-y-1/2 text-black/60 w-4 h-4 md:w-6 md:h-6"></div>
                                 </div>
                              </div>
                          </div>
 
-                         <!-- Right Endzone (Goal) -->
-                         <div class="h-full w-[8%] bg-blue-900/30 flex items-center justify-center border-l-2 border-white/50 z-0">
-                             <span class="text-[0.6rem] md:text-sm font-bold text-white/50 rotate-90">GOAL</span>
+                         <!-- Right Endzone (Away) -->
+                         <div class="h-full w-[8%] bg-black/40 flex items-center justify-center border-l-2 border-white/50 z-0 relative">
+                             <span id="ez-text-right" class="text-[clamp(0.6rem,1.5vh,1rem)] font-black rotate-90 whitespace-nowrap absolute">AWAY</span>
                          </div>
                     </div>
                     
@@ -324,8 +320,10 @@
                         <span id="field-label-away">Opp EZ</span>
                     </div>
                 </div>
-                <div class="text-center pb-2 flex-none">
-                    <p id="steelers-summary" class="text-[clamp(0.8rem,min(2vw,2.5vh),1.5rem)] text-gray-300 font-light italic truncate">--</p>
+                
+                <!-- Summary (Flex None - Small text for wide/short screens) -->
+                <div class="text-center pb-1 flex-none min-h-[2vh]">
+                    <p id="steelers-summary" class="text-[clamp(0.7rem,min(1.8vw,2vh),1.5rem)] text-gray-300 font-light italic truncate">--</p>
                 </div>
             </div>
         </div>
@@ -828,6 +826,30 @@
                         }
                     }
                     
+                    // ENDZONE CUSTOMIZATION
+                    const getTeamColor = (abbrev) => {
+                        if(abbrev === 'PIT') return '#FFB612';
+                        if(abbrev === 'MIA') return '#008E97';
+                        if(abbrev === 'BAL') return '#241773';
+                        if(abbrev === 'CIN') return '#FB4F14';
+                        if(abbrev === 'CLE') return '#FF3C00';
+                        return '#ffffff';
+                    };
+
+                    const ezLeft = document.getElementById('ez-text-left');
+                    const ezRight = document.getElementById('ez-text-right');
+                    
+                    if(ezLeft) {
+                        ezLeft.innerText = home.team.abbreviation;
+                        ezLeft.style.color = getTeamColor(home.team.abbreviation);
+                        ezLeft.style.opacity = '1';
+                    }
+                    if(ezRight) {
+                        ezRight.innerText = away.team.abbreviation;
+                        ezRight.style.color = getTeamColor(away.team.abbreviation);
+                        ezRight.style.opacity = '1';
+                    }
+
                     // BALL ON / YARDLINE LOGIC
                     let yardText = "--";
                     let absoluteYardLine = 50; 
