@@ -106,6 +106,16 @@
         .rotate-180 { transform: rotate(180deg); }
         .right-0 { right: 0; left: auto; }
         .left-0 { left: 0; right: auto; }
+        
+        /* Fit Text Utility */
+        .fit-text-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body class="h-screen w-screen relative text-white bg-black">
@@ -132,7 +142,7 @@
                         <i data-lucide="loader" class="w-32 h-32 md:w-48 md:h-48 text-gray-500 animate-spin"></i>
                     </div>
                     <div class="text-center">
-                        <div id="weather-temp" class="text-[20vw] md:text-[14rem] leading-none font-bold tracking-tighter">--°</div>
+                        <div id="weather-temp" class="text-[clamp(6rem,20vw,14rem)] leading-none font-bold tracking-tighter">--°</div>
                         <div id="weather-desc" class="text-2xl md:text-4xl text-gray-400 mt-2 font-light">Loading...</div>
                     </div>
                 </div>
@@ -196,45 +206,49 @@
         <div id="slide-steelers" class="slide-container bg-steelers">
             <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
                 <div class="flex items-center gap-4 md:gap-6 mb-4 border-b border-gray-800 pb-2">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-12 h-12 md:w-24 md:h-24" alt="Steelers">
-                    <div>
-                        <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter">Steelers</h2>
-                        <p id="steelers-status-text" class="text-lg md:text-2xl text-[#FFB612] font-bold uppercase">Loading...</p>
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-12 h-12 md:w-24 md:h-24 flex-shrink-0" alt="Steelers">
+                    <div class="overflow-hidden">
+                        <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter truncate">Steelers</h2>
+                        <p id="steelers-status-text" class="text-lg md:text-2xl text-[#FFB612] font-bold uppercase truncate">Loading...</p>
                     </div>
                 </div>
                 
-                <div class="bg-white/5 rounded-3xl p-4 md:p-8 backdrop-blur-md relative overflow-hidden mb-4 border border-white/5">
+                <div class="bg-white/5 rounded-3xl p-4 md:p-8 backdrop-blur-md relative overflow-hidden mb-4 border border-white/5 flex flex-col justify-center min-h-[40vh]">
                     <div id="steelers-live-badge" class="hidden absolute top-0 left-1/2 -translate-x-1/2 mt-2 bg-red-600 px-4 py-1 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider live-pulse z-20">LIVE</div>
                     
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between w-full">
                         <!-- Home -->
-                        <div class="text-center w-1/3">
-                            <div class="flex flex-col md:flex-row items-center justify-center gap-2">
+                        <div class="text-center w-1/3 flex flex-col items-center">
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-2 mb-2 w-full">
                                 <div id="steelers-home-possession" class="hidden possession-icon mb-1 md:mb-0">
                                     <svg width="24" height="36" viewBox="0 0 100 100" class="w-6 h-6 md:w-10 md:h-10 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
                                 </div>
-                                <div class="text-[10vw] md:text-8xl font-black mb-1 text-white leading-none" id="steelers-home-score">--</div>
+                                <div class="fit-text-container">
+                                    <span class="text-[clamp(4rem,12vw,9rem)] font-black leading-none text-white" id="steelers-home-score">--</span>
+                                </div>
                             </div>
-                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1" id="steelers-home-name">--</div>
-                            <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest" id="steelers-home-record"></div>
+                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="steelers-home-name">--</div>
+                            <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-home-record"></div>
                         </div>
                         
                         <!-- Center -->
-                        <div class="text-center w-1/3 flex flex-col justify-center px-2">
-                            <div id="steelers-game-clock" class="text-lg md:text-4xl text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
+                        <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
+                            <div id="steelers-game-clock" class="text-[clamp(1.5rem,4vw,3rem)] text-gray-200 font-bold mb-1 uppercase whitespace-nowrap">VS</div>
                             <div id="steelers-game-detail" class="text-sm md:text-xl text-gray-500 whitespace-nowrap">Loading...</div>
                         </div>
                         
                         <!-- Away -->
-                        <div class="text-center w-1/3">
-                             <div class="flex flex-col md:flex-row-reverse items-center justify-center gap-2">
+                        <div class="text-center w-1/3 flex flex-col items-center">
+                             <div class="flex flex-col md:flex-row-reverse items-center justify-center gap-2 mb-2 w-full">
                                 <div id="steelers-away-possession" class="hidden possession-icon mb-1 md:mb-0">
                                     <svg width="24" height="36" viewBox="0 0 100 100" class="w-6 h-6 md:w-10 md:h-10 rotate-45"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M50 10 L50 90 M30 30 L70 30 M30 50 L70 50 M30 70 L70 70" stroke="white" stroke-width="3" fill="none" /></svg>
                                 </div>
-                                <div class="text-[10vw] md:text-8xl font-black mb-1 text-white leading-none" id="steelers-away-score">--</div>
+                                <div class="fit-text-container">
+                                     <span class="text-[clamp(4rem,12vw,9rem)] font-black leading-none text-white" id="steelers-away-score">--</span>
+                                </div>
                             </div>
-                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1" id="steelers-away-name">--</div>
-                            <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest" id="steelers-away-record"></div>
+                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="steelers-away-name">--</div>
+                            <div class="text-sm md:text-2xl text-gray-300 font-mono tracking-widest truncate w-full" id="steelers-away-record"></div>
                         </div>
                     </div>
                 </div>
@@ -312,17 +326,21 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
-                    <div class="text-center w-1/3">
-                        <div class="text-[10vw] md:text-7xl font-black mb-1 md:mb-2 text-white" id="steelers-prev-home-score">--</div>
-                        <div class="text-xl md:text-3xl font-bold mb-1" id="steelers-prev-home-name">--</div>
+                    <div class="text-center w-1/3 flex flex-col items-center">
+                        <div class="fit-text-container">
+                            <span class="text-[clamp(3rem,10vw,7rem)] font-black mb-1 md:mb-2 text-white" id="steelers-prev-home-score">--</span>
+                        </div>
+                        <div class="text-xl md:text-3xl font-bold mb-1 truncate w-full" id="steelers-prev-home-name">--</div>
                     </div>
-                    <div class="text-center w-1/3 flex flex-col justify-center">
+                    <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
                         <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
                         <div id="steelers-prev-game-detail" class="text-sm md:text-lg text-gray-600">--</div>
                     </div>
-                    <div class="text-center w-1/3">
-                        <div class="text-[10vw] md:text-7xl font-black mb-1 md:mb-2 text-white" id="steelers-prev-away-score">--</div>
-                        <div class="text-xl md:text-3xl font-bold mb-1" id="steelers-prev-away-name">--</div>
+                    <div class="text-center w-1/3 flex flex-col items-center">
+                        <div class="fit-text-container">
+                             <span class="text-[clamp(3rem,10vw,7rem)] font-black mb-1 md:mb-2 text-white" id="steelers-prev-away-score">--</span>
+                        </div>
+                        <div class="text-xl md:text-3xl font-bold mb-1 truncate w-full" id="steelers-prev-away-name">--</div>
                     </div>
                 </div>
                 <div class="mt-8 text-center"><p id="steelers-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
@@ -333,28 +351,32 @@
         <div id="slide-penguins" class="slide-container bg-penguins">
              <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
                 <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-800 pb-4">
-                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-16 h-16 md:w-24 md:h-24" alt="Penguins">
-                    <div>
-                        <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter">Penguins</h2>
-                        <p id="pens-status-text" class="text-lg md:text-2xl text-[#CFC493] font-bold uppercase">Loading...</p>
+                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-16 h-16 md:w-24 md:h-24 flex-shrink-0" alt="Penguins">
+                    <div class="overflow-hidden">
+                        <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter truncate">Penguins</h2>
+                        <p id="pens-status-text" class="text-lg md:text-2xl text-[#CFC493] font-bold uppercase truncate">Loading...</p>
                     </div>
                 </div>
-                <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden">
+                <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden min-h-[40vh] flex flex-col justify-center">
                      <div id="pens-live-badge" class="hidden absolute top-0 right-0 m-4 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse z-20">LIVE</div>
-                     <div class="flex items-center justify-between">
-                        <div class="text-center w-1/3">
-                            <div class="text-[12vw] md:text-8xl font-black mb-1 text-white" id="pens-home-score">--</div>
-                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1" id="pens-home-name">--</div>
-                            <div class="text-sm md:text-xl text-gray-500 font-mono" id="pens-home-record"></div>
+                     <div class="flex items-center justify-between w-full">
+                        <div class="text-center w-1/3 flex flex-col items-center">
+                            <div class="fit-text-container">
+                                <span class="text-[clamp(4rem,12vw,9rem)] font-black mb-1 text-white" id="pens-home-score">--</span>
+                            </div>
+                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="pens-home-name">--</div>
+                            <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pens-home-record"></div>
                         </div>
-                        <div class="text-center w-1/3 flex flex-col justify-center px-2">
-                            <div id="pens-game-clock" class="text-xl md:text-3xl text-gray-200 font-bold mb-1 uppercase">VS</div>
+                        <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
+                            <div id="pens-game-clock" class="text-[clamp(1.5rem,4vw,3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
                             <div id="pens-game-detail" class="text-sm md:text-xl text-gray-500">Loading...</div>
                         </div>
-                        <div class="text-center w-1/3">
-                            <div class="text-[12vw] md:text-8xl font-black mb-1 text-white" id="pens-away-score">--</div>
-                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1" id="pens-away-name">--</div>
-                            <div class="text-sm md:text-xl text-gray-500 font-mono" id="pens-away-record"></div>
+                        <div class="text-center w-1/3 flex flex-col items-center">
+                             <div class="fit-text-container">
+                                <span class="text-[clamp(4rem,12vw,9rem)] font-black mb-1 text-white" id="pens-away-score">--</span>
+                             </div>
+                            <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="pens-away-name">--</div>
+                            <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pens-away-record"></div>
                         </div>
                     </div>
                 </div>
@@ -373,17 +395,21 @@
                    </div>
                </div>
                <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
-                   <div class="text-center w-1/3">
-                       <div class="text-[10vw] md:text-7xl font-black mb-1 md:mb-2 text-white" id="pens-prev-home-score">--</div>
-                       <div class="text-xl md:text-3xl font-bold mb-1" id="pens-prev-home-name">--</div>
+                   <div class="text-center w-1/3 flex flex-col items-center">
+                       <div class="fit-text-container">
+                           <span class="text-[clamp(3rem,10vw,7rem)] font-black mb-1 md:mb-2 text-white" id="pens-prev-home-score">--</span>
+                       </div>
+                       <div class="text-xl md:text-3xl font-bold mb-1 truncate w-full" id="pens-prev-home-name">--</div>
                    </div>
-                   <div class="text-center w-1/3 flex flex-col justify-center">
+                   <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
                        <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
                        <div id="pens-prev-game-detail" class="text-sm md:text-lg text-gray-600">--</div>
                    </div>
-                   <div class="text-center w-1/3">
-                       <div class="text-[10vw] md:text-7xl font-black mb-1 md:mb-2 text-white" id="pens-prev-away-score">--</div>
-                       <div class="text-xl md:text-3xl font-bold mb-1" id="pens-prev-away-name">--</div>
+                   <div class="text-center w-1/3 flex flex-col items-center">
+                        <div class="fit-text-container">
+                            <span class="text-[clamp(3rem,10vw,7rem)] font-black mb-1 md:mb-2 text-white" id="pens-prev-away-score">--</span>
+                        </div>
+                       <div class="text-xl md:text-3xl font-bold mb-1 truncate w-full" id="pens-prev-away-name">--</div>
                    </div>
                </div>
                 <div class="mt-8 text-center"><p id="pens-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
@@ -394,28 +420,32 @@
        <div id="slide-pirates" class="slide-container bg-pirates">
         <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
            <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-800 pb-4">
-               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-16 h-16 md:w-24 md:h-24" alt="Pirates">
-               <div>
-                   <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter">Pirates</h2>
-                   <p id="pirates-status-text" class="text-lg md:text-2xl text-[#FDB827] font-bold uppercase">Loading...</p>
+               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-16 h-16 md:w-24 md:h-24 flex-shrink-0" alt="Pirates">
+               <div class="overflow-hidden">
+                   <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter truncate">Pirates</h2>
+                   <p id="pirates-status-text" class="text-lg md:text-2xl text-[#FDB827] font-bold uppercase truncate">Loading...</p>
                </div>
            </div>
-           <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden">
+           <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden min-h-[40vh] flex flex-col justify-center">
                 <div id="pirates-live-badge" class="hidden absolute top-0 right-0 m-4 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse z-20">LIVE</div>
-                <div class="flex items-center justify-between">
-                    <div class="text-center w-1/3">
-                       <div class="text-[12vw] md:text-8xl font-black mb-1 text-white" id="pirates-home-score">--</div>
-                       <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1" id="pirates-home-name">--</div>
-                       <div class="text-sm md:text-xl text-gray-500 font-mono" id="pirates-home-record"></div>
+                <div class="flex items-center justify-between w-full">
+                    <div class="text-center w-1/3 flex flex-col items-center">
+                        <div class="fit-text-container">
+                            <span class="text-[clamp(4rem,12vw,9rem)] font-black mb-1 text-white" id="pirates-home-score">--</span>
+                        </div>
+                       <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="pirates-home-name">--</div>
+                       <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pirates-home-record"></div>
                    </div>
-                   <div class="text-center w-1/3 flex flex-col justify-center px-2">
-                       <div id="pirates-game-clock" class="text-xl md:text-3xl text-gray-200 font-bold mb-1 uppercase">VS</div>
+                   <div class="text-center w-1/3 flex flex-col justify-center px-2 flex-shrink-0">
+                       <div id="pirates-game-clock" class="text-[clamp(1.5rem,4vw,3rem)] text-gray-200 font-bold mb-1 uppercase">VS</div>
                        <div id="pirates-game-detail" class="text-lg md:text-xl text-gray-500">Loading...</div>
                    </div>
-                   <div class="text-center w-1/3">
-                       <div class="text-[12vw] md:text-8xl font-black mb-1 text-white" id="pirates-away-score">--</div>
-                       <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1" id="pirates-away-name">--</div>
-                       <div class="text-sm md:text-xl text-gray-500 font-mono" id="pirates-away-record"></div>
+                   <div class="text-center w-1/3 flex flex-col items-center">
+                        <div class="fit-text-container">
+                            <span class="text-[clamp(4rem,12vw,9rem)] font-black mb-1 text-white" id="pirates-away-score">--</span>
+                        </div>
+                       <div class="text-xl md:text-4xl font-bold text-gray-400 mb-1 truncate w-full" id="pirates-away-name">--</div>
+                       <div class="text-sm md:text-xl text-gray-500 font-mono truncate w-full" id="pirates-away-record"></div>
                    </div>
                </div>
            </div>
@@ -434,17 +464,21 @@
               </div>
           </div>
           <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
-              <div class="text-center w-1/3">
-                  <div class="text-[10vw] md:text-7xl font-black mb-1 md:mb-2 text-white" id="pirates-prev-home-score">--</div>
-                  <div class="text-xl md:text-3xl font-bold mb-1" id="pirates-prev-home-name">--</div>
+              <div class="text-center w-1/3 flex flex-col items-center">
+                  <div class="fit-text-container">
+                      <span class="text-[clamp(3rem,10vw,7rem)] font-black mb-1 md:mb-2 text-white" id="pirates-prev-home-score">--</span>
+                  </div>
+                  <div class="text-xl md:text-3xl font-bold mb-1 truncate w-full" id="pirates-prev-home-name">--</div>
               </div>
-              <div class="text-center w-1/3 flex flex-col justify-center">
+              <div class="text-center w-1/3 flex flex-col justify-center flex-shrink-0">
                   <div class="text-lg md:text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
                   <div id="pirates-prev-game-detail" class="text-sm md:text-lg text-gray-600">--</div>
               </div>
-              <div class="text-center w-1/3">
-                  <div class="text-[10vw] md:text-7xl font-black mb-1 md:mb-2 text-white" id="pirates-prev-away-score">--</div>
-                  <div class="text-xl md:text-3xl font-bold mb-1" id="pirates-prev-away-name">--</div>
+              <div class="text-center w-1/3 flex flex-col items-center">
+                  <div class="fit-text-container">
+                      <span class="text-[clamp(3rem,10vw,7rem)] font-black mb-1 md:mb-2 text-white" id="pirates-prev-away-score">--</span>
+                  </div>
+                  <div class="text-xl md:text-3xl font-bold mb-1 truncate w-full" id="pirates-prev-away-name">--</div>
               </div>
           </div>
            <div class="mt-8 text-center"><p id="pirates-prev-summary" class="text-lg md:text-2xl text-gray-400 italic">--</p></div>
@@ -571,15 +605,40 @@
                 processTeamData('pirates', API.MLB, 'slide-pirates', 'slide-pirates-prev', register)
             ]);
 
+            // Logic Switch: If there are ANY live slides, show ONLY those.
             if(liveSlides.size > 0) {
-                const newActive = ['slide-weather', ...Array.from(liveSlides)];
-                activeSlides = newActive;
+                // EXCLUSIVE LIVE MODE
+                const newActive = Array.from(liveSlides);
+                
+                // If the active set changed, reset index to ensure we don't overflow
+                if(JSON.stringify(newActive) !== JSON.stringify(activeSlides)) {
+                    activeSlides = newActive;
+                    currentSlideIndex = 0;
+                    
+                    // Immediately hide others and show first live
+                    document.querySelectorAll('.slide-container').forEach(el => el.classList.remove('active'));
+                    const firstLive = document.getElementById(activeSlides[0]);
+                    if(firstLive) firstLive.classList.add('active');
+                } else {
+                     activeSlides = newActive;
+                }
                 liveGameActive = true;
             } else {
+                // NORMAL MODE (Weather + Forecast + Upcoming/Post)
                 activeSlides = Array.from(validSlides);
                 liveGameActive = false;
             }
+            
+            // Safety check for index
             if(currentSlideIndex >= activeSlides.length) currentSlideIndex = 0;
+            
+            // If only 1 slide (e.g. 1 live game), hide progress bar
+            const progBar = document.getElementById('progress');
+            if(activeSlides.length <= 1) {
+                progBar.style.display = 'none';
+            } else {
+                progBar.style.display = 'block';
+            }
         }
 
         async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId, registerCallback) {
@@ -824,8 +883,9 @@
             const hScoreEl = document.getElementById(`${elementPrefix}-home-score`);
             const aScoreEl = document.getElementById(`${elementPrefix}-away-score`);
             
-            hScoreEl.className = `text-[10vw] md:text-8xl font-black mb-1 md:mb-2 leading-none text-white`;
-            aScoreEl.className = `text-[10vw] md:text-8xl font-black mb-1 md:mb-2 leading-none text-white`;
+            // Updated Classes using Clamp for better sizing
+            hScoreEl.className = `text-[clamp(4rem,12vw,9rem)] font-black leading-none text-white`;
+            aScoreEl.className = `text-[clamp(4rem,12vw,9rem)] font-black leading-none text-white`;
 
             if (state === 'post' || (state === 'in' && (hScore > 0 || aScore > 0))) {
                 if (hScore > aScore) {
@@ -870,6 +930,12 @@
         function startCarousel() {
             let startTime = Date.now();
             function updateProgress() {
+                // If we have 1 or 0 slides, don't rotate
+                if (activeSlides.length <= 1) {
+                    requestAnimationFrame(updateProgress);
+                    return;
+                }
+
                 const currentId = activeSlides[currentSlideIndex];
                 let duration = CONFIG.defaultDuration;
                 if(currentId === 'slide-steelers' && liveGameActive) duration = CONFIG.liveDuration;
@@ -889,7 +955,7 @@
                         if(nextEl) nextEl.classList.add('active');
                     }
                     startTime = Date.now();
-                    if (currentSlideIndex === 0) { fetchWeather(); } // Weather separate
+                    if (currentSlideIndex === 0 && !liveGameActive) { fetchWeather(); } // Weather separate, only if not exclusively live
                 }
                 requestAnimationFrame(updateProgress);
             }
