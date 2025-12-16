@@ -130,8 +130,9 @@
 
     <!-- CLOCK WIDGET -->
     <div class="absolute top-4 right-4 md:top-6 md:right-8 z-50 text-right pointer-events-none">
-        <div id="clock-time" class="text-3xl md:text-5xl font-black tracking-tighter text-gray-100">--:--</div>
-        <div id="clock-date" class="text-lg md:text-xl text-gray-400 font-medium mt-1">Loading...</div>
+        <!-- Responsive scaling using min(vw, vh) to prevent oversized text on wide displays -->
+        <div id="clock-time" class="text-[clamp(1.5rem,min(5vw,5vh),4rem)] font-black tracking-tighter text-gray-100">--:--</div>
+        <div id="clock-date" class="text-[clamp(0.8rem,min(2vw,2vh),1.5rem)] text-gray-400 font-medium mt-1">Loading...</div>
     </div>
 
     <!-- MAIN DASHBOARD -->
@@ -214,12 +215,12 @@
         <div id="slide-steelers" class="slide-container bg-steelers">
             <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
                 <div class="flex items-center gap-4 md:gap-6 mb-2 border-b border-gray-800 pb-2 flex-none">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-12 h-12 md:w-24 md:h-24 flex-shrink-0" alt="Steelers">
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Steelers">
                     <div class="overflow-hidden flex flex-col justify-center">
-                        <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter truncate leading-none">Steelers</h2>
+                        <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-black text-white uppercase tracking-tighter truncate leading-none">Steelers</h2>
                         <!-- Replaced status text with a container for either text OR live badge -->
                         <div id="steelers-header-status" class="mt-1">
-                            <p id="steelers-status-text" class="text-lg md:text-2xl text-[#FFB612] font-bold uppercase truncate leading-none">Loading...</p>
+                            <p id="steelers-status-text" class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-[#FFB612] font-bold uppercase truncate leading-none">Loading...</p>
                             <div id="steelers-live-badge-header" class="hidden inline-block bg-red-600 px-3 py-0.5 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider live-pulse text-white">LIVE</div>
                         </div>
                     </div>
@@ -333,10 +334,10 @@
         <div id="slide-steelers-prev" class="slide-container bg-steelers">
             <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
                 <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-700 pb-4">
-                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-12 h-12 md:w-24 md:h-24" alt="Steelers">
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Steelers">
                     <div>
-                        <h2 class="text-3xl md:text-5xl font-bold text-gray-300">Previous Game</h2>
-                        <p class="text-lg md:text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                        <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-bold text-gray-300">Previous Game</h2>
+                        <p class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-gray-500 font-bold uppercase">Final Result</p>
                     </div>
                 </div>
                 <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
@@ -369,10 +370,10 @@
         <div id="slide-penguins" class="slide-container bg-penguins">
              <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
                 <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-800 pb-4">
-                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-16 h-16 md:w-24 md:h-24 flex-shrink-0" alt="Penguins">
+                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Penguins">
                     <div class="overflow-hidden">
-                        <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter truncate">Penguins</h2>
-                        <p id="pens-status-text" class="text-lg md:text-2xl text-[#CFC493] font-bold uppercase truncate">Loading...</p>
+                        <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-black text-white uppercase tracking-tighter truncate">Penguins</h2>
+                        <p id="pens-status-text" class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-[#CFC493] font-bold uppercase truncate">Loading...</p>
                     </div>
                 </div>
                 <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden min-h-[40vh] flex flex-col justify-center">
@@ -410,10 +411,10 @@
         <div id="slide-penguins-prev" class="slide-container bg-penguins">
             <div class="w-full max-w-7xl px-4 md:px-8 opacity-90 flex flex-col justify-center h-full">
                <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-700 pb-4">
-                   <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-16 h-16 md:w-20 md:h-20 grayscale opacity-80" alt="Penguins">
+                   <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] grayscale opacity-80" alt="Penguins">
                    <div>
-                       <h2 class="text-3xl md:text-5xl font-bold text-gray-300">Previous Game</h2>
-                       <p class="text-lg md:text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                       <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-bold text-gray-300">Previous Game</h2>
+                       <p class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-gray-500 font-bold uppercase">Final Result</p>
                    </div>
                </div>
                <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
@@ -446,10 +447,10 @@
        <div id="slide-pirates" class="slide-container bg-pirates">
         <div class="w-full max-w-7xl px-4 md:px-8 flex flex-col justify-center h-full">
            <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-800 pb-4">
-               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-16 h-16 md:w-24 md:h-24 flex-shrink-0" alt="Pirates">
+               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] flex-shrink-0" alt="Pirates">
                <div class="overflow-hidden">
-                   <h2 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter truncate">Pirates</h2>
-                   <p id="pirates-status-text" class="text-lg md:text-2xl text-[#FDB827] font-bold uppercase truncate">Loading...</p>
+                   <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-black text-white uppercase tracking-tighter truncate">Pirates</h2>
+                   <p id="pirates-status-text" class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-[#FDB827] font-bold uppercase truncate">Loading...</p>
                </div>
            </div>
            <div class="bg-white/5 rounded-3xl p-4 md:p-10 backdrop-blur-md relative overflow-hidden min-h-[40vh] flex flex-col justify-center">
@@ -487,10 +488,10 @@
    <div id="slide-pirates-prev" class="slide-container bg-pirates">
        <div class="w-full max-w-7xl px-4 md:px-8 opacity-90 flex flex-col justify-center h-full">
           <div class="flex items-center gap-4 md:gap-6 mb-8 border-b border-gray-700 pb-4">
-              <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-16 h-16 md:w-20 md:h-20 grayscale opacity-80" alt="Pirates">
+              <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-[clamp(3rem,min(10vw,10vh),6rem)] h-[clamp(3rem,min(10vw,10vh),6rem)] grayscale opacity-80" alt="Pirates">
               <div>
-                  <h2 class="text-3xl md:text-5xl font-bold text-gray-300">Previous Game</h2>
-                  <p class="text-lg md:text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                  <h2 class="text-[clamp(2rem,min(6vw,7vh),5rem)] font-bold text-gray-300">Previous Game</h2>
+                  <p class="text-[clamp(1rem,min(2vw,2.5vh),1.8rem)] text-gray-500 font-bold uppercase">Final Result</p>
               </div>
           </div>
           <div class="flex items-center justify-between bg-black/40 rounded-3xl p-4 md:p-10 backdrop-blur-sm border border-white/10">
