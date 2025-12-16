@@ -631,12 +631,34 @@
         }
 
         async function fetchSportsData() {
-            await processTeamData('steelers', API.NFL, 'slide-steelers', 'slide-steelers-prev');
-            await processTeamData('pens', API.NHL, 'slide-penguins', 'slide-penguins-prev');
-            await processTeamData('pirates', API.MLB, 'slide-pirates', 'slide-pirates-prev');
+            const validSlides = new Set(['slide-weather', 'slide-forecast']);
+            const liveSlides = new Set();
+            
+            const register = (id, isLive) => {
+                validSlides.add(id);
+                if(isLive) liveSlides.add(id);
+            };
+
+            await Promise.all([
+                processTeamData('steelers', API.NFL, 'slide-steelers', 'slide-steelers-prev', register),
+                processTeamData('pens', API.NHL, 'slide-penguins', 'slide-penguins-prev', register),
+                processTeamData('pirates', API.MLB, 'slide-pirates', 'slide-pirates-prev', register)
+            ]);
+
+            // Logic: If ANY game is live, only show live games.
+            if(liveSlides.size > 0) {
+                activeSlides = Array.from(liveSlides);
+                liveGameActive = true;
+            } else {
+                activeSlides = Array.from(validSlides);
+                liveGameActive = false;
+            }
+            
+            // Safety reset index if out of bounds
+            if(currentSlideIndex >= activeSlides.length) currentSlideIndex = 0;
         }
 
-        async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId) {
+        async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId, registerCallback) {
             try {
                 const res = await fetch(`${apiConfig.url}?t=${Date.now()}`);
                 const data = await res.json();
@@ -701,30 +723,16 @@
                     if (diff > TWO_WEEKS_MS) mainGame = null; 
                 }
 
-                const updateActiveSlides = (id, shouldShow) => {
-                    const idx = activeSlides.indexOf(id);
-                    if (shouldShow && idx === -1) activeSlides.push(id);
-                    if (!shouldShow && idx > -1) activeSlides.splice(idx, 1);
-                };
-
-                // Slide Logic
-                if (mainState === 'in') {
-                    // If live, hide previous
-                    updateActiveSlides(prevSlideId, false);
-                } else {
-                    if (prevGame) updateActiveSlides(prevSlideId, true);
-                    else updateActiveSlides(prevSlideId, false);
-                }
-
                 if (mainGame) {
                     renderGame(prefix, mainGame, mainState, apiConfig.color);
-                    updateActiveSlides(mainSlideId, true);
-                } else {
-                    updateActiveSlides(mainSlideId, false);
+                    // Register main slide. If Live, mark as live.
+                    registerCallback(mainSlideId, mainState === 'in');
                 }
 
                 if(prevGame) {
                      renderGame(prefix + '-prev', prevGame, 'post', apiConfig.color);
+                     // Prev game is never live (by definition above logic), so isLive=false
+                     registerCallback(prevSlideId, false);
                 }
 
             } catch (e) {
@@ -811,7 +819,11 @@
                 if (statusText) statusText.innerText = "Game In Progress";
                 if (liveBadge) liveBadge.classList.remove('hidden');
                 if (gameClock) gameClock.innerText = status.displayClock;
-                if (gameDetail) gameDetail.innerText = `Period ${status.period}`;
+                if (gameDetail) {
+                    let pLabel = "Period";
+                    if(elementPrefix === 'steelers') pLabel = "Quarter";
+                    gameDetail.innerText = `${pLabel} ${status.period}`;
+                }
                 if (summary) summary.innerText = game.name;
             } else if (state === 'post') {
                 if (statusText) statusText.innerText = "Final Result"; 
