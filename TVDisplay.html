@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pittsburgh Smart Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            overflow: hidden; 
+        }
+
+        /* Fade Transition */
+        .slide-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 0;
+        }
+
+        .slide-container.active {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        /* Team Themes & Gradients */
+        .bg-steelers {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            border-left: 20px solid #FFB612;
+        }
+        .text-steelers-win { color: #FFB612; text-shadow: 0 0 20px rgba(255, 182, 18, 0.4); }
+
+        .bg-penguins {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            border-left: 20px solid #CFC493;
+        }
+        .text-penguins-win { color: #CFC493; text-shadow: 0 0 20px rgba(207, 196, 147, 0.4); }
+
+        .bg-pirates {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            border-left: 20px solid #FDB827;
+        }
+        .text-pirates-win { color: #FDB827; text-shadow: 0 0 20px rgba(253, 184, 39, 0.4); }
+
+        .bg-weather {
+            background: linear-gradient(to bottom right, #0f172a, #1e293b);
+        }
+
+        /* Weather Colors */
+        .text-sun { color: #FACC15; filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.5)); }
+        .text-rain { color: #60A5FA; filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.5)); }
+        .text-cloud { color: #9CA3AF; }
+        .text-snow { color: #E0F2FE; }
+        .text-thunder { color: #C084FC; }
+
+        /* Custom Stacked Icon for Partly Cloudy */
+        .icon-stack { position: relative; width: 12rem; height: 12rem; display: flex; justify-content: center; align-items: center; }
+        .icon-stack .sun-layer { position: absolute; top: -10px; right: -10px; z-index: 1; color: #FACC15; filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.6)); }
+        .icon-stack .cloud-layer { position: relative; z-index: 2; color: #9CA3AF; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5)); }
+
+        .icon-stack-small { position: relative; width: 6rem; height: 6rem; display: flex; justify-content: center; align-items: center; margin: 0 auto; }
+        .icon-stack-small .sun-layer { position: absolute; top: -4px; right: -4px; z-index: 1; color: #FACC15; width: 3rem; height: 3rem; }
+        .icon-stack-small .cloud-layer { position: relative; z-index: 2; color: #9CA3AF; width: 4rem; height: 4rem; }
+
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            width: 0%;
+            transition: width 0.1s linear;
+            z-index: 50;
+        }
+        
+        /* Live Badge Animation */
+        .live-pulse {
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Football Field Visuals */
+        .field-bar {
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 19%,
+                rgba(255,255,255,0.2) 20%
+            );
+        }
+    </style>
+</head>
+<body class="h-screen w-screen relative text-white">
+
+    <!-- CLOCK WIDGET -->
+    <div class="absolute top-8 right-12 z-50 text-right">
+        <div id="clock-time" class="text-6xl font-black tracking-tighter text-gray-100">--:--</div>
+        <div id="clock-date" class="text-2xl text-gray-400 font-medium mt-1">Loading...</div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <main id="dashboard" class="relative w-full h-full">
+
+        <!-- SLIDE 1: CURRENT WEATHER -->
+        <div id="slide-weather" class="slide-container active bg-weather">
+            <div class="text-center w-full">
+                <div class="flex items-center justify-center gap-4 mb-6 opacity-70">
+                    <i data-lucide="map-pin" class="w-8 h-8"></i>
+                    <span id="location-name" class="text-3xl uppercase tracking-widest font-bold">Locating...</span>
+                </div>
+                
+                <div class="flex items-center justify-center gap-12">
+                    <div id="weather-icon-container" class="transform scale-150">
+                        <i data-lucide="loader" class="w-48 h-48 text-gray-500 animate-spin"></i>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div id="weather-temp" class="text-[12rem] leading-none font-bold tracking-tighter">--°</div>
+                        <div id="weather-desc" class="text-4xl text-gray-400 mt-4 font-light">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="flex gap-20 mt-20 justify-center">
+                    <div class="text-center">
+                        <span class="block text-gray-500 text-xl uppercase mb-2">Humidity</span>
+                        <span id="weather-humidity" class="text-4xl font-semibold">--%</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-gray-500 text-xl uppercase mb-2">Wind</span>
+                        <span id="weather-wind" class="text-4xl font-semibold">-- mph</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-gray-500 text-xl uppercase mb-2">High / Low</span>
+                        <span id="weather-hl" class="text-4xl font-semibold">--° / --°</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 1B: 3-DAY FORECAST -->
+        <div id="slide-forecast" class="slide-container bg-weather">
+            <div class="w-full max-w-6xl px-8">
+                <div class="flex items-center gap-6 mb-16 border-b border-gray-600 pb-6 opacity-80">
+                    <i data-lucide="calendar-days" class="w-12 h-12"></i>
+                    <h2 class="text-5xl font-bold uppercase tracking-tighter">3-Day Forecast</h2>
+                </div>
+
+                <div class="grid grid-cols-3 gap-8">
+                    <!-- Day 1 -->
+                    <div class="bg-white/10 rounded-3xl p-8 backdrop-blur-md text-center">
+                        <div id="fc-day-1-name" class="text-3xl font-bold text-gray-300 mb-4 uppercase">--</div>
+                        <div id="fc-day-1-icon" class="flex justify-center my-6">
+                            <i data-lucide="cloud" class="w-24 h-24 text-gray-400"></i>
+                        </div>
+                        <div class="text-5xl font-black mb-2"><span id="fc-day-1-max">--</span>°</div>
+                        <div class="text-2xl text-gray-400"><span id="fc-day-1-min">--</span>° Low</div>
+                    </div>
+                    <!-- Day 2 -->
+                    <div class="bg-white/10 rounded-3xl p-8 backdrop-blur-md text-center">
+                        <div id="fc-day-2-name" class="text-3xl font-bold text-gray-300 mb-4 uppercase">--</div>
+                        <div id="fc-day-2-icon" class="flex justify-center my-6">
+                            <i data-lucide="cloud" class="w-24 h-24 text-gray-400"></i>
+                        </div>
+                        <div class="text-5xl font-black mb-2"><span id="fc-day-2-max">--</span>°</div>
+                        <div class="text-2xl text-gray-400"><span id="fc-day-2-min">--</span>° Low</div>
+                    </div>
+                    <!-- Day 3 -->
+                    <div class="bg-white/10 rounded-3xl p-8 backdrop-blur-md text-center">
+                        <div id="fc-day-3-name" class="text-3xl font-bold text-gray-300 mb-4 uppercase">--</div>
+                        <div id="fc-day-3-icon" class="flex justify-center my-6">
+                            <i data-lucide="cloud" class="w-24 h-24 text-gray-400"></i>
+                        </div>
+                        <div class="text-5xl font-black mb-2"><span id="fc-day-3-max">--</span>°</div>
+                        <div class="text-2xl text-gray-400"><span id="fc-day-3-min">--</span>° Low</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: STEELERS (Next or Live) -->
+        <div id="slide-steelers" class="slide-container bg-steelers">
+            <div class="w-full max-w-7xl px-8">
+                <div class="flex items-center gap-6 mb-6 border-b border-gray-800 pb-6">
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-24 h-24" alt="Steelers">
+                    <div>
+                        <h2 class="text-6xl font-black text-white uppercase tracking-tighter">Steelers</h2>
+                        <p id="steelers-status-text" class="text-2xl text-[#FFB612] font-bold uppercase">Loading...</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between bg-white/5 rounded-3xl p-12 backdrop-blur-md relative overflow-hidden mb-6">
+                    <div id="steelers-live-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse">LIVE</div>
+                    
+                    <div class="text-center w-1/3">
+                        <div class="text-8xl font-black mb-2" id="steelers-home-score">--</div>
+                        <div class="text-4xl font-bold text-gray-400 mb-1" id="steelers-home-name">--</div>
+                        <div class="text-xl text-gray-500 font-mono" id="steelers-home-record"></div>
+                    </div>
+                    
+                    <div class="text-center w-1/3 flex flex-col justify-center h-full">
+                        <div id="steelers-game-clock" class="text-3xl text-gray-200 font-bold mb-2 uppercase">VS</div>
+                        <div id="steelers-game-detail" class="text-xl text-gray-500">Loading...</div>
+                    </div>
+                    
+                    <div class="text-center w-1/3">
+                        <div class="text-8xl font-black mb-2" id="steelers-away-score">--</div>
+                        <div class="text-4xl font-bold text-gray-400 mb-1" id="steelers-away-name">--</div>
+                        <div class="text-xl text-gray-500 font-mono" id="steelers-away-record"></div>
+                    </div>
+                </div>
+
+                <!-- LIVE FIELD VISUALIZATION (Hidden unless live) -->
+                <div id="steelers-live-viz" class="hidden bg-white/10 rounded-3xl p-6 backdrop-blur-md">
+                    <div class="flex justify-between items-end mb-4 px-2">
+                        <div>
+                             <div class="text-sm text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                             <div id="steelers-down-dist" class="text-4xl font-black text-white mt-1">1st & 10</div>
+                        </div>
+                        <div class="text-right">
+                             <div class="text-sm text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
+                             <div id="steelers-ball-on" class="text-4xl font-black text-[#FFB612] mt-1">OPP 40</div>
+                        </div>
+                    </div>
+                    <div class="relative h-6 bg-green-900/60 rounded-full overflow-hidden border border-white/20 w-full field-bar">
+                         <div id="steelers-drive-bar" class="absolute top-0 left-0 h-full bg-[#FFB612] transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(255,182,18,0.5)]" style="width: 0%;"></div>
+                         <div class="absolute top-0 left-[50%] h-full w-0.5 bg-white/30"></div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <p id="steelers-summary" class="text-3xl text-gray-300 font-light italic">--</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2B: STEELERS PREVIOUS -->
+        <div id="slide-steelers-prev" class="slide-container bg-steelers">
+            <div class="w-full max-w-7xl px-8 opacity-90"> 
+                <div class="flex items-center gap-6 mb-12 border-b border-gray-700 pb-6">
+                    <img src="https://a.espncdn.com/i/teamlogos/nfl/500/pit.png" class="w-20 h-20 grayscale opacity-80" alt="Steelers">
+                    <div>
+                        <h2 class="text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
+                        <p class="text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between bg-black/40 rounded-3xl p-10 backdrop-blur-sm border border-white/10">
+                    <div class="text-center w-1/3">
+                        <div class="text-7xl font-black mb-2" id="steelers-prev-home-score">--</div>
+                        <div class="text-3xl font-bold mb-1" id="steelers-prev-home-name">--</div>
+                    </div>
+                    <div class="text-center w-1/3 flex flex-col justify-center h-full">
+                        <div class="text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
+                        <div id="steelers-prev-game-detail" class="text-lg text-gray-600">--</div>
+                    </div>
+                    <div class="text-center w-1/3">
+                        <div class="text-7xl font-black mb-2" id="steelers-prev-away-score">--</div>
+                        <div class="text-3xl font-bold mb-1" id="steelers-prev-away-name">--</div>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <p id="steelers-prev-summary" class="text-2xl text-gray-400 font-light italic">--</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: PENGUINS (Next or Live) -->
+        <div id="slide-penguins" class="slide-container bg-penguins">
+             <div class="w-full max-w-7xl px-8">
+                <div class="flex items-center gap-6 mb-12 border-b border-gray-800 pb-6">
+                    <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-24 h-24" alt="Penguins">
+                    <div>
+                        <h2 class="text-6xl font-black text-white uppercase tracking-tighter">Penguins</h2>
+                        <p id="pens-status-text" class="text-2xl text-[#CFC493] font-bold uppercase">Loading...</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between bg-white/5 rounded-3xl p-12 backdrop-blur-md relative overflow-hidden">
+                     <div id="pens-live-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse">LIVE</div>
+                     <div class="text-center w-1/3">
+                        <div class="text-8xl font-black mb-2" id="pens-home-score">--</div>
+                        <div class="text-4xl font-bold text-gray-400 mb-1" id="pens-home-name">--</div>
+                        <div class="text-xl text-gray-500 font-mono" id="pens-home-record"></div>
+                    </div>
+                    <div class="text-center w-1/3 flex flex-col justify-center h-full">
+                        <div id="pens-game-clock" class="text-3xl text-gray-200 font-bold mb-2 uppercase">VS</div>
+                        <div id="pens-game-detail" class="text-xl text-gray-500">Loading...</div>
+                    </div>
+                    <div class="text-center w-1/3">
+                        <div class="text-8xl font-black mb-2" id="pens-away-score">--</div>
+                        <div class="text-4xl font-bold text-gray-400 mb-1" id="pens-away-name">--</div>
+                        <div class="text-xl text-gray-500 font-mono" id="pens-away-record"></div>
+                    </div>
+                </div>
+                 <div class="mt-8 text-center">
+                    <p id="pens-summary" class="text-3xl text-gray-300 font-light italic">--</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3B: PENGUINS PREVIOUS -->
+        <div id="slide-penguins-prev" class="slide-container bg-penguins">
+            <div class="w-full max-w-7xl px-8 opacity-90">
+               <div class="flex items-center gap-6 mb-12 border-b border-gray-700 pb-6">
+                   <img src="https://a.espncdn.com/i/teamlogos/nhl/500/pit.png" class="w-20 h-20 grayscale opacity-80" alt="Penguins">
+                   <div>
+                       <h2 class="text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
+                       <p class="text-xl text-gray-500 font-bold uppercase">Final Result</p>
+                   </div>
+               </div>
+               <div class="flex items-center justify-between bg-black/40 rounded-3xl p-10 backdrop-blur-sm border border-white/10">
+                   <div class="text-center w-1/3">
+                       <div class="text-7xl font-black mb-2" id="pens-prev-home-score">--</div>
+                       <div class="text-3xl font-bold mb-1" id="pens-prev-home-name">--</div>
+                   </div>
+                   <div class="text-center w-1/3 flex flex-col justify-center h-full">
+                       <div class="text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
+                       <div id="pens-prev-game-detail" class="text-lg text-gray-600">--</div>
+                   </div>
+                   <div class="text-center w-1/3">
+                       <div class="text-7xl font-black mb-2" id="pens-prev-away-score">--</div>
+                       <div class="text-3xl font-bold mb-1" id="pens-prev-away-name">--</div>
+                   </div>
+               </div>
+                <div class="mt-8 text-center">
+                   <p id="pens-prev-summary" class="text-2xl text-gray-400 font-light italic">--</p>
+               </div>
+           </div>
+       </div>
+
+       <!-- SLIDE 4: PIRATES (Next or Live) -->
+       <div id="slide-pirates" class="slide-container bg-pirates">
+        <div class="w-full max-w-7xl px-8">
+           <div class="flex items-center gap-6 mb-12 border-b border-gray-800 pb-6">
+               <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-24 h-24" alt="Pirates">
+               <div>
+                   <h2 class="text-6xl font-black text-white uppercase tracking-tighter">Pirates</h2>
+                   <p id="pirates-status-text" class="text-2xl text-[#FDB827] font-bold uppercase">Loading...</p>
+               </div>
+           </div>
+           <div class="flex items-center justify-between bg-white/5 rounded-3xl p-12 backdrop-blur-md relative overflow-hidden">
+                <div id="pirates-live-badge" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 bg-red-600 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider live-pulse">LIVE</div>
+                
+                <div class="text-center w-1/3">
+                   <div class="text-8xl font-black mb-2" id="pirates-home-score">--</div>
+                   <div class="text-4xl font-bold text-gray-400 mb-1" id="pirates-home-name">--</div>
+                   <div class="text-xl text-gray-500 font-mono" id="pirates-home-record"></div>
+               </div>
+               <div class="text-center w-1/3 flex flex-col justify-center h-full">
+                   <div id="pirates-game-clock" class="text-3xl text-gray-200 font-bold mb-2 uppercase">VS</div>
+                   <div id="pirates-game-detail" class="text-xl text-gray-500">Loading...</div>
+               </div>
+               <div class="text-center w-1/3">
+                   <div class="text-8xl font-black mb-2" id="pirates-away-score">--</div>
+                   <div class="text-4xl font-bold text-gray-400 mb-1" id="pirates-away-name">--</div>
+                   <div class="text-xl text-gray-500 font-mono" id="pirates-away-record"></div>
+               </div>
+           </div>
+            <div class="mt-8 text-center">
+               <p id="pirates-summary" class="text-3xl text-gray-300 font-light italic">--</p>
+           </div>
+       </div>
+   </div>
+
+   <!-- SLIDE 4B: PIRATES PREVIOUS -->
+   <div id="slide-pirates-prev" class="slide-container bg-pirates">
+       <div class="w-full max-w-7xl px-8 opacity-90">
+          <div class="flex items-center gap-6 mb-12 border-b border-gray-700 pb-6">
+              <img src="https://a.espncdn.com/i/teamlogos/mlb/500/pit.png" class="w-20 h-20 grayscale opacity-80" alt="Pirates">
+              <div>
+                  <h2 class="text-5xl font-bold text-gray-300 uppercase tracking-tighter">Previous Game</h2>
+                  <p class="text-xl text-gray-500 font-bold uppercase">Final Result</p>
+              </div>
+          </div>
+          <div class="flex items-center justify-between bg-black/40 rounded-3xl p-10 backdrop-blur-sm border border-white/10">
+              <div class="text-center w-1/3">
+                  <div class="text-7xl font-black mb-2" id="pirates-prev-home-score">--</div>
+                  <div class="text-3xl font-bold mb-1" id="pirates-prev-home-name">--</div>
+              </div>
+              <div class="text-center w-1/3 flex flex-col justify-center h-full">
+                  <div class="text-2xl text-gray-500 font-bold mb-2 uppercase">FINAL</div>
+                  <div id="pirates-prev-game-detail" class="text-lg text-gray-600">--</div>
+              </div>
+              <div class="text-center w-1/3">
+                  <div class="text-7xl font-black mb-2" id="pirates-prev-away-score">--</div>
+                  <div class="text-3xl font-bold mb-1" id="pirates-prev-away-name">--</div>
+              </div>
+          </div>
+           <div class="mt-8 text-center">
+              <p id="pirates-prev-summary" class="text-2xl text-gray-400 font-light italic">--</p>
+          </div>
+      </div>
+  </div>
+
+    </main>
+
+    <!-- Progress Bar -->
+    <div id="progress" class="progress-bar"></div>
+
+    <script>
+        // --- CONFIG ---
+        const CONFIG = {
+            defaultDuration: 10000, 
+            liveDuration: 30000, 
+            fallbackLocation: { lat: 40.9525, long: -76.4613, name: "Catawissa, PA" }, 
+            currentLocation: null
+        };
+        
+        // --- TIME UTILS ---
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        const TWO_WEEKS_MS = 14 * ONE_DAY_MS;
+
+        // --- STATE ---
+        let currentSlideIndex = 0;
+        let activeSlides = ['slide-weather', 'slide-forecast']; 
+        let liveGameActive = false;
+        
+        const API = {
+            // Updated IDs for safety, but primary filtering is now by NAME
+            NFL: { url: 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/23/schedule', name: 'Steelers', color: 'text-steelers-win' },
+            NHL: { url: 'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams/5/schedule', name: 'Penguins', color: 'text-penguins-win' },
+            MLB: { url: 'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams/23/schedule', name: 'Pirates', color: 'text-pirates-win' }
+        };
+
+        function init() {
+            lucide.createIcons();
+            startClock();
+            
+            // Geolocation Logic
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const lat = position.coords.latitude;
+                        const long = position.coords.longitude;
+                        let locationName = "Your Location";
+                        try {
+                            const geoUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${long}&localityLanguage=en`;
+                            const geoRes = await fetch(geoUrl);
+                            const geoData = await geoRes.json();
+                            const city = geoData.city || geoData.locality || "";
+                            const region = geoData.principalSubdivisionCode || ""; 
+                            const cleanRegion = region.replace("US-", "");
+                            if(city) locationName = `${city}${cleanRegion ? ', ' + cleanRegion : ''}`;
+                        } catch(e) {}
+
+                        CONFIG.currentLocation = { lat: lat, long: long, name: locationName };
+                        fetchWeather();
+                    },
+                    (error) => {
+                        CONFIG.currentLocation = CONFIG.fallbackLocation;
+                        fetchWeather();
+                    }
+                );
+            } else {
+                CONFIG.currentLocation = CONFIG.fallbackLocation;
+                fetchWeather();
+            }
+
+            fetchSportsData();
+            startCarousel();
+        }
+
+        function startClock() {
+            const updateTime = () => {
+                const now = new Date();
+                let hours = now.getHours();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12; 
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+                document.getElementById('clock-time').innerText = `${hours}:${minutes} ${ampm}`;
+                document.getElementById('clock-date').innerText = dateStr;
+            };
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        async function fetchWeather() {
+            const loc = CONFIG.currentLocation || CONFIG.fallbackLocation;
+            document.getElementById('location-name').innerText = loc.name;
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.long}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=4`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if(!data.current) throw new Error("No weather data");
+
+                const current = data.current;
+                const daily = data.daily;
+                
+                document.getElementById('weather-temp').innerText = Math.round(current.temperature_2m) + '°';
+                document.getElementById('weather-humidity').innerText = current.relative_humidity_2m + '%';
+                document.getElementById('weather-wind').innerText = Math.round(current.wind_speed_10m) + ' mph';
+                document.getElementById('weather-hl').innerText = `${Math.round(daily.temperature_2m_max[0])}° / ${Math.round(daily.temperature_2m_min[0])}°`;
+                const info = getWeatherDetails(current.weather_code);
+                document.getElementById('weather-desc').innerText = info.desc;
+                
+                // --- CUSTOM RENDERER FOR PARTLY CLOUDY ---
+                const container = document.getElementById('weather-icon-container');
+                if(info.desc === 'Partly Cloudy') {
+                    container.innerHTML = `
+                        <div class="icon-stack">
+                            <i data-lucide="sun" class="w-48 h-48 sun-layer"></i>
+                            <i data-lucide="cloud" class="w-48 h-48 cloud-layer"></i>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<i data-lucide="${info.icon}" class="w-48 h-48 ${info.color}"></i>`;
+                }
+
+                for(let i=1; i<=3; i++) {
+                    const date = new Date(daily.time[i]);
+                    const dayName = date.toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }); 
+                    
+                    document.getElementById(`fc-day-${i}-name`).innerText = dayName;
+                    document.getElementById(`fc-day-${i}-max`).innerText = Math.round(daily.temperature_2m_max[i]);
+                    document.getElementById(`fc-day-${i}-min`).innerText = Math.round(daily.temperature_2m_min[i]);
+                    const fInfo = getWeatherDetails(daily.weather_code[i]);
+                    
+                    const fcContainer = document.getElementById(`fc-day-${i}-icon`);
+                    if(fInfo.desc === 'Partly Cloudy') {
+                        fcContainer.innerHTML = `
+                            <div class="icon-stack-small">
+                                <i data-lucide="sun" class="sun-layer"></i>
+                                <i data-lucide="cloud" class="cloud-layer"></i>
+                            </div>
+                        `;
+                    } else {
+                        fcContainer.innerHTML = `<i data-lucide="${fInfo.icon}" class="w-24 h-24 ${fInfo.color}"></i>`;
+                    }
+                }
+                lucide.createIcons();
+            } catch (e) {}
+        }
+
+        function getWeatherDetails(code) {
+            if (code === 0) return { desc: 'Clear Sky', icon: 'sun', color: 'text-sun' };
+            if (code <= 3) return { desc: 'Partly Cloudy', icon: 'cloud-sun', color: 'text-sun' }; // Logic handled in main render
+            if (code <= 48) return { desc: 'Foggy', icon: 'cloud-fog', color: 'text-cloud' };
+            if (code <= 55) return { desc: 'Drizzle', icon: 'cloud-drizzle', color: 'text-rain' };
+            if (code <= 65) return { desc: 'Rain', icon: 'cloud-rain', color: 'text-rain' };
+            if (code <= 77) return { desc: 'Snow', icon: 'snowflake', color: 'text-snow' };
+            if (code >= 95) return { desc: 'Thunderstorm', icon: 'cloud-lightning', color: 'text-thunder' };
+            return { desc: 'Cloudy', icon: 'cloud', color: 'text-cloud' };
+        }
+
+        async function fetchSportsData() {
+            await processTeamData('steelers', API.NFL, 'slide-steelers', 'slide-steelers-prev');
+            await processTeamData('pens', API.NHL, 'slide-penguins', 'slide-penguins-prev');
+            await processTeamData('pirates', API.MLB, 'slide-pirates', 'slide-pirates-prev');
+        }
+
+        async function processTeamData(prefix, apiConfig, mainSlideId, prevSlideId) {
+            try {
+                const res = await fetch(`${apiConfig.url}?t=${Date.now()}`);
+                const data = await res.json();
+                const allEvents = data.events;
+
+                if (!allEvents || allEvents.length === 0) throw new Error("No games");
+
+                // --- BRUTE FORCE FILTER: CHECK NAMES ---
+                // We convert everything to strings and look for the team name
+                // "Penguins", "Steelers", "Pirates"
+                const events = allEvents.filter(e => {
+                    const str = JSON.stringify(e).toLowerCase();
+                    return str.includes(apiConfig.name.toLowerCase());
+                });
+
+                if (events.length === 0) throw new Error("No specific team games found");
+
+                // --- ROBUST PREV/NEXT LOGIC ---
+                // Sort EVERYTHING by date
+                events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                const now = new Date();
+                let mainGame = null;
+                let prevGame = null;
+                let mainState = '';
+
+                // Find index where games switch from past to future
+                let nextGameIndex = events.findIndex(e => new Date(e.date) > now);
+
+                if (nextGameIndex === -1) {
+                    // All games are in the past
+                    prevGame = events[events.length - 1];
+                    // "Main" game could be the last game shown as "Final" if close enough
+                    mainGame = null; 
+                } else if (nextGameIndex === 0) {
+                    // All games are in the future
+                    mainGame = events[0];
+                    mainState = 'pre';
+                    // Check if there was a game *before* the schedule start? (API limit)
+                    // If API only returns future, we have no prev.
+                } else {
+                    // We are in the middle of schedule
+                    prevGame = events[nextGameIndex - 1];
+                    mainGame = events[nextGameIndex];
+                    mainState = 'pre';
+                }
+                
+                // CHECK IF "PREV" GAME IS ACTUALLY LIVE
+                if (prevGame && prevGame.competitions[0].status.type.state === 'in') {
+                    // It's actually LIVE, so it becomes MAIN
+                    mainGame = prevGame;
+                    mainState = 'in';
+                    prevGame = (nextGameIndex > 1) ? events[nextGameIndex - 2] : null; // Game before the live one
+                    if(prefix === 'steelers') liveGameActive = true;
+                }
+
+                // --- HIDE RULES ---
+                // 1. If Prev Game is > 14 days old, Hide it.
+                if (prevGame) {
+                    const diff = now - new Date(prevGame.date);
+                    if (diff > TWO_WEEKS_MS) prevGame = null; 
+                }
+                // 2. If Next Game is > 14 days away, Hide it.
+                if (mainGame && mainState === 'pre') {
+                    const diff = new Date(mainGame.date) - now;
+                    if (diff > TWO_WEEKS_MS) mainGame = null; 
+                }
+
+                const updateActiveSlides = (id, shouldShow) => {
+                    const idx = activeSlides.indexOf(id);
+                    if (shouldShow && idx === -1) activeSlides.push(id);
+                    if (!shouldShow && idx > -1) activeSlides.splice(idx, 1);
+                };
+
+                // Logic for Slide Activation
+                if (mainState === 'in') {
+                    // If live, hide previous
+                    updateActiveSlides(prevSlideId, false);
+                } else {
+                    if (prevGame) updateActiveSlides(prevSlideId, true);
+                    else updateActiveSlides(prevSlideId, false);
+                }
+
+                if (mainGame) {
+                    renderGame(prefix, mainGame, mainState, apiConfig.color);
+                    updateActiveSlides(mainSlideId, true);
+                } else {
+                    updateActiveSlides(mainSlideId, false);
+                }
+
+                // If Prev exists, render it
+                if(prevGame) {
+                     renderGame(prefix + '-prev', prevGame, 'post', apiConfig.color);
+                }
+
+            } catch (e) {
+                console.error(`Error ${prefix}`, e);
+            }
+        }
+
+        function renderGame(elementPrefix, game, state, winColorClass) {
+            const comp = game.competitions[0];
+            const home = comp.competitors.find(c => c.homeAway === 'home');
+            const away = comp.competitors.find(c => c.homeAway === 'away');
+            const status = comp.status;
+
+            const setTxt = (id, txt) => {
+                const el = document.getElementById(elementPrefix + '-' + id);
+                if (el) el.innerText = txt;
+            };
+
+            setTxt('home-name', home.team.abbreviation);
+            setTxt('away-name', away.team.abbreviation);
+            setTxt('home-score', home.score ? home.score.value : '0');
+            setTxt('away-score', away.score ? away.score.value : '0');
+
+            const getRec = (c) => {
+                if(c.records && c.records[0] && c.records[0].summary) return c.records[0].summary;
+                return "";
+            };
+            setTxt('home-record', getRec(home));
+            setTxt('away-record', getRec(away));
+
+            const statusText = document.getElementById(`${elementPrefix}-status-text`);
+            const gameClock = document.getElementById(`${elementPrefix}-game-clock`);
+            const gameDetail = document.getElementById(`${elementPrefix}-game-detail`);
+            const summary = document.getElementById(`${elementPrefix}-summary`);
+            const liveBadge = document.getElementById(`${elementPrefix}-live-badge`);
+
+            if (liveBadge) liveBadge.classList.add('hidden');
+            
+            // --- LIVE VISUALIZATION (NFL Only) ---
+            if(elementPrefix === 'steelers') {
+                const vizContainer = document.getElementById('steelers-live-viz');
+                if(state === 'in') {
+                    vizContainer.classList.remove('hidden');
+                    if(comp.situation) {
+                        const sit = comp.situation;
+                        const downStr = sit.down ? `${sit.down}${getOrdinal(sit.down)}` : '1st';
+                        const distStr = sit.distance ? ` & ${sit.distance}` : ' & 10';
+                        document.getElementById('steelers-down-dist').innerText = downStr + distStr;
+                        
+                        let posTeam = "Ball";
+                        if(sit.possession === home.id) posTeam = home.team.abbreviation;
+                        if(sit.possession === away.id) posTeam = away.team.abbreviation;
+                        
+                        if(sit.yardLine) document.getElementById('steelers-ball-on').innerText = `${posTeam} ${100-sit.yardLine}`;
+                        
+                        let pct = sit.yardLine || 50;
+                        document.getElementById('steelers-drive-bar').style.width = `${pct}%`;
+                    }
+                } else {
+                    vizContainer.classList.add('hidden');
+                }
+            }
+
+            // SCORE COLORS
+            const hScore = parseInt(home.score ? home.score.value : 0);
+            const aScore = parseInt(away.score ? away.score.value : 0);
+            const hScoreEl = document.getElementById(`${elementPrefix}-home-score`);
+            const aScoreEl = document.getElementById(`${elementPrefix}-away-score`);
+            
+            hScoreEl.className = "text-8xl font-black mb-2 text-white";
+            aScoreEl.className = "text-8xl font-black mb-2 text-white";
+
+            if (state === 'post' || (state === 'in' && (hScore > 0 || aScore > 0))) {
+                if (hScore > aScore) {
+                    hScoreEl.className = `text-8xl font-black mb-2 ${winColorClass}`;
+                    aScoreEl.className = "text-8xl font-black mb-2 text-gray-500 opacity-60";
+                } else if (aScore > hScore) {
+                    aScoreEl.className = `text-8xl font-black mb-2 ${winColorClass}`;
+                    hScoreEl.className = "text-8xl font-black mb-2 text-gray-500 opacity-60";
+                }
+            }
+
+            if (state === 'in') {
+                if (statusText) statusText.innerText = "Game In Progress";
+                if (liveBadge) liveBadge.classList.remove('hidden');
+                if (gameClock) gameClock.innerText = status.displayClock;
+                if (gameDetail) gameDetail.innerText = `Period ${status.period}`;
+                if (summary) summary.innerText = game.name;
+            } else if (state === 'post') {
+                if (statusText) statusText.innerText = "Final Result"; 
+                if (gameClock) gameClock.innerText = "FINAL"; 
+                if (gameDetail) gameDetail.innerText = new Date(game.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                const winner = home.score.value > away.score.value ? home.team.displayName : away.team.displayName;
+                if (summary) summary.innerText = `${game.shortName} - ${winner} wins.`;
+            } else {
+                if (statusText) statusText.innerText = "Next Game";
+                const gameDate = new Date(game.date);
+                const isToday = new Date().toDateString() === gameDate.toDateString();
+                const timeStr = gameDate.toLocaleTimeString('en-US', { hour: 'numeric', minute:'2-digit' });
+                const dateStr = gameDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                if (gameClock) gameClock.innerText = isToday ? "TODAY" : dateStr;
+                if (gameDetail) gameDetail.innerText = timeStr;
+                if (summary) summary.innerText = `Upcoming at ${comp.venue ? comp.venue.fullName : 'Stadium'}`;
+            }
+        }
+        
+        function getOrdinal(n) {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return s[(v - 20) % 10] || s[v] || s[0];
+        }
+
+        function startCarousel() {
+            let startTime = Date.now();
+            function updateProgress() {
+                const currentId = activeSlides[currentSlideIndex];
+                let duration = CONFIG.defaultDuration;
+                if(currentId === 'slide-steelers' && liveGameActive) {
+                    duration = CONFIG.liveDuration;
+                }
+                const elapsed = Date.now() - startTime;
+                const pct = Math.min((elapsed / duration) * 100, 100);
+                document.getElementById('progress').style.width = `${pct}%`;
+                
+                if (elapsed >= duration) {
+                    nextSlide();
+                } else {
+                    requestAnimationFrame(updateProgress);
+                }
+            }
+            
+            function nextSlide() {
+                if (activeSlides.length > 0) {
+                    const currentId = activeSlides[currentSlideIndex];
+                    const currentEl = document.getElementById(currentId);
+                    if(currentEl) currentEl.classList.remove('active');
+                }
+                
+                currentSlideIndex = (currentSlideIndex + 1) % activeSlides.length;
+                
+                if (activeSlides.length > 0) {
+                    const nextId = activeSlides[currentSlideIndex];
+                    const nextEl = document.getElementById(nextId);
+                    if(nextEl) nextEl.classList.add('active');
+                }
+                
+                startTime = Date.now();
+                if (currentSlideIndex === 0) {
+                    fetchWeather();
+                    fetchSportsData();
+                }
+                updateProgress();
+            }
+
+            updateProgress();
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>
