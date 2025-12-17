@@ -96,19 +96,13 @@
         const IconBase = ({ children, className, ...props }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>
         );
-        // Standard Icons
         const Settings = (props) => <IconBase {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
         const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
         const Plus = (props) => <IconBase {...props}><path d="M5 12h14"/><path d="M12 5v14"/></IconBase>;
         const Clock = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></IconBase>;
-        const Trophy = (props) => <IconBase {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></IconBase>;
         const CalendarIcon = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
         const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
-        const ChevronRight = (props) => <IconBase {...props}><path d="m9 18 6-6-6-6"/></IconBase>;
         const Check = (props) => <IconBase {...props}><polyline points="20 6 9 17 4 12"/></IconBase>;
-        const TrendingUp = (props) => <IconBase {...props}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></IconBase>;
-        const Trash2 = (props) => <IconBase {...props}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></IconBase>;
-        const Newspaper = (props) => <IconBase {...props}><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></IconBase>;
         
         // Weather Icons
         const Sun = (props) => <IconBase {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></IconBase>;
@@ -256,6 +250,35 @@
             { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' },
         ];
 
+        // NCAA Football Teams (Major Programs) - Uses numeric IDs
+        const NCAAF_TEAMS = [
+            { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' },
+            { id: '150', city: 'Duke', name: 'Blue Devils', color: '#003087' },
+            { id: '57',  city: 'Florida', name: 'Gators', color: '#0021A5' },
+            { id: '52',  city: 'Florida State', name: 'Seminoles', color: '#782F40' },
+            { id: '61',  city: 'Georgia', name: 'Bulldogs', color: '#BA0C2F' },
+            { id: '130', city: 'Michigan', name: 'Wolverines', color: '#00274C' },
+            { id: '127', city: 'Michigan State', name: 'Spartans', color: '#18453B' },
+            { id: '87',  city: 'Notre Dame', name: 'Fighting Irish', color: '#0C2340' },
+            { id: '194', city: 'Ohio State', name: 'Buckeyes', color: '#BB0000' },
+            { id: '201', city: 'Oklahoma', name: 'Sooners', color: '#841617' },
+            { id: '2483', city: 'Oregon', name: 'Ducks', color: '#154733' },
+            { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' },
+            { id: '251', city: 'Texas', name: 'Longhorns', color: '#BF5700' },
+            { id: '245', city: 'Texas A&M', name: 'Aggies', color: '#500000' },
+            { id: '30',  city: 'USC', name: 'Trojans', color: '#990000' },
+            { id: '2633', city: 'Tennessee', name: 'Volunteers', color: '#FF8200' },
+            { id: '99',  city: 'LSU', name: 'Tigers', color: '#461D7C' },
+            { id: '228', city: 'Clemson', name: 'Tigers', color: '#F56600' },
+            { id: '239', city: 'Baylor', name: 'Bears', color: '#154734' },
+            { id: '2641', city: 'Texas Tech', name: 'Red Raiders', color: '#CC0000' },
+            { id: '252', city: 'TCU', name: 'Horned Frogs', color: '#4d1979' },
+            { id: '142', city: 'Missouri', name: 'Tigers', color: '#F1B82D' },
+            { id: '145', city: 'Ole Miss', name: 'Rebels', color: '#CE1126' },
+            { id: '254', city: 'Utah', name: 'Utes', color: '#CC0000' },
+            { id: '265', city: 'Washington', name: 'Huskies', color: '#4B2E83' },
+        ];
+
         // --- COMPONENTS ---
 
         const NFLCard = ({ teamId, realData }) => {
@@ -393,6 +416,172 @@
                                         <div className="flex flex-col items-center w-[30%]">
                                             <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
                                             <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="text-[6vh] font-bold text-gray-500 w-[40%] text-center">VS</div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.next?.opponentLogo ? (
+                                                <img src={team.schedule.next.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            ) : (
+                                                <div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.next?.opponent}</div>
+                                            )}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.next?.opponent}</div>
+                                            {team.schedule?.next?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    </div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // NEW COMPONENT: NCAA Football Card (Similar to NFL, but handles College Data)
+        const NCAAFCard = ({ teamId, realData }) => {
+            const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                // NCAA Logo URL Pattern
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId}.png` };
+                if (realData) { 
+                    const oppColor = NCAAF_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
+                    if (realData.live) realData.live.opponentColor = oppColor;
+                    return { ...base, ...realData }; 
+                }
+                return {
+                    ...base, status: 'OFFLINE', record: '0-0',
+                    schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } }
+                };
+            }, [teamId, teamConfig, realData]);
+
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            const containerStyle = { background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` };
+            const fieldTurfStyle = { backgroundColor: '#3f6228', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.8)' };
+
+            // Reuse the exact same layout as NFLCard
+            return (
+                <div className="h-full w-full flex flex-col relative overflow-hidden text-white font-sans" style={containerStyle}>
+                    <div className="flex-none flex items-center gap-[2vw] p-[3vh] border-b border-gray-800 relative z-10">
+                        <img src={team.logo} alt={team.name} className="h-[8vh] w-[8vh] object-contain drop-shadow-lg" />
+                        <div className="flex flex-col justify-center">
+                            <div className="flex items-baseline gap-[1vw]">
+                                <h2 className="text-[5vmin] font-black uppercase tracking-tighter leading-none text-white">{team.city} {team.name}</h2>
+                                <span className="text-[3vmin] text-gray-400 font-bold">({team.record})</span>
+                                {isLive && <span className="bg-red-600 text-white text-[1.5vh] font-bold px-[1vw] py-[0.2vh] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider ml-[1vw]">LIVE</span>}
+                            </div>
+                            <p className="text-[2vh] font-bold uppercase tracking-widest mt-[0.5vh]" style={{ color: team.color }}>
+                                {isLive ? "IN PROGRESS" : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-h-0 flex flex-col justify-center p-[2vh] relative z-10 gap-[2vh]">
+                        {isLive ? (
+                            <>
+                                <div className="flex-shrink-0 flex flex-col items-center justify-center bg-white/5 rounded-3xl p-[1vh] border border-white/5 backdrop-blur-md h-[30vh]">
+                                    <div className="flex w-full justify-between items-center px-[2vw] mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <img src={team.logo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold text-gray-400">{team.city}</div>
+                                            <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.record}</div>
+                                            <div className="text-[8vh] font-black leading-none" style={{ textShadow: `0 0 10px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        </div>
+                                        <div className="text-[4vh] font-bold text-gray-400">VS</div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                             {team.live.opponentLogo ? <img src={team.live.opponentLogo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" /> : <div className="h-[8vh] w-[8vh] bg-white/10 rounded-full flex items-center justify-center text-[3vh] font-bold">{team.live.opponent}</div>}
+                                            <div className="text-[3vh] font-bold text-gray-400">{team.live.opponent}</div>
+                                            {team.live.opponentRecord && <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.live.opponentRecord}</div>}
+                                            <div className="text-[8vh] font-black leading-none text-white">{team.live.score.oppScore}</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-[4vh] font-black tracking-tighter text-white leading-none">
+                                        {team.live.quarter}Q <span className="text-gray-400 mx-2">|</span> {team.live.time}
+                                    </div>
+                                </div>
+                                <div className="flex-shrink-0 text-center py-[0.5vh] min-h-[6vh] flex items-center justify-center">
+                                     <div className="text-[2.5vmin] text-gray-300 font-bold tracking-tight px-2 leading-tight whitespace-normal line-clamp-3">
+                                         {team.live.lastPlay}
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-h-0 bg-white/10 rounded-xl p-[1.5vh] border border-white/10 flex flex-col justify-end backdrop-blur-md">
+                                    <div className="flex justify-between items-end mb-[0.5vh] px-2 flex-shrink-0">
+                                        <div>
+                                            <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                                            <div className="text-[3vh] font-black text-white leading-none mt-[0.5vh]">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
+                                            <div className="text-[3vh] font-black leading-none mt-[0.5vh]" style={{ color: team.color }}>{team.live.yardLine > 50 ? `OPP ${100 - team.live.yardLine}` : `OWN ${team.live.yardLine}`}</div>
+                                        </div>
+                                    </div>
+                                    <div className="relative w-full rounded overflow-hidden flex flex-1 min-h-[8vh] max-h-[15vh]" style={fieldTurfStyle}>
+                                        <div className="w-[8%] h-full bg-black/40 border-r-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black -rotate-90 whitespace-nowrap absolute">{team.id}</span></div>
+                                        <div className="flex-1 relative h-full field-lines z-0">
+                                            <div className="absolute bottom-[5%] w-full flex justify-between px-[10%] text-[1.5vh] font-bold text-white/80 font-courier transform -translate-x-[0%]">
+                                                <span>10</span><span>20</span><span>30</span><span>40</span><span className="text-white">50</span><span>40</span><span>30</span><span>20</span><span>10</span>
+                                            </div>
+                                            <div className="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style={{ left: team.live.possession === 'myTeam' ? 0 : 'auto', right: team.live.possession === 'myTeam' ? 'auto' : 0, width: `${team.live.possession === 'myTeam' ? team.live.yardLine : (100 - team.live.yardLine)}%`, flexDirection: team.live.possession === 'myTeam' ? 'row' : 'row-reverse' }}>
+                                               <div className="h-[60%] flex-grow rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] relative flex items-center overflow-visible" style={{ backgroundColor: team.live.possession === 'myTeam' ? team.color : (team.live.opponentColor || '#fff') }}>
+                                                    {/* Possession Logo on the Drive Line */}
+                                                    <div className="absolute h-[5vh] w-[5vh] md:h-[6vh] md:w-[6vh] aspect-square z-20 flex items-center justify-center" style={{ right: team.live.possession === 'myTeam' ? '0' : 'auto', left: team.live.possession === 'myTeam' ? 'auto' : '0', top: '50%', transform: 'translateY(-50%)' }}>
+                                                        <img 
+                                                            src={team.live.possession === 'myTeam' ? team.logo : (team.live.opponentLogo || 'https://via.placeholder.com/50')} 
+                                                            className="w-full h-full object-contain drop-shadow-md"
+                                                            alt="possession"
+                                                        />
+                                                    </div>
+                                               </div>
+                                            </div>
+                                        </div>
+                                        <div className="w-[8%] h-full bg-black/40 border-l-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black rotate-90 whitespace-nowrap absolute">{team.live.opponent}</span></div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="h-full flex flex-col justify-center gap-[4vh]">
+                                {/* Last Game */}
+                                <div className="bg-black/20 rounded-3xl p-[4vh] border border-white/10 backdrop-blur-sm relative overflow-hidden">
+                                    <div className="text-[1.5vh] opacity-50 font-bold mb-[2vh] uppercase tracking-widest text-center">Last Game</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.city}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <div className={`text-[5vh] md:text-[7vh] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
+                                                {team.schedule?.prev?.score || '-'}
+                                            </div>
+                                            <div className="text-[3vh] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.prev?.opponentLogo ? (
+                                                <img src={team.schedule.prev.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            ) : (
+                                                <div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.prev?.opponent}</div>
+                                            )}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.prev?.opponent}</div>
+                                            {team.schedule?.prev?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.prev.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vh] opacity-60 flex items-center justify-center gap-2">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.prev?.date || 'Date Pending'}
+                                    </div>
+                                </div>
+                                <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
+                                    <div className="text-[1.5vh] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.city}</div>
                                             <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
                                         </div>
                                         <div className="text-[6vh] font-bold text-gray-500 w-[40%] text-center">VS</div>
@@ -926,7 +1115,7 @@
                     <div className="flex flex-wrap gap-2 mb-3">
                         {selected.map(id => (
                             <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                                {id}
+                                {teams.find(t=>t.id===id)?.name || id}
                                 <button onClick={() => onRemove(id)} className="hover:text-red-400"><X size={14} /></button>
                             </span>
                         ))}
@@ -967,10 +1156,12 @@
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
             const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
+            const [ncaafTeamsSelected, setNcaafTeamsSelected] = usePersistedState('ncaafTeams', []);
             
             const [nflData, setNflData] = useState({});
             const [nhlData, setNhlData] = useState({});
             const [mlbData, setMlbData] = useState({});
+            const [ncaafData, setNcaafData] = useState({});
 
             const [zipCodes, setZipCodes] = usePersistedState('zipCodes', ['10001']);
             const [weatherDataMap, setWeatherDataMap] = useState({});
@@ -1038,8 +1229,13 @@
                     if (comp.status.type.completed) {
                         const myTeam = comp.competitors.find(c => c.team.abbreviation === teamId);
                         const oppTeam = comp.competitors.find(c => c.team.abbreviation !== teamId);
-                        if (myTeam) {
-                            if (myTeam.winner) {
+                        // Fix for College where ID is used but Abbreviation is in response
+                        const myTeamById = comp.competitors.find(c => c.team.id === teamId); 
+                        
+                        const targetTeam = myTeam || myTeamById;
+
+                        if (targetTeam) {
+                            if (targetTeam.winner) {
                                 w++;
                             } else {
                                 if (league === 'nhl') {
@@ -1061,7 +1257,9 @@
 
             const fetchSportData = async (sport, league, teamId) => {
                 try {
-                    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${teamId.toLowerCase()}/schedule`);
+                    // Safe handling for College IDs which are numeric
+                    const idStr = String(teamId).toLowerCase(); 
+                    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`);
                     const data = await res.json();
                     const events = data.events || [];
                     
@@ -1098,8 +1296,11 @@
                         let prevOppLogo = null;
                         let nextOppLogo = null;
 
+                        // ID Check helper
+                        const isMe = (comp) => comp.team.id === idStr || comp.team.abbreviation.toLowerCase() === idStr;
+
                         if (prevGame) {
-                            const prevComp = prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId);
+                            const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
                             if (prevComp) {
                                 if (prevComp.team.logos && prevComp.team.logos.length > 0) {
                                     prevOppLogo = prevComp.team.logos[0].href;
@@ -1109,7 +1310,7 @@
                         }
 
                         if (nextGame) {
-                            const nextComp = nextGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId);
+                            const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
                             if (nextComp) {
                                 if (nextComp.team.logos && nextComp.team.logos.length > 0) {
                                     nextOppLogo = nextComp.team.logos[0].href;
@@ -1122,17 +1323,18 @@
                         
                         mapped.schedule = {
                             prev: prevGame ? {
-                                opponent: prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'OPP',
+                                opponent: prevGame.competitions[0].competitors.find(c => !isMe(c))?.team?.abbreviation || 'OPP',
                                 opponentLogo: prevOppLogo,
                                 opponentRecord: prevOppRecord,
-                                score: (prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.score?.value || '0') + "-" + (prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.score?.value || '0'),
-                                result: prevGame.competitions[0].status.type.completed ? (prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.winner ? 'W' : 'L') + " " + prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.score?.value + "-" + prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.score?.value : 'TBD',
+                                score: (prevGame.competitions[0].competitors.find(c => isMe(c))?.score?.value || '0') + "-" + (prevGame.competitions[0].competitors.find(c => !isMe(c))?.score?.value || '0'),
+                                result: prevGame.competitions[0].status.type.completed ? (prevGame.competitions[0].competitors.find(c => isMe(c))?.winner ? 'W' : 'L') + " " + prevGame.competitions[0].competitors.find(c => isMe(c))?.score?.value + "-" + prevGame.competitions[0].competitors.find(c => !isMe(c))?.score?.value : 'TBD',
                                 date: new Date(prevGame.date).toLocaleDateString()
                             } : { opponent: 'None', result: '-', date: '-' },
                             next: nextGame ? {
-                                opponent: nextGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'TBD',
+                                opponent: nextGame.competitions[0].competitors.find(c => !isMe(c))?.team?.abbreviation || 'TBD',
                                 opponentLogo: nextOppLogo,
                                 opponentRecord: nextOppRecord,
+                                rawDate: nextGame.date, // Stored for filtering
                                 date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
                                 time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                                 location: nextGame.competitions[0].venue?.fullName || 'TBD'
@@ -1141,8 +1343,8 @@
 
                         if (liveGame) {
                             const comp = liveGame.header.competitions[0];
-                            const myTeam = comp.competitors.find(c => c.team.abbreviation === teamId);
-                            const oppTeam = comp.competitors.find(c => c.team.abbreviation !== teamId);
+                            const myTeam = comp.competitors.find(c => isMe(c));
+                            const oppTeam = comp.competitors.find(c => !isMe(c));
 
                             let oppLogo = null;
                             if (oppTeam.team.logos && oppTeam.team.logos.length > 0) {
@@ -1172,13 +1374,13 @@
                                 time: comp.status.displayClock
                             };
 
-                            if (league === 'nfl') {
+                            if (league === 'nfl' || league === 'college-football') {
                                 mapped.live = { ...liveBase, 
                                     quarter: comp.status.period,
                                     down: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.down : 0,
                                     distance: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.distance : 0,
                                     yardLine: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.yardLine : 50,
-                                    possession: liveGame.drives?.current?.team?.abbreviation === teamId ? 'myTeam' : 'oppTeam',
+                                    possession: isMe(liveGame.drives?.current) ? 'myTeam' : 'oppTeam',
                                     lastPlay: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress"
                                 };
                             } else if (league === 'nhl') {
@@ -1208,25 +1410,28 @@
                       nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
                       nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
                       mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
+                      ncaafTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'college-football', id).then(d => setNcaafData(prev => ({...prev, ...d})))));
                       await Promise.all(promises);
                 };
                 loadAll();
                 const interval = setInterval(loadAll, 60000);
                 return () => clearInterval(interval);
-            }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected]);
+            }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
 
             const allCards = useMemo(() => {
                 // Determine if ANY game is LIVE
                 const liveNfl = nflTeamsSelected.filter(id => nflData[id]?.status === 'LIVE');
                 const liveNhl = nhlTeamsSelected.filter(id => nhlData[id]?.status === 'LIVE');
                 const liveMlb = mlbTeamsSelected.filter(id => mlbData[id]?.status === 'LIVE');
+                const liveNcaaf = ncaafTeamsSelected.filter(id => ncaafData[id]?.status === 'LIVE');
                 
                 // If there are any live games, override the rotation to ONLY show those live games
-                if (liveNfl.length > 0 || liveNhl.length > 0 || liveMlb.length > 0) {
+                if (liveNfl.length > 0 || liveNhl.length > 0 || liveMlb.length > 0 || liveNcaaf.length > 0) {
                     const liveCards = [];
                     liveNfl.forEach(id => liveCards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }));
                     liveNhl.forEach(id => liveCards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }));
                     liveMlb.forEach(id => liveCards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }));
+                    liveNcaaf.forEach(id => liveCards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }));
                     return liveCards;
                 }
 
@@ -1249,12 +1454,27 @@
                 const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
                 cards.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
                 
-                nflTeamsSelected.forEach(id => cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }));
-                nhlTeamsSelected.forEach(id => cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }));
-                mlbTeamsSelected.forEach(id => cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }));
+                // Helper to check if game is within 13 days
+                const isWithinRange = (data) => {
+                    if (!data) return true; // Show loading state
+                    if (data.status === 'LIVE') return true;
+                    if (!data.schedule?.next?.rawDate) return false; // No next game scheduled
+                    
+                    const nextGameDate = new Date(data.schedule.next.rawDate);
+                    const now = new Date();
+                    const diffTime = nextGameDate - now;
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                    
+                    return diffDays <= 13;
+                };
+
+                nflTeamsSelected.forEach(id => { if(isWithinRange(nflData[id])) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
+                nhlTeamsSelected.forEach(id => { if(isWithinRange(nhlData[id])) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
+                mlbTeamsSelected.forEach(id => { if(isWithinRange(mlbData[id])) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
+                ncaafTeamsSelected.forEach(id => { if(isWithinRange(ncaafData[id])) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
                 
                 return cards;
-            }, [zipCodes, weatherDataMap, showForecast, forecastDays, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, nflData, nhlData, mlbData, clockColor]);
+            }, [zipCodes, weatherDataMap, showForecast, forecastDays, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor]);
 
             useEffect(() => {
                 if (allCards.length === 0) return;
@@ -1295,6 +1515,7 @@
                                     </div>
 
                                     <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
+                                    <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
                                     <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
                                     <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
                                 </div>
