@@ -840,32 +840,34 @@
 
             return (
                 <div className="h-full w-full flex flex-col p-[4vh] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
-                    <div className="flex items-center gap-[1.5vh] mb-[4vh] relative z-10">
+                    <div className="flex items-center gap-[1.5vh] mb-[3vh] relative z-10 flex-none">
                         <CalendarIcon className="w-[4vh] h-[4vh] text-blue-300" />
                         <div><h2 className="text-[3vh] font-bold leading-none">Forecast</h2><p className="text-[1.5vh] opacity-70 uppercase tracking-widest">{city}</p></div>
                     </div>
-                    <div className="flex-1 grid gap-[2vh] relative z-10">
+                    
+                    {/* Horizontal Container for Column Cards */}
+                    <div className="flex-1 flex flex-row gap-[2vw] relative z-10 min-h-0">
                         {forecastItems.map((day, idx) => (
-                            <div key={idx} className="flex items-center justify-between bg-white/10 rounded-2xl p-[2vh] backdrop-blur-md border border-white/5">
-                                {/* Day Name */}
-                                <div className="w-[15%] text-center">
-                                    <div className="text-[2vh] font-bold uppercase text-blue-200">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                            <div key={idx} className="flex-1 flex flex-col items-center justify-between bg-white/10 rounded-3xl p-[2vh] backdrop-blur-md border border-white/5">
+                                {/* Day */}
+                                <div className="text-[2.5vh] font-bold uppercase text-blue-200 mt-[1vh]">
+                                    {day.date.toLocaleDateString('en-US', { weekday: 'short' })}
                                 </div>
-                                
-                                {/* Icon & Precip Info */}
-                                <div className="flex-1 flex flex-col items-center justify-center">
-                                    {getWeatherIcon(day.code, "w-[5vh] h-[5vh]")}
+
+                                {/* Icon & Precip */}
+                                <div className="flex flex-col items-center justify-center flex-1">
+                                    {getWeatherIcon(day.code, "w-[8vh] h-[8vh]")}
                                     {day.precip > 0.01 && (
-                                        <div className="text-[1.5vh] font-bold text-blue-200 mt-[0.5vh] bg-blue-900/40 px-[1vh] rounded-full">
+                                        <div className="text-[1.5vh] font-bold text-white mt-[1.5vh] bg-blue-600/80 px-[1.5vh] py-[0.5vh] rounded-full whitespace-nowrap shadow-md">
                                             {getPrecipLabel(day.precip, day.code)}
                                         </div>
                                     )}
                                 </div>
-                                
+
                                 {/* Temps */}
-                                <div className="text-right w-[25%]">
-                                    <div className="text-[3.5vh] font-black leading-none">{day.max}°</div>
-                                    <div className="text-[1.8vh] opacity-60 font-medium">{day.min}° Low</div>
+                                <div className="text-center mb-[1vh]">
+                                    <div className="text-[5vh] font-black leading-none tracking-tighter">{day.max}°</div>
+                                    <div className="text-[2vh] opacity-60 font-medium">{day.min}°</div>
                                 </div>
                             </div>
                         ))}
