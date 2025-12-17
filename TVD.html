@@ -1,15 +1,50 @@
-const WeatherCard = ({ weatherData }) => {
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <!-- Updated Viewport for Mobile Safety -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Sports & Smart Dashboard</title>
+
+    <!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React & ReactDOM -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+
+    <!-- Babel -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Fonts -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&display=swap');
+@@ -324,7 +319,7 @@ <h2 className="text-[6vmin] font-black uppercase tracking-tighter leading-none t
+</div>
+<div className="flex-shrink-0 text-center py-[0.5vh] min-h-[6vh] flex items-center justify-center">
+<div className="text-[2.5vmin] text-gray-300 font-bold tracking-tight px-2 leading-tight whitespace-normal line-clamp-3">
+                                        {team.live.lastPlay}
+                                         {team.live.lastPlay}
+</div>
+</div>
+<div className="flex-1 min-h-0 bg-white/10 rounded-xl p-[1.5vh] border border-white/10 flex flex-col justify-end backdrop-blur-md">
+@@ -735,10 +730,9 @@ <h2 className="text-[6vh] font-black uppercase tracking-tighter leading-none tex
+</div>
+</div>
+);
+        };
+        
+        const WeatherCard = ({ weatherData }) => {
+            const { temp, condition, wind, city, loading, error, daily } = weatherData;
+        };const WeatherCard = ({ weatherData }) => {
             const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
             
-            const getConditionText = (code) => {
-                if (code === 0) return "Clear Sky";
-                if (code <= 3) return "Partly Cloudy";
-                if (code <= 45) return "Foggy";
-                if (code <= 67) return "Rainy";
-                if (code <= 77) return "Snow";
-                if (code >= 95) return "Thunderstorms";
-                return "Cloudy";
-            };
+const getConditionText = (code) => {
+if (code === 0) return "Clear Sky";
+if (code <= 3) return "Partly Cloudy";
+@@ -749,6 +743,23 @@ <h2 className="text-[6vh] font-black uppercase tracking-tighter leading-none tex
+return "Cloudy";
+};
 
             const getPrecipText = (amount, code) => {
                 if (amount === 0) return '0"';
@@ -28,31 +63,16 @@ const WeatherCard = ({ weatherData }) => {
                 return 'text-rose-900';
             };
 
-            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
-            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
+if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
 
-            const high = daily?.temperature_2m_max?.[0];
-            const low = daily?.temperature_2m_min?.[0];
-
-            return (
-                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-gradient-to-br from-blue-600 to-cyan-500 text-white relative overflow-hidden font-sans">
-                    <div className="absolute top-[3vh] left-[3vw] flex items-center gap-[1vh] opacity-80"><MapPin className="w-[2.5vh] h-[2.5vh]" /><span className="text-[2.5vh] font-bold uppercase tracking-wider">{city}</span></div>
-                    <div className="mb-[2vh]">{getWeatherIcon(condition, "w-[20vh] h-[20vh]")}</div>
-                    <h1 className="text-[15vh] font-bold mb-[1vh] tracking-tighter leading-none">{Math.round(temp)}°</h1>
-                    <p className="text-[3vh] font-light opacity-90">{getConditionText(condition)}</p>
-                    {high !== undefined && low !== undefined && (
-                        <div className="flex items-center gap-[4vh] mt-[2vh]">
-                            <div className="flex flex-col items-center">
-                                <span className="text-[1.5vh] font-bold uppercase tracking-widest opacity-80 mb-[0.5vh]">High</span>
-                                <span className="text-[6vh] font-black leading-none">{Math.round(high)}°</span>
-                            </div>
-                            <div className="w-[1px] h-[6vh] bg-white/30 rounded-full"></div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-[1.5vh] font-bold uppercase tracking-widest opacity-80 mb-[0.5vh]">Low</span>
-                                <span className="text-[6vh] font-black leading-none text-white/90">{Math.round(low)}°</span>
-                            </div>
-                        </div>
-                    )}
+@@ -774,9 +785,20 @@ <h1 className="text-[15vh] font-bold mb-[1vh] tracking-tighter leading-none">{Ma
+</div>
+</div>
+)}
+                    <div className="mt-[4vh] grid grid-cols-2 gap-[5vh] text-center w-full max-w-[50vh] bg-white/20 p-[3vh] rounded-3xl backdrop-blur-md">
+                        <div><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Wind</div><div className="font-bold text-[3vh]">{wind} mph</div></div>
+                        <div><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Precip</div><div className="font-bold text-[3vh]">{condition > 50 ? 'High' : 'Low'}</div></div>
                     
                     <div className="mt-[4vh] grid grid-cols-3 gap-[2vh] text-center w-full max-w-[60vh] bg-white/20 p-[2vh] rounded-3xl backdrop-blur-md">
                         <div>
@@ -67,511 +87,34 @@ const WeatherCard = ({ weatherData }) => {
                             <div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Air Quality</div>
                             <div className={`font-black text-[2.5vh] ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
                         </div>
-                    </div>
-                </div>
-            );
-        };
+</div>
+</div>
+);
+@@ -945,9 +967,17 @@ <h3 className="font-bold text-white mb-2">{title}</h3>
+state = zipData.places[0].state;
+} catch (e) { lat = 40.71; lon = -74.00; city = "New York"; state = "NY"; }
 
-        const ForecastCard = ({ weatherData, days }) => {
-            const { daily, loading, error, city } = weatherData;
-            if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
-            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
-
-            const forecastItems = [];
-            const limit = Math.min(days, 5);
-            if (daily && daily.time) {
-                for (let i = 1; i <= limit; i++) {
-                    if (daily.time[i]) {
-                        // Fix for timezone offset issue: Parse YYYY-MM-DD explicitly
-                        const parts = daily.time[i].split('-');
-                        const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                        
-                        forecastItems.push({
-                            date: localDate,
-                            max: Math.round(daily.temperature_2m_max[i]),
-                            min: Math.round(daily.temperature_2m_min[i]),
-                            precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0,
-                            code: daily.weather_code[i]
-                        });
-                    }
-                }
-            }
-
-            // Helper to label precip type
-            const getPrecipLabel = (amount, code) => {
-                if (!amount || amount < 0.01) return null;
-                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
-                return `${amount}" ${type}`;
-            };
-
-            return (
-                <div className="h-full w-full flex flex-col p-[4vh] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
-                    <div className="flex items-center gap-[1.5vh] mb-[4vh] relative z-10">
-                        <CalendarIcon className="w-[4vh] h-[4vh] text-blue-300" />
-                        <div><h2 className="text-[3vh] font-bold leading-none">Forecast</h2><p className="text-[1.5vh] opacity-70 uppercase tracking-widest">{city}</p></div>
-                    </div>
-                    <div className="flex-1 grid gap-[2vh] relative z-10">
-                        {forecastItems.map((day, idx) => (
-                            <div key={idx} className="flex items-center justify-between bg-white/10 rounded-2xl p-[2vh] backdrop-blur-md border border-white/5">
-                                {/* Day Name */}
-                                <div className="w-[15%] text-center">
-                                    <div className="text-[2vh] font-bold uppercase text-blue-200">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                                </div>
-                                
-                                {/* Icon & Precip Info */}
-                                <div className="flex-1 flex flex-col items-center justify-center">
-                                    {getWeatherIcon(day.code, "w-[5vh] h-[5vh]")}
-                                    {day.precip > 0.01 && (
-                                        <div className="text-[1.5vh] font-bold text-blue-200 mt-[0.5vh] bg-blue-900/40 px-[1vh] rounded-full">
-                                            {getPrecipLabel(day.precip, day.code)}
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                {/* Temps */}
-                                <div className="text-right w-[25%]">
-                                    <div className="text-[3.5vh] font-black leading-none">{day.max}°</div>
-                                    <div className="text-[1.8vh] opacity-60 font-medium">{day.min}° Low</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="absolute -bottom-10 -right-10 w-[40vh] h-[40vh] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
-                </div>
-            );
-        };
-
-        const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
-            const [time, setTime] = useState(new Date());
-            useEffect(() => {
-                const timer = setInterval(() => {
-                    const now = new Date();
-                    if (timezoneOffset !== null && timezoneOffset !== undefined) {
-                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                        const targetTime = new Date(utc + (1000 * timezoneOffset));
-                        setTime(targetTime);
-                    } else {
-                        setTime(now);
-                    }
-                }, 1000);
-                return () => clearInterval(timer);
-            }, [timezoneOffset]);
-
-            const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
-            const [hours, minutes] = formatTime(time).split(':');
-            const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
-            const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-
-            return (
-                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
-                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
-                    <div className="relative z-10 flex flex-col items-center">
-                        <div className={`text-[3vh] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
-                        <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
-                            <span className="text-[25vmin] font-bold tracking-tighter drop-shadow-2xl flex items-baseline">
-                                {hours}<span className="animate-blink">:</span>{minutes}
-                            </span>
-                            <span className="text-[6vh] font-light uppercase opacity-80">{getAmPm(time)}</span>
-                        </div>
-                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vh] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
-                           <div className="w-[1vh] h-[1vh] rounded-full bg-green-500 animate-pulse" />
-                           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
-            const [selectedTeam, setSelectedTeam] = useState('');
-            return (
-                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <h3 className="font-bold text-white mb-2">{title}</h3>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                        {selected.map(id => (
-                            <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                                {id}
-                                <button onClick={() => onRemove(id)} className="hover:text-red-400"><X size={14} /></button>
-                            </span>
-                        ))}
-                    </div>
-                    <div className="flex gap-2">
-                        <select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">
-                            <option value="">Select Team</option>
-                            {teams.map(t => <option key={t.id} value={t.id}>{t.city} {t.name}</option>)}
-                        </select>
-                        <button onClick={() => { if(selectedTeam && !selected.includes(selectedTeam)) { onAdd(selectedTeam); setSelectedTeam(''); } }} className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button>
-                    </div>
-                </div>
-            );
-        };
-
-        const ZipSelector = ({ zips, onAdd, onRemove }) => {
-            const [inputZip, setInputZip] = useState('');
-            return (
-                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <label className="block text-sm text-slate-400 mb-2">ZIP Codes</label>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                        {zips.map(zip => (
-                            <span key={zip} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                                {zip}
-                                <button onClick={() => onRemove(zip)} className="hover:text-red-400"><X size={14} /></button>
-                            </span>
-                        ))}
-                    </div>
-                    <div className="flex gap-2">
-                        <input type="text" value={inputZip} onChange={(e) => setInputZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="Enter ZIP" maxLength={5} />
-                        <button onClick={() => { if(inputZip.length === 5 && !zips.includes(inputZip)) { onAdd(inputZip); setInputZip(''); } }} className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button>
-                    </div>
-                </div>
-            );
-        };
-
-        const App = () => {
-            const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
-            const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
-            const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
-            
-            const [nflData, setNflData] = useState({});
-            const [nhlData, setNhlData] = useState({});
-            const [mlbData, setMlbData] = useState({});
-
-            const [zipCodes, setZipCodes] = usePersistedState('zipCodes', ['10001']);
-            const [weatherDataMap, setWeatherDataMap] = useState({});
-            
-            const [showForecast, setShowForecast] = usePersistedState('showForecast', false);
-            const [forecastDays, setForecastDays] = usePersistedState('forecastDays', 3);
-            const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-            const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-            const [isPaused, setIsPaused] = useState(false);
-            const [clockColor, setClockColor] = usePersistedState('clockColor', 'text-white');
-
-            useEffect(() => {
-                const fetchWeatherForZip = async (zip) => {
-                    try {
-                        let lat, lon, city, state;
-                        try {
-                            const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
-                            if (!zipRes.ok) throw new Error("ZIP API Failed");
-                            const zipData = await zipRes.json();
-                            lat = zipData.places[0].latitude;
-                            lon = zipData.places[0].longitude;
-                            city = zipData.places[0]["place name"];
-                            state = zipData.places[0].state;
-                        } catch (e) { lat = 40.71; lon = -74.00; city = "New York"; state = "NY"; }
-
-                        // 1. Fetch Weather (Updated to include daily precipitation_sum)
-                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
+                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=8`);
+                        // 1. Fetch Weather (Added precipitation & units)
+                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
                         
                         // 2. Fetch Air Quality (New API call)
                         const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`);
 
-                        if (!weatherRes.ok) throw new Error("Weather API Failed");
+if (!weatherRes.ok) throw new Error("Weather API Failed");
                         
-                        const wData = await weatherRes.json();
+const wData = await weatherRes.json();
                         const aqiData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }}; // Fallback if AQI fails
 
-                        if (!wData.current) throw new Error("No current weather data");
+if (!wData.current) throw new Error("No current weather data");
 
-                        setWeatherDataMap(prev => ({
-                            ...prev,
-                            [zip]: {
-                                temp: wData.current.temperature_2m,
-                                condition: wData.current.weather_code,
-                                wind: wData.current.wind_speed_10m,
+setWeatherDataMap(prev => ({
+@@ -956,6 +986,8 @@ <h3 className="font-bold text-white mb-2">{title}</h3>
+temp: wData.current.temperature_2m,
+condition: wData.current.weather_code,
+wind: wData.current.wind_speed_10m,
                                 precip: wData.current.precipitation, // Store precip amount
                                 aqi: aqiData.current?.us_aqi || 0,   // Store AQI
-                                city: `${city}, ${state}`,
-                                timezoneOffset: wData.utc_offset_seconds || -14400,
-                                daily: wData.daily,
-                                loading: false,
-                                error: false
-                            }
-                        }));
-                    } catch (err) { console.error("Weather Error:", err); }
-                };
-
-                zipCodes.forEach(zip => fetchWeatherForZip(zip));
-            }, [zipCodes]);
-
-            // --- HELPER TO CALCULATE RECORD ---
-            const calculateRecord = (events, teamId, league) => {
-                let w = 0, l = 0, d = 0, otl = 0;
-                events.forEach(e => {
-                    const comp = e.competitions[0];
-                    if (comp.status.type.completed) {
-                        const myTeam = comp.competitors.find(c => c.team.abbreviation === teamId);
-                        const oppTeam = comp.competitors.find(c => c.team.abbreviation !== teamId);
-                        if (myTeam) {
-                            if (myTeam.winner) {
-                                w++;
-                            } else {
-                                if (league === 'nhl') {
-                                    if (comp.status.period > 3) { otl++; } else { l++; }
-                                } else if (league === 'nfl') {
-                                    if (!oppTeam.winner) { d++; } else { l++; }
-                                } else {
-                                    l++;
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                if (league === 'nhl') return `${w}-${l}-${otl}`;
-                if (league === 'nfl' && d > 0) return `${w}-${l}-${d}`;
-                return `${w}-${l}`;
-            };
-
-            const fetchSportData = async (sport, league, teamId) => {
-                try {
-                    const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${teamId.toLowerCase()}/schedule`);
-                    const data = await res.json();
-                    const events = data.events || [];
-                    
-                    if (events.length > 0) {
-                        // Calculate Record
-                        const record = calculateRecord(events, teamId, league);
-
-                        events.sort((a, b) => new Date(a.date) - new Date(b.date));
-                        const now = new Date();
-                        const nextGameIndex = events.findIndex(e => new Date(e.date) > now);
-                        let prevGame, nextGame, liveGame = null;
-                        if (nextGameIndex === -1) { prevGame = events[events.length - 1]; nextGame = null; } 
-                        else if (nextGameIndex === 0) { prevGame = null; nextGame = events[0]; } 
-                        else { prevGame = events[nextGameIndex - 1]; nextGame = events[nextGameIndex]; }
-
-                        if (prevGame) {
-                            const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${prevGame.id}`);
-                            const summaryData = await summaryRes.json();
-                            if (summaryData.header?.competitions?.[0]?.status?.type?.state === 'in') { liveGame = summaryData; }
-                        }
-
-                        // Helper to fetch opponent record if not directly available
-                        const fetchOpponentRecord = async (oppId, oppAbbrev) => {
-                            if (!oppId) return null;
-                            try {
-                                const oppRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}/schedule`);
-                                const oppData = await oppRes.json();
-                                return calculateRecord(oppData.events || [], oppAbbrev, league);
-                            } catch (e) { return null; }
-                        };
-
-                        let prevOppRecord = null;
-                        let nextOppRecord = null;
-                        let prevOppLogo = null;
-                        let nextOppLogo = null;
-
-                        if (prevGame) {
-                            const prevComp = prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId);
-                            if (prevComp) {
-                                if (prevComp.team.logos && prevComp.team.logos.length > 0) {
-                                    prevOppLogo = prevComp.team.logos[0].href;
-                                }
-                                prevOppRecord = await fetchOpponentRecord(prevComp.team.id, prevComp.team.abbreviation);
-                            }
-                        }
-
-                        if (nextGame) {
-                            const nextComp = nextGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId);
-                            if (nextComp) {
-                                if (nextComp.team.logos && nextComp.team.logos.length > 0) {
-                                    nextOppLogo = nextComp.team.logos[0].href;
-                                }
-                                nextOppRecord = await fetchOpponentRecord(nextComp.team.id, nextComp.team.abbreviation);
-                            }
-                        }
-
-                        let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
-                        
-                        mapped.schedule = {
-                            prev: prevGame ? {
-                                opponent: prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'OPP',
-                                opponentLogo: prevOppLogo,
-                                opponentRecord: prevOppRecord,
-                                score: (prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.score?.value || '0') + "-" + (prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.score?.value || '0'),
-                                result: prevGame.competitions[0].status.type.completed ? (prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.winner ? 'W' : 'L') + " " + prevGame.competitions[0].competitors.find(c => c.team.abbreviation === teamId)?.score?.value + "-" + prevGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.score?.value : 'TBD',
-                                date: new Date(prevGame.date).toLocaleDateString()
-                            } : { opponent: 'None', result: '-', date: '-' },
-                            next: nextGame ? {
-                                opponent: nextGame.competitions[0].competitors.find(c => c.team.abbreviation !== teamId)?.team?.abbreviation || 'TBD',
-                                opponentLogo: nextOppLogo,
-                                opponentRecord: nextOppRecord,
-                                date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
-                                time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                                location: nextGame.competitions[0].venue?.fullName || 'TBD'
-                            } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
-                        };
-
-                        if (liveGame) {
-                            const comp = liveGame.header.competitions[0];
-                            const myTeam = comp.competitors.find(c => c.team.abbreviation === teamId);
-                            const oppTeam = comp.competitors.find(c => c.team.abbreviation !== teamId);
-
-                            let oppLogo = null;
-                            if (oppTeam.team.logos && oppTeam.team.logos.length > 0) {
-                                oppLogo = oppTeam.team.logos[0].href;
-                            } else {
-                                // For mock simulation if logo missing
-                                if (league === 'nfl') {
-                                    const t = NFL_TEAMS.find(x => x.id === oppTeam.team.abbreviation);
-                                    if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`;
-                                } else if (league === 'nhl') {
-                                    const t = NHL_TEAMS.find(x => x.id === oppTeam.team.abbreviation);
-                                    if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${t.id.toLowerCase()}.png`;
-                                } else if (league === 'mlb') {
-                                    const t = MLB_TEAMS.find(x => x.id === oppTeam.team.abbreviation);
-                                    if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${t.id.toLowerCase()}.png`;
-                                }
-                            }
-
-                            // Fetch Live Opponent Record if possible
-                            const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id, oppTeam.team.abbreviation);
-                            
-                            const liveBase = {
-                                opponent: oppTeam.team.abbreviation,
-                                opponentLogo: oppLogo,
-                                opponentRecord: liveOppRecord,
-                                score: { myScore: myTeam.score, oppScore: oppTeam.score },
-                                time: comp.status.displayClock
-                            };
-
-                            if (league === 'nfl') {
-                                mapped.live = { ...liveBase, 
-                                    quarter: comp.status.period,
-                                    down: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.down : 0,
-                                    distance: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.distance : 0,
-                                    yardLine: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.yardLine : 50,
-                                    possession: liveGame.drives?.current?.team?.abbreviation === teamId ? 'myTeam' : 'oppTeam',
-                                    lastPlay: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress"
-                                };
-                            } else if (league === 'nhl') {
-                                mapped.live = { ...liveBase, period: comp.status.period };
-                            } else if (league === 'mlb') {
-                                const sit = liveGame.situation || {};
-                                mapped.live = { ...liveBase, 
-                                    inning: comp.status.period,
-                                    inningState: comp.status.type.detail || `Inn ${comp.status.period}`, // Ensures we use the text like "Bot 7th"
-                                    balls: sit.balls || 0, 
-                                    strikes: sit.strikes || 0, 
-                                    outs: sit.outs || 0, 
-                                    runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird }
-                                };
-                            }
-                        }
-                        return { [teamId]: mapped };
-                    }
-                } catch(e) { console.error(e); }
-                return { [teamId]: null };
-            };
-
-            // Batched Loading to prevent freezing
-            useEffect(() => {
-                const loadAll = async () => {
-                      const promises = [];
-                      nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
-                      nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
-                      mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
-                      await Promise.all(promises);
-                };
-                loadAll();
-                const interval = setInterval(loadAll, 60000);
-                return () => clearInterval(interval);
-            }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected]);
-
-            const allCards = useMemo(() => {
-                // Determine if ANY game is LIVE
-                const liveNfl = nflTeamsSelected.filter(id => nflData[id]?.status === 'LIVE');
-                const liveNhl = nhlTeamsSelected.filter(id => nhlData[id]?.status === 'LIVE');
-                const liveMlb = mlbTeamsSelected.filter(id => mlbData[id]?.status === 'LIVE');
-                
-                // If there are any live games, override the rotation to ONLY show those live games
-                if (liveNfl.length > 0 || liveNhl.length > 0 || liveMlb.length > 0) {
-                    const liveCards = [];
-                    liveNfl.forEach(id => liveCards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }));
-                    liveNhl.forEach(id => liveCards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }));
-                    liveMlb.forEach(id => liveCards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }));
-                    return liveCards;
-                }
-
-                // Otherwise, show standard rotation
-                const cards = [];
-                
-                // Add Weather Cards for each Zip
-                zipCodes.forEach(zip => {
-                    const data = weatherDataMap[zip];
-                    if (data) {
-                        cards.push({ id: `weather-${zip}`, component: <WeatherCard weatherData={data} /> });
-                        if (showForecast) {
-                             cards.push({ id: `forecast-${zip}`, component: <ForecastCard weatherData={data} days={forecastDays} /> });
-                        }
-                    }
-                });
-
-                // Add Clock
-                const firstZip = zipCodes[0];
-                const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
-                cards.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
-                
-                nflTeamsSelected.forEach(id => cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }));
-                nhlTeamsSelected.forEach(id => cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }));
-                mlbTeamsSelected.forEach(id => cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }));
-                
-                return cards;
-            }, [zipCodes, weatherDataMap, showForecast, forecastDays, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, nflData, nhlData, mlbData, clockColor]);
-
-            useEffect(() => {
-                if (allCards.length === 0) return;
-                if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
-                if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
-                const interval = setInterval(() => { setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); }, 6000); 
-                return () => clearInterval(interval);
-            }, [allCards.length, isPaused, isSettingsOpen, currentSlideIndex]);
-
-            const closeSettings = () => { setIsSettingsOpen(false); };
-
-            return (
-                <div className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
-                    <div className="w-full h-full relative" onMouseEnter={() => setIsPaused(false)} onMouseLeave={() => setIsPaused(false)}>
-                        {allCards.map((card, index) => (
-                            <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === currentSlideIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
-                                {card.component}
-                            </div>
-                        ))}
-                    </div>
-                    <button onClick={() => setIsSettingsOpen(true)} className="absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors border border-white/10 group"><Settings className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-500" /></button>
-                    {isSettingsOpen && (
-                        <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-                            <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-                                <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900 z-10 shrink-0"><h2 className="text-xl font-bold text-white">Settings</h2><button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button></div>
-                                <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar">
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <ZipSelector zips={zipCodes} onAdd={(zip) => setZipCodes([...zipCodes, zip])} onRemove={(zip) => setZipCodes(zipCodes.filter(z => z !== zip))} />
-                                        <div className="flex justify-between items-center pt-4 border-t border-slate-700 mt-4"><span className="text-sm">Show Forecast</span><button onClick={() => setShowForecast(!showForecast)} className={`w-10 h-5 rounded-full relative ${showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${showForecast ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
-                                        {showForecast && (<div className="flex gap-2 mt-3"><button onClick={() => setForecastDays(3)} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${forecastDays === 3 ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`}>3 Days</button><button onClick={() => setForecastDays(5)} className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${forecastDays === 5 ? 'bg-blue-600 text-white' : 'bg-slate-900 text-slate-400 hover:bg-slate-800'}`}>5 Days</button></div>)}
-                                    </div>
-
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 mt-4">
-                                        <label className="block text-sm text-slate-400 mb-2">Clock Color</label>
-                                        <select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">
-                                            {CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                                        </select>
-                                    </div>
-
-                                    <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
-                                    <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
-                                    <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
-                                </div>
-                                <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0"><button onClick={closeSettings} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2"><Check size={20} /> Done</button></div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+city: `${city}, ${state}`,
+timezoneOffset: wData.utc_offset_seconds || -14400,
+daily: wData.daily,
