@@ -2,21 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Updated Viewport for Mobile Safety -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sports & Smart Dashboard</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     
-    <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Fonts -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&display=swap');
@@ -324,7 +319,7 @@
                                 </div>
                                 <div className="flex-shrink-0 text-center py-[0.5vh] min-h-[6vh] flex items-center justify-center">
                                      <div className="text-[2.5vmin] text-gray-300 font-bold tracking-tight px-2 leading-tight whitespace-normal line-clamp-3">
-                                        {team.live.lastPlay}
+                                         {team.live.lastPlay}
                                     </div>
                                 </div>
                                 <div className="flex-1 min-h-0 bg-white/10 rounded-xl p-[1.5vh] border border-white/10 flex flex-col justify-end backdrop-blur-md">
@@ -735,10 +730,9 @@
                     </div>
                 </div>
             );
-        };
-        
-        const WeatherCard = ({ weatherData }) => {
-            const { temp, condition, wind, city, loading, error, daily } = weatherData;
+        };const WeatherCard = ({ weatherData }) => {
+            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
+            
             const getConditionText = (code) => {
                 if (code === 0) return "Clear Sky";
                 if (code <= 3) return "Partly Cloudy";
@@ -747,6 +741,23 @@
                 if (code <= 77) return "Snow";
                 if (code >= 95) return "Thunderstorms";
                 return "Cloudy";
+            };
+
+            const getPrecipText = (amount, code) => {
+                if (amount === 0) return '0"';
+                // Codes for snow: 71, 73, 75, 77, 85, 86
+                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
+                if (amount < 0.01) return `< 0.01" ${type}`;
+                return `${amount}" ${type}`;
+            };
+
+            const getAqiColor = (val) => {
+                if (val <= 50) return 'text-green-400';
+                if (val <= 100) return 'text-yellow-400';
+                if (val <= 150) return 'text-orange-400';
+                if (val <= 200) return 'text-red-500';
+                if (val <= 300) return 'text-purple-500';
+                return 'text-rose-900';
             };
 
             if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
@@ -774,9 +785,20 @@
                             </div>
                         </div>
                     )}
-                    <div className="mt-[4vh] grid grid-cols-2 gap-[5vh] text-center w-full max-w-[50vh] bg-white/20 p-[3vh] rounded-3xl backdrop-blur-md">
-                        <div><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Wind</div><div className="font-bold text-[3vh]">{wind} mph</div></div>
-                        <div><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Precip</div><div className="font-bold text-[3vh]">{condition > 50 ? 'High' : 'Low'}</div></div>
+                    
+                    <div className="mt-[4vh] grid grid-cols-3 gap-[2vh] text-center w-full max-w-[60vh] bg-white/20 p-[2vh] rounded-3xl backdrop-blur-md">
+                        <div>
+                            <div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Wind</div>
+                            <div className="font-bold text-[2.5vh]">{wind} mph</div>
+                        </div>
+                        <div className="border-l border-white/20">
+                            <div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Precip</div>
+                            <div className="font-bold text-[2.5vh] leading-tight">{getPrecipText(precip, condition)}</div>
+                        </div>
+                        <div className="border-l border-white/20">
+                            <div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Air Quality</div>
+                            <div className={`font-black text-[2.5vh] ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
+                        </div>
                     </div>
                 </div>
             );
@@ -945,9 +967,17 @@
                             state = zipData.places[0].state;
                         } catch (e) { lat = 40.71; lon = -74.00; city = "New York"; state = "NY"; }
 
-                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=8`);
+                        // 1. Fetch Weather (Added precipitation & units)
+                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
+                        
+                        // 2. Fetch Air Quality (New API call)
+                        const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`);
+
                         if (!weatherRes.ok) throw new Error("Weather API Failed");
+                        
                         const wData = await weatherRes.json();
+                        const aqiData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }}; // Fallback if AQI fails
+
                         if (!wData.current) throw new Error("No current weather data");
 
                         setWeatherDataMap(prev => ({
@@ -956,6 +986,8 @@
                                 temp: wData.current.temperature_2m,
                                 condition: wData.current.weather_code,
                                 wind: wData.current.wind_speed_10m,
+                                precip: wData.current.precipitation, // Store precip amount
+                                aqi: aqiData.current?.us_aqi || 0,   // Store AQI
                                 city: `${city}, ${state}`,
                                 timezoneOffset: wData.utc_offset_seconds || -14400,
                                 daily: wData.daily,
