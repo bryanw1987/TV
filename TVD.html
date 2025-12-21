@@ -95,12 +95,18 @@
         const CalendarIcon = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
         const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
         const Check = (props) => <IconBase {...props}><polyline points="20 6 9 17 4 12"/></IconBase>;
+        
+        // Weather Icons
         const Sun = (props) => <IconBase {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></IconBase>;
         const CloudRain = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></IconBase>;
         const CloudSnow = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></IconBase>;
         const CloudLightning = (props) => <IconBase {...props}><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/></IconBase>;
         const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
-        const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
+        const CloudFilled = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+                <path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/>
+            </svg>
+        );
 
         const getWeatherIcon = (code, sizeClass) => {
             if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} />;
@@ -114,74 +120,131 @@
             return <CloudFilled className={`${sizeClass} ${color}`} />;
         };
 
-        const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
+        const getOrdinal = (n) => {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return s[(v - 20) % 10] || s[v] || s[0];
+        };
 
+        // --- COLOR OPTIONS ---
         const CLOCK_COLORS = [
-            { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' },
-            { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' },
-            { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' },
-            { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
+            { label: 'White', value: 'text-white' },
+            { label: 'Red', value: 'text-red-500' },
+            { label: 'Blue', value: 'text-blue-500' },
+            { label: 'Green', value: 'text-green-500' },
+            { label: 'Yellow', value: 'text-yellow-400' },
+            { label: 'Purple', value: 'text-purple-500' },
+            { label: 'Cyan', value: 'text-cyan-400' },
+            { label: 'Orange', value: 'text-orange-500' },
         ];
 
+        // --- TEAMS CONFIG ---
         const NFL_TEAMS = [
-            { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' },
-            { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' },
-            { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' },
-            { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' },
-            { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' },
-            { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' },
-            { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' },
-            { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' },
-            { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' },
-            { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' },
-            { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' },
-            { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' },
-            { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' },
-            { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' },
-            { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' },
-            { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' },
+            { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' },
+            { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' },
+            { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' },
+            { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' },
+            { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' },
+            { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' },
+            { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' },
+            { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' },
+            { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' },
+            { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' },
+            { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' },
+            { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' },
+            { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' },
+            { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' },
+            { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' },
+            { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' },
+            { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' },
+            { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' },
+            { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' },
+            { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' },
+            { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' },
+            { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' },
+            { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' },
+            { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' },
+            { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' },
+            { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' },
+            { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' },
+            { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' },
+            { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' },
+            { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' },
+            { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' },
+            { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' },
         ];
 
         const NHL_TEAMS = [
-            { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' },
-            { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' },
-            { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' },
-            { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' },
-            { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' },
-            { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' },
-            { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' },
-            { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' },
-            { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' },
-            { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' },
-            { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' },
-            { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' },
-            { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' },
-            { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' },
-            { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' },
-            { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' },
+            { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' },
+            { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' },
+            { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' },
+            { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' },
+            { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' },
+            { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' },
+            { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' },
+            { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' },
+            { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' },
+            { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' },
+            { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' },
+            { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' },
+            { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' },
+            { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' },
+            { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' },
+            { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' },
+            { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' },
+            { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' },
+            { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' },
+            { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' },
+            { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' },
+            { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' },
+            { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' },
+            { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' },
+            { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' },
+            { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' },
+            { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' },
+            { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' },
+            { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' },
+            { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' },
+            { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' },
+            { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' },
         ];
 
         const MLB_TEAMS = [
-            { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' },
-            { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' },
-            { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' },
-            { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' },
-            { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' },
-            { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' },
-            { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' },
-            { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' },
-            { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' },
-            { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' },
-            { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' },
-            { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' },
-            { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' },
-            { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' },
-            { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' },
+            { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' },
+            { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' },
+            { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' },
+            { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' },
+            { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' },
+            { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' },
+            { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' },
+            { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' },
+            { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' },
+            { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' },
+            { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' },
+            { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' },
+            { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' },
+            { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' },
+            { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' },
+            { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' },
+            { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' },
+            { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' },
+            { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' },
+            { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' },
+            { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' },
+            { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' },
+            { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' },
+            { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' },
+            { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' },
+            { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' },
+            { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' },
+            { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' },
+            { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' },
+            { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' },
         ];
 
-        // EXPANDED NCAA Football Teams List
+        // EXPANDED NCAA Football Teams List - Now includes JMU and many others
         const NCAAF_TEAMS = [
-            // Major Power 4
+            // Power 4 + Independents
             { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '8',   city: 'Arkansas', name: 'Razorbacks', color: '#9D2235' },
             { id: '2',   city: 'Auburn', name: 'Tigers', color: '#0C2340' }, { id: '239', city: 'Baylor', name: 'Bears', color: '#154734' },
             { id: '25',  city: 'California', name: 'Golden Bears', color: '#003262' }, { id: '228', city: 'Clemson', name: 'Tigers', color: '#F56600' },
@@ -210,7 +273,7 @@
             { id: '264', city: 'Washington State', name: 'Cougars', color: '#981E32' }, { id: '277', city: 'West Virginia', name: 'Mountaineers', color: '#002855' },
             { id: '275', city: 'Wisconsin', name: 'Badgers', color: '#C5050C' }, { id: '2567', city: 'SMU', name: 'Mustangs', color: '#354C8C' },
             
-            // Group of 5 & Independents Additions
+            // Major Group of 5 Additions (AAC, Sun Belt, Mountain West, MAC, C-USA)
             { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' }, 
             { id: '2335', city: 'Liberty', name: 'Flames', color: '#002D62' },
             { id: '68', city: 'Boise State', name: 'Broncos', color: '#0033A0' },
@@ -794,7 +857,7 @@
                                     <div className="flex items-center justify-between mb-[2vh]">
                                         <div className="flex flex-col items-center w-[30%]">
                                             <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
-                                            <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[3vh] font-bold">{team.city}</div>
                                             <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
                                         </div>
                                         <div className="text-[6vh] font-bold text-gray-500 w-[40%] text-center">VS</div>
@@ -833,10 +896,10 @@
             };
 
             const getPrecipText = (amount, code) => {
-                if (amount === 0) return '0"';
+                if (amount === 0) return '0.00"';
                 const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
                 if (amount < 0.01) return `< 0.01" ${type}`;
-                return `${amount}" ${type}`;
+                return `${amount.toFixed(2)}" ${type}`;
             };
 
             const getAqiColor = (val) => {
@@ -902,7 +965,7 @@
             const getPrecipLabel = (amount, code) => {
                 if (!amount || amount < 0.01) return null;
                 const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
-                return `${amount}" ${type}`;
+                return `${amount.toFixed(2)}" ${type}`;
             };
 
             return (
@@ -1092,19 +1155,18 @@
                         );
 
                         if (myTeam) {
+                            const myScore = parseInt(myTeam.score?.value || 0);
                             const oppTeam = comp.competitors.find(c => c.id !== myTeam.id);
-                            if (myTeam.winner) {
-                                w++;
-                            } else {
-                                if (league === 'nhl') {
-                                    if (comp.status.period > 3) { otl++; } else { l++; }
-                                } else if (league === 'nfl' || league === 'college-football') {
-                                     if (oppTeam && !oppTeam.winner && !myTeam.winner) { d++; } 
-                                     else { l++; }
-                                } else {
-                                    l++;
-                                }
-                            }
+                            const oppScore = parseInt(oppTeam?.score?.value || 0);
+
+                            const isWin = myTeam.winner === true || (myTeam.winner === undefined && myScore > oppScore);
+                            const isLoss = myTeam.winner === false || (myTeam.winner === undefined && myScore < oppScore);
+                            const isTie = !isWin && !isLoss;
+
+                            if (isWin) w++;
+                            else if (isTie && (league === 'nfl' || league === 'college-football')) d++;
+                            else if (league === 'nhl' && comp.status.period > 3) otl++;
+                            else l++;
                         }
                     }
                 });
