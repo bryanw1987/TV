@@ -1252,24 +1252,34 @@
             // --- HELPER TO CALCULATE RECORD ---
             const calculateRecord = (events, teamId, league) => {
                 let w = 0, l = 0, d = 0, otl = 0;
+                
+                // Ensure teamId is treated as a string for comparison (NCAA uses Numeric Strings)
+                const targetId = String(teamId).toLowerCase();
+
                 events.forEach(e => {
                     const comp = e.competitions[0];
                     if (comp.status.type.completed) {
-                        const myTeam = comp.competitors.find(c => c.team.abbreviation === teamId);
-                        const oppTeam = comp.competitors.find(c => c.team.abbreviation !== teamId);
-                        // Fix for College where ID is used but Abbreviation is in response
-                        const myTeamById = comp.competitors.find(c => c.team.id === teamId); 
-                        
-                        const targetTeam = myTeam || myTeamById;
+                        // Find MY team. We check both ID and Abbreviation because ESPN API varies by sport.
+                        // For NCAA: ID matches. For NFL: Abbreviation matches.
+                        const myTeam = comp.competitors.find(c => 
+                            String(c.team.id) === targetId || 
+                            (c.team.abbreviation && c.team.abbreviation.toLowerCase() === targetId)
+                        );
 
-                        if (targetTeam) {
-                            if (targetTeam.winner) {
+                        if (myTeam) {
+                            // Find OPPONENT (The one that isn't me)
+                            // We use the unique ID of the competitor to distinguish.
+                            const oppTeam = comp.competitors.find(c => c.id !== myTeam.id);
+
+                            if (myTeam.winner) {
                                 w++;
                             } else {
                                 if (league === 'nhl') {
                                     if (comp.status.period > 3) { otl++; } else { l++; }
-                                } else if (league === 'nfl') {
-                                    if (!oppTeam.winner) { d++; } else { l++; }
+                                } else if (league === 'nfl' || league === 'college-football') {
+                                     // Check for tie
+                                     if (oppTeam && !oppTeam.winner && !myTeam.winner) { d++; } 
+                                     else { l++; }
                                 } else {
                                     l++;
                                 }
@@ -1279,7 +1289,7 @@
                 });
                 
                 if (league === 'nhl') return `${w}-${l}-${otl}`;
-                if (league === 'nfl' && d > 0) return `${w}-${l}-${d}`;
+                if ((league === 'nfl' || league === 'college-football') && d > 0) return `${w}-${l}-${d}`;
                 return `${w}-${l}`;
             };
 
@@ -1325,7 +1335,7 @@
                         let nextOppLogo = null;
 
                         // ID Check helper
-                        const isMe = (comp) => comp.team.id === idStr || comp.team.abbreviation.toLowerCase() === idStr;
+                        const isMe = (comp) => String(comp.team.id) === idStr || (comp.team.abbreviation && comp.team.abbreviation.toLowerCase() === idStr);
 
                         if (prevGame) {
                             const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
