@@ -59,7 +59,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
         // --- SELF-HEALING PERSISTENCE HOOK ---
         const usePersistedState = (key, defaultValue) => {
@@ -813,13 +813,31 @@
             const [ncaafData, setNcaafData] = useState({});
 
             const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3 }]);
-            
             const [weatherDataMap, setWeatherDataMap] = useState({});
+            
             const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [isPaused, setIsPaused] = useState(false);
             const [clockColor, setClockColor] = usePersistedState('clockColor', 'text-white');
 
+            // Interaction State
+            const [showControls, setShowControls] = useState(false);
+            const controlsTimeoutRef = useRef(null);
+
+            const handleInteraction = () => {
+                setShowControls(true);
+                if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+                controlsTimeoutRef.current = setTimeout(() => {
+                    setShowControls(false);
+                }, 5000);
+            };
+
+            // Initial load effect to show controls briefly
+            useEffect(() => {
+                handleInteraction();
+            }, []);
+
+            // Weather Fetcher
             useEffect(() => {
                 const fetchWeatherForZip = async (zip) => {
                     try {
@@ -877,12 +895,10 @@
                         );
 
                         if (myTeam) {
-                            // Parse scores as Integers to be safe
                             const myScore = parseInt(myTeam.score?.value || 0, 10);
                             const oppTeam = comp.competitors.find(c => c.id !== myTeam.id);
                             const oppScore = parseInt(oppTeam?.score?.value || 0, 10);
 
-                            // Determine Win/Loss manually if 'winner' field is missing or unreliable
                             let isWin = false;
                             let isLoss = false;
                             let isTie = false;
@@ -890,7 +906,6 @@
                             if (myTeam.winner === true) isWin = true;
                             else if (myTeam.winner === false) isLoss = true;
                             else {
-                                // Fallback: Manual Score Comparison
                                 if (myScore > oppScore) isWin = true;
                                 else if (myScore < oppScore) isLoss = true;
                                 else isTie = true;
@@ -898,7 +913,7 @@
 
                             if (isWin) w++;
                             else if (isTie && (league === 'nfl' || league === 'college-football')) d++;
-                            else if (league === 'nhl' && comp.status.period > 3) otl++; // OTL logic for NHL
+                            else if (league === 'nhl' && comp.status.period > 3) otl++; 
                             else l++;
                         }
                     }
@@ -913,7 +928,7 @@
                 try {
                     const idStr = String(teamId).toLowerCase(); 
                     
-                    // PARALLEL FETCH: Schedule AND Team Info (to fix 0-0 record issue)
+                    // ISSUE 1 FIX: Parallel Fetch for Record
                     const [scheduleRes, teamInfoRes] = await Promise.all([
                         fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`),
                         fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`)
@@ -921,17 +936,14 @@
 
                     const scheduleData = await scheduleRes.json();
                     const teamInfoData = await teamInfoRes.json();
-
                     const events = scheduleData.events || [];
                     
-                    // ISSUE 1 FIX: Get Record from Team Info Endpoint
                     let record = "0-0";
                     try {
                         if (teamInfoData.team && teamInfoData.team.record && teamInfoData.team.record.items) {
-                            const summary = teamInfoData.team.record.items[0].summary; // e.g. "12-1"
+                            const summary = teamInfoData.team.record.items[0].summary; 
                             if (summary) record = summary;
                         } else {
-                            // Fallback to calculation if API fails
                             record = calculateRecord(events, teamId, league);
                         }
                     } catch (e) {
@@ -953,11 +965,9 @@
                             if (summaryData.header?.competitions?.[0]?.status?.type?.state === 'in') { liveGame = summaryData; }
                         }
 
-                        // Helper to fetch opp record
-                        const fetchOpponentRecord = async (oppId, oppAbbrev) => {
+                        const fetchOpponentRecord = async (oppId) => {
                             if (!oppId) return null;
                             try {
-                                // For opponents, we just fetch their team info page for speed/reliability
                                 const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`);
                                 const d = await res.json();
                                 return d.team?.record?.items?.[0]?.summary || null;
@@ -975,7 +985,7 @@
                             const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
                             if (prevComp) {
                                 if (prevComp.team.logos && prevComp.team.logos.length > 0) { prevOppLogo = prevComp.team.logos[0].href; }
-                                prevOppRecord = await fetchOpponentRecord(prevComp.team.id, prevComp.team.abbreviation);
+                                prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
                             }
                         }
 
@@ -983,7 +993,7 @@
                             const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
                             if (nextComp) {
                                 if (nextComp.team.logos && nextComp.team.logos.length > 0) { nextOppLogo = nextComp.team.logos[0].href; }
-                                nextOppRecord = await fetchOpponentRecord(nextComp.team.id, nextComp.team.abbreviation);
+                                nextOppRecord = await fetchOpponentRecord(nextComp.team.id);
                             }
                         }
 
@@ -1024,7 +1034,7 @@
                                 else if (league === 'mlb') { const t = MLB_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${t.id.toLowerCase()}.png`; }
                             }
 
-                            const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id, oppTeam.team.abbreviation);
+                            const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
                             
                             const liveBase = {
                                 id: liveGame.header.id,
@@ -1080,7 +1090,7 @@
 
             const allCards = useMemo(() => {
                 const cards = [];
-                const processedGameIds = new Set(); // To track duplicate live games
+                const processedGameIds = new Set(); 
 
                 const checkAndAddLive = (teamsSelected, dataMap, CardComponent) => {
                     const liveTeams = teamsSelected.filter(id => dataMap[id]?.status === 'LIVE');
@@ -1166,7 +1176,12 @@
             const closeSettings = () => { setIsSettingsOpen(false); };
 
             return (
-                <div className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+                <div 
+                    className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
+                    onMouseMove={handleInteraction}
+                    onClick={handleInteraction}
+                    onTouchStart={handleInteraction}
+                >
                     <div className="w-full h-full relative" onMouseEnter={() => setIsPaused(false)} onMouseLeave={() => setIsPaused(false)}>
                         {allCards.map((card, index) => (
                             <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === currentSlideIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
@@ -1174,7 +1189,15 @@
                             </div>
                         ))}
                     </div>
-                    <button onClick={() => setIsSettingsOpen(true)} className="absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full hover:bg-white/20 transition-colors border border-white/10 group"><Settings className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-500" /></button>
+                    
+                    {/* Settings Button with Visibility Logic */}
+                    <button 
+                        onClick={() => setIsSettingsOpen(true)} 
+                        className={`absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full hover:bg-white/20 border border-white/10 group transition-all duration-500 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                    >
+                        <Settings className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-500" />
+                    </button>
+
                     {isSettingsOpen && (
                         <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                             <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
