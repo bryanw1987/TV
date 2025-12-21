@@ -1,103 +1,277 @@
-const WeatherCard = ({ weatherData }) => {
-            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
-            
-            const getConditionText = (code) => {
-                if (code === 0) return "Clear Sky";
-                if (code <= 3) return "Partly Cloudy";
-                if (code <= 45) return "Foggy";
-                if (code <= 67) return "Rainy";
-                if (code <= 77) return "Snow";
-                if (code >= 95) return "Thunderstorms";
-                return "Cloudy";
-            };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Football Scoreboard</title>
+    <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --accent-color: #c0392b; /* Red accent */
+            --text-color: #ffffff;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-            const getPrecipText = (amount, code) => {
-                if (amount === 0) return '0.00"';
-                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
-                if (amount < 0.01) return `< 0.01" ${type}`;
-                return `${amount.toFixed(2)}" ${type}`;
-            };
+        body {
+            background-color: transparent; /* Allows overlay on OBS/Stream */
+            font-family: var(--font-family);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
 
-            const getAqiColor = (val) => {
-                if (val <= 50) return 'text-green-400';
-                if (val <= 100) return 'text-yellow-400';
-                if (val <= 150) return 'text-orange-400';
-                if (val <= 200) return 'text-red-500';
-                if (val <= 300) return 'text-purple-500';
-                return 'text-rose-900';
-            };
+        /* Main Scoreboard Container */
+        .scoreboard-container {
+            display: flex;
+            background-color: var(--primary-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 2px solid #333;
+            color: var(--text-color);
+            width: 800px;
+            height: 100px;
+        }
 
-            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
-            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
+        /* Team Sections */
+        .team-section {
+            flex: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: relative;
+        }
 
-            const high = daily?.temperature_2m_max?.[0];
-            const low = daily?.temperature_2m_min?.[0];
+        .team-home {
+            background: linear-gradient(90deg, #2c3e50 0%, #1a1a1a 100%);
+            border-right: 1px solid #444;
+        }
 
-            return (
-                <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
-                    {/* Location Tag - Absolute Positioned */}
-                    <div className="absolute top-[3vh] left-[3vw] flex items-center gap-[1vh] opacity-80 z-20">
-                        <MapPin className="w-[2.5vh] h-[2.5vh]" />
-                        <span className="text-[2.5vh] font-bold uppercase tracking-wider">{city}</span>
-                    </div>
+        .team-away {
+            background: linear-gradient(90deg, #1a1a1a 0%, #2c3e50 100%);
+            border-left: 1px solid #444;
+            flex-direction: row-reverse; /* Flip layout for away team */
+        }
 
-                    {/* Main Layout: Flex Column for Portrait, Flex Row for Landscape */}
-                    <div className="flex flex-col landscape:flex-row w-full h-full items-center justify-center gap-[2vh] landscape:gap-[4vw]">
-                        
-                        {/* LEFT SIDE (Landscape): Main Visuals */}
-                        <div className="flex flex-col items-center justify-center text-center landscape:items-end landscape:w-1/2 landscape:pr-[2vw]">
-                            <div className="mb-[1vh] landscape:mb-[-2vh] drop-shadow-2xl">
-                                {getWeatherIcon(condition, "w-[20vh] h-[20vh] landscape:w-[28vh] landscape:h-[28vh]")}
-                            </div>
-                            <h1 className="text-[18vh] landscape:text-[24vh] font-bold tracking-tighter leading-none filter drop-shadow-lg">
-                                {Math.round(temp)}°
-                            </h1>
-                            <p className="text-[3vh] landscape:text-[5vh] font-medium opacity-90 whitespace-nowrap mt-[1vh]">
-                                {getConditionText(condition)}
-                            </p>
-                        </div>
+        .team-logo {
+            width: 60px;
+            height: 60px;
+            background-color: #fff; /* Placeholder for logo transparency */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+            font-size: 12px;
+        }
 
-                        {/* RIGHT SIDE (Landscape): Data & Stats */}
-                        <div className="flex flex-col items-center landscape:items-start justify-center landscape:w-1/2 landscape:pl-[2vw] gap-[3vh]">
-                            
-                            {/* High / Low Section */}
-                            {high !== undefined && low !== undefined && (
-                                <div className="flex items-center gap-[4vh] landscape:gap-[6vh]">
-                                    <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[1.5vh] landscape:text-[2vh] font-bold uppercase tracking-widest opacity-70">High</span>
-                                        <span className="text-[6vh] landscape:text-[8vh] font-black leading-none">{Math.round(high)}°</span>
-                                    </div>
-                                    <div className="w-[1px] h-[6vh] landscape:h-[8vh] bg-white/30 rounded-full"></div>
-                                    <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[1.5vh] landscape:text-[2vh] font-bold uppercase tracking-widest opacity-70">Low</span>
-                                        <span className="text-[6vh] landscape:text-[8vh] font-black leading-none text-blue-100">{Math.round(low)}°</span>
-                                    </div>
-                                </div>
-                            )}
+        .team-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0 15px;
+        }
 
-                            {/* Stats Grid: 3 Cols in Portrait, Vertical List in Landscape */}
-                            <div className="grid grid-cols-3 landscape:grid-cols-1 landscape:gap-[1.5vh] w-full max-w-[60vh] landscape:w-auto bg-white/20 p-[2vh] landscape:p-[3vh] rounded-3xl backdrop-blur-md border border-white/10 shadow-lg">
-                                {/* Wind */}
-                                <div className="flex flex-col landscape:flex-row landscape:justify-between landscape:items-center landscape:gap-[4vh] landscape:min-w-[25vh]">
-                                    <div className="opacity-75 text-[1.5vh] landscape:text-[1.8vh] uppercase font-bold tracking-wider mb-1 landscape:mb-0">Wind</div>
-                                    <div className="font-bold text-[2.5vh] landscape:text-[3vh]">{wind} mph</div>
-                                </div>
-                                
-                                {/* Precip - Border logic changes based on orientation */}
-                                <div className="border-l border-white/20 landscape:border-l-0 landscape:border-t landscape:border-white/10 landscape:pt-[1.5vh] landscape:mt-[1.5vh] landscape:flex landscape:flex-row landscape:justify-between landscape:items-center landscape:gap-[4vh]">
-                                    <div className="opacity-75 text-[1.5vh] landscape:text-[1.8vh] uppercase font-bold tracking-wider mb-1 landscape:mb-0 pl-2 landscape:pl-0">Precip</div>
-                                    <div className="font-bold text-[2.5vh] landscape:text-[3vh] leading-tight pl-2 landscape:pl-0">{getPrecipText(precip, condition)}</div>
-                                </div>
+        .team-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-                                {/* AQI */}
-                                <div className="border-l border-white/20 landscape:border-l-0 landscape:border-t landscape:border-white/10 landscape:pt-[1.5vh] landscape:mt-[1.5vh] landscape:flex landscape:flex-row landscape:justify-between landscape:items-center landscape:gap-[4vh]">
-                                    <div className="opacity-75 text-[1.5vh] landscape:text-[1.8vh] uppercase font-bold tracking-wider mb-1 landscape:mb-0 pl-2 landscape:pl-0">Air Qual</div>
-                                    <div className={`font-black text-[2.5vh] landscape:text-[3vh] pl-2 landscape:pl-0 ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
-                                </div>
-                            </div>
+        .team-record {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
 
-                        </div>
-                    </div>
-                </div>
-            );
+        .team-score {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #fff;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Center Game Info Section */
+        .game-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            border-left: 2px solid var(--accent-color);
+            border-right: 2px solid var(--accent-color);
+            padding: 5px;
+        }
+
+        .clock {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffcc00; /* Yellow for time */
+            font-variant-numeric: tabular-nums;
+        }
+
+        .quarter {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #ccc;
+            margin-top: 2px;
+        }
+
+        .possession-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            margin-top: 5px;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s;
+        }
+
+        .active-possession {
+            opacity: 1;
+            box-shadow: 0 0 5px var(--accent-color);
+        }
+
+        /* Loading State */
+        #loading {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading">Connecting to Scoreboard...</div>
+
+    <div class="scoreboard-container">
+        <div class="team-section team-home">
+            <div class="team-logo" id="homeLogo">H</div>
+            <div class="team-info">
+                <div class="team-name" id="homeName">HOME</div>
+                <div class="team-record" id="homeRecord">0-0</div>
+            </div>
+            <div class="team-score" id="homeScore">0</div>
+            <div class="possession-indicator" id="homePossession"></div> 
+        </div>
+
+        <div class="game-info">
+            <div class="clock" id="gameClock">12:00</div>
+            <div class="quarter" id="gameQuarter">1ST</div>
+            <div style="font-size: 0.8rem; color: #888; margin-top: 2px;" id="downDistance">1st & 10</div>
+        </div>
+
+        <div class="team-section team-away">
+            <div class="team-logo" id="awayLogo">A</div>
+            <div class="team-info">
+                <div class="team-name" id="awayName">AWAY</div>
+                <div class="team-record" id="awayRecord">0-0</div>
+            </div>
+            <div class="team-score" id="awayScore">0</div>
+             <div class="possession-indicator" id="awayPossession"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        // ---------------------------------------------------------
+        // 1. FIREBASE CONFIGURATION
+        // REPLACE THESE VALUES WITH YOUR ACTUAL FIREBASE PROJECT KEYS
+        // ---------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
+
+        // 2. Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 3. Select DOM Elements
+        const els = {
+            homeName: document.getElementById('homeName'),
+            homeScore: document.getElementById('homeScore'),
+            homeRecord: document.getElementById('homeRecord'),
+            homePoss: document.getElementById('homePossession'),
+            
+            awayName: document.getElementById('awayName'),
+            awayScore: document.getElementById('awayScore'),
+            awayRecord: document.getElementById('awayRecord'),
+            awayPoss: document.getElementById('awayPossession'),
+            
+            clock: document.getElementById('gameClock'),
+            quarter: document.getElementById('gameQuarter'),
+            downDist: document.getElementById('downDistance'),
+            loading: document.getElementById('loading')
+        };
+
+        // 4. Data Listener
+        // Listening to the root 'match_data' node
+        const matchRef = db.ref('match_data');
+
+        matchRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            
+            if (data) {
+                // Update DOM with data from Firebase
+                
+                // HOME TEAM
+                els.homeName.textContent = data.home_name || "HOME";
+                els.homeScore.textContent = data.home_score || "0";
+                els.homeRecord.textContent = data.home_record || "";
+                
+                // AWAY TEAM
+                els.awayName.textContent = data.away_name || "AWAY";
+                els.awayScore.textContent = data.away_score || "0";
+                els.awayRecord.textContent = data.away_record || "";
+
+                // GAME STATUS
+                els.clock.textContent = data.clock || "12:00";
+                els.quarter.textContent = data.quarter || "PRE";
+                els.downDist.textContent = data.down_distance || "";
+
+                // POSSESSION LOGIC
+                // Assumes data.possession is either 'home' or 'away'
+                if (data.possession === 'home') {
+                    els.homePoss.classList.add('active-possession');
+                    els.awayPoss.classList.remove('active-possession');
+                } else if (data.possession === 'away') {
+                    els.awayPoss.classList.add('active-possession');
+                    els.homePoss.classList.remove('active-possession');
+                } else {
+                    els.homePoss.classList.remove('active-possession');
+                    els.awayPoss.classList.remove('active-possession');
+                }
+
+                // Hide loading screen once data is received
+                els.loading.style.display = 'none';
+            } else {
+                console.log("No data available");
+                els.loading.textContent = "Waiting for Data...";
+            }
+        }, (error) => {
+            console.error("Firebase Read Error:", error);
+            els.loading.textContent = "Error Loading Data";
+        });
+    </script>
+</body>
+</html>
