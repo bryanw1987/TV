@@ -435,8 +435,8 @@
                 const targetId = String(teamId).toLowerCase();
 
                 events.forEach(e => {
-                    const comp = e.competitions[0];
-                    if (comp.status.type.completed) {
+                    const comp = e.competitions?.[0]; // Safe access
+                    if (comp?.status?.type?.completed) {
                         const myTeam = comp.competitors.find(c => 
                             String(c.team.id) === targetId || 
                             (c.team.abbreviation && c.team.abbreviation.toLowerCase() === targetId)
