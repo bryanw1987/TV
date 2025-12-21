@@ -28,6 +28,16 @@
         
         .font-courier { font-family: 'Courier Prime', monospace; }
         
+        .field-lines {
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent 0%,
+                transparent calc(10% - 1px),
+                rgba(255, 255, 255, 0.3) 10%,
+                transparent calc(10% + 1px)
+            );
+        }
+        
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
@@ -58,6 +68,7 @@
                     const item = window.localStorage.getItem(key);
                     if (!item) return defaultValue;
                     const parsed = JSON.parse(item);
+                    // Migration Fix
                     if (key === 'zipConfigs') {
                         if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
                             return parsed.map(z => ({ id: z, showForecast: false, days: 3 }));
@@ -82,12 +93,13 @@
         };
 
         // --- ICONS ---
-        const IconBase = ({ children, className, style, ...props }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style} {...props}>{children}</svg>
+        const IconBase = ({ children, className, ...props }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>
         );
         const Settings = (props) => <IconBase {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
         const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
         const Plus = (props) => <IconBase {...props}><path d="M5 12h14"/><path d="M12 5v14"/></IconBase>;
+        const Clock = (props) => <IconBase {...props}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></IconBase>;
         const CalendarIcon = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
         const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
         const Check = (props) => <IconBase {...props}><polyline points="20 6 9 17 4 12"/></IconBase>;
@@ -96,18 +108,18 @@
         const CloudSnow = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></IconBase>;
         const CloudLightning = (props) => <IconBase {...props}><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/></IconBase>;
         const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
-        const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
+        const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
 
-        const getWeatherIcon = (code, sizeClass, style = {}) => {
-            if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} style={style} />;
+        const getWeatherIcon = (code, sizeClass) => {
+            if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} />;
             const color = "text-gray-200";
-            if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} style={style} fill="currentColor" />;
-            if (code <= 3) return <div className="relative" style={style}><Sun className={`${sizeClass} text-yellow-400`} fill="currentColor" /><div className={`absolute bottom-[-10%] right-[-10%] ${sizeClass} scale-75 text-gray-100`}><CloudFilled className="w-full h-full" /></div></div>;
-            if (code <= 48) return <CloudFilled className={`${sizeClass} ${color}`} style={style} />;
-            if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} style={style} fill="currentColor" />;
-            if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} style={style} fill="currentColor" />;
-            if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} style={style} fill="currentColor" />;
-            return <CloudFilled className={`${sizeClass} ${color}`} style={style} />;
+            if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} fill="currentColor" />;
+            if (code <= 3) return <div className="relative"><Sun className={`${sizeClass} text-yellow-400`} fill="currentColor" /><div className={`absolute bottom-[-10%] right-[-10%] ${sizeClass} scale-75 text-gray-100`}><CloudFilled /></div></div>;
+            if (code <= 48) return <CloudFilled className={`${sizeClass} ${color}`} />;
+            if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} fill="currentColor" />;
+            if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} fill="currentColor" />;
+            if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} fill="currentColor" />;
+            return <CloudFilled className={`${sizeClass} ${color}`} />;
         };
 
         const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
@@ -208,8 +220,8 @@
             { id: '356', city: 'Illinois', name: 'Fighting Illini', color: '#E84A27' },
             { id: '2294', city: 'Iowa', name: 'Hawkeyes', color: '#FFCD00' },
             { id: '66',  city: 'Iowa State', name: 'Cyclones', color: '#C8102E' },
-            { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' },
             { id: '55', city: 'Jacksonville State', name: 'Gamecocks', color: '#CC0000' },
+            { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' },
             { id: '2305', city: 'Kansas', name: 'Jayhawks', color: '#0051BA' },
             { id: '2306', city: 'Kansas State', name: 'Wildcats', color: '#512888' },
             { id: '96',  city: 'Kentucky', name: 'Wildcats', color: '#0033A0' },
@@ -439,12 +451,8 @@
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
                                 <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[12vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.score}</div>
-                                <div className="flex items-center gap-[2vmin] mt-[1vmin]">
-                                    <span className="text-[3vmin] font-bold text-gray-400">vs</span>
-                                    {team.schedule?.prev?.opponentLogo && <img src={team.schedule.prev.opponentLogo} className="h-[6vmin] w-[6vmin] object-contain" />}
-                                    <span className="text-[3vmin] font-bold text-white">{team.schedule?.prev?.opponent}</span>
-                                </div>
+                                <div className={`text-[8vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.result}</div>
+                                <div className="text-[2.5vmin] font-bold text-gray-400 mt-[1vmin]">vs {team.schedule?.prev?.opponent}</div>
                             </div>
                         </>
                     )}
@@ -576,7 +584,6 @@
         };
 
         const WeatherCard = ({ weatherData }) => {
-            if (!weatherData) return null;
             const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
             
             const getConditionText = (code) => {
@@ -660,23 +667,19 @@
                         </div>
                     </div>
                     <div className="absolute -bottom-[10%] -right-[10%] w-[50vmin] h-[50vmin] opacity-10 text-white pointer-events-none rotate-12">
-                        <CloudFilled className="w-full h-full" />
+                       <CloudFilled className="w-full h-full" />
                     </div>
                 </div>
             );
         };
 
         const ForecastCard = ({ weatherData, days }) => {
-            if (!weatherData) return null;
             const { daily, loading, error, city } = weatherData;
             if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
             if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
 
-            const limit = Math.min(days, 5);
-            // Dynamic Font Sizing Logic - Bigger if 3 days, Smaller if 5
-            const baseScale = days === 3 ? 1.4 : 1.0; 
-            
             const forecastItems = [];
+            const limit = Math.min(days, 5);
             if (daily && daily.time) {
                 for (let i = 1; i <= limit; i++) {
                     if (daily.time[i]) {
@@ -700,42 +703,30 @@
             };
 
             return (
-                <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
-                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none">
-                        <CalendarIcon className="w-[4vmin] h-[4vmin] text-blue-300" />
-                        <div><h2 className="text-[3vmin] font-bold leading-none">Forecast</h2><p className="text-[1.5vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
+                <div className="h-full w-full flex flex-col p-[4vh] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
+                    <div className="flex items-center gap-[1.5vh] mb-[3vh] relative z-10 flex-none">
+                        <CalendarIcon className="w-[4vh] h-[4vh] text-blue-300" />
+                        <div><h2 className="text-[3vh] font-bold leading-none">Forecast</h2><p className="text-[1.5vh] opacity-70 uppercase tracking-widest">{city}</p></div>
                     </div>
-                    
-                    {/* Main Forecast Container - Uses flex-1 to fill remaining space */}
-                    <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
+                    <div className="flex-1 flex flex-row gap-[2vw] relative z-10 min-h-0">
                         {forecastItems.map((day, idx) => (
-                            <div key={idx} className="flex-1 flex flex-col items-center justify-between bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
-                                
-                                {/* Date Section */}
-                                <div className="text-center mt-[1vmin]">
-                                    <div style={{ fontSize: `clamp(1rem, ${3.5 * baseScale}vmin, 3rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                                    <div style={{ fontSize: `clamp(0.8rem, ${1.5 * baseScale}vmin, 1.5rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                            <div key={idx} className="flex-1 flex flex-col items-center justify-between bg-white/10 rounded-3xl p-[2vh] backdrop-blur-md border border-white/5">
+                                <div className="text-center mt-[1vh]">
+                                    <div className="text-[2.5vh] font-bold uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                                    <div className="text-[1.5vh] font-bold text-blue-300 mt-[0.5vh]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
                                 </div>
-                                
-                                {/* Icon Section */}
-                                <div className="flex flex-col items-center justify-center flex-1 w-full">
-                                    {getWeatherIcon(day.code, "", { width: `${10 * baseScale}vmin`, height: `${10 * baseScale}vmin` })}
-                                    {day.precip > 0.01 && (
-                                        <div style={{ fontSize: `clamp(0.7rem, ${1.5 * baseScale}vmin, 1.2rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[1.5vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">
-                                            {getPrecipLabel(day.precip, day.code)}
-                                        </div>
-                                    )}
+                                <div className="flex flex-col items-center justify-center flex-1">
+                                    {getWeatherIcon(day.code, "w-[8vh] h-[8vh]")}
+                                    {day.precip > 0.01 && (<div className="text-[1.5vh] font-bold text-white mt-[1.5vh] bg-blue-600/80 px-[1.5vh] py-[0.5vh] rounded-full whitespace-nowrap shadow-md">{getPrecipLabel(day.precip, day.code)}</div>)}
                                 </div>
-
-                                {/* Temps Section */}
-                                <div className="text-center mb-[1vmin]">
-                                    <div style={{ fontSize: `clamp(2rem, ${7 * baseScale}vmin, 8rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div>
-                                    <div style={{ fontSize: `clamp(1rem, ${3 * baseScale}vmin, 3rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div>
+                                <div className="text-center mb-[1vh]">
+                                    <div className="text-[5vh] font-black leading-none tracking-tighter">{day.max}°</div>
+                                    <div className="text-[2vh] opacity-60 font-medium">{day.min}°</div>
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div className="absolute -bottom-10 -right-10 w-[40vmin] h-[40vmin] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
+                    <div className="absolute -bottom-10 -right-10 w-[40vh] h-[40vh] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
                 </div>
             );
         };
@@ -967,8 +958,8 @@
             const fetchSportData = async (sport, league, teamId) => {
                 try {
                     const idStr = String(teamId).toLowerCase(); 
-                    const now = new Date();
                     
+                    // ISSUE 1 FIX: Parallel Fetch for Record
                     const [scheduleRes, teamInfoRes] = await Promise.all([
                         fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`),
                         fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`)
@@ -990,142 +981,126 @@
                         record = calculateRecord(events, teamId, league);
                     }
 
-                    // Separate Completed vs Upcoming
-                    // Note: Sorting strings directly can be risky, new Date() handles ISO strings
-                    const completedGames = events
-                        .filter(e => e.status.type.completed)
-                        .sort((a,b) => new Date(a.date) - new Date(b.date));
-                        
-                    const upcomingGames = events
-                        .filter(e => !e.status.type.completed)
-                        .sort((a,b) => new Date(a.date) - new Date(b.date));
+                    if (events.length > 0 || record !== "0-0") {
+                        events.sort((a, b) => new Date(a.date) - new Date(b.date));
+                        const now = new Date();
+                        const nextGameIndex = events.findIndex(e => new Date(e.date) > now);
+                        let prevGame, nextGame, liveGame = null;
+                        if (nextGameIndex === -1) { prevGame = events[events.length - 1]; nextGame = null; } 
+                        else if (nextGameIndex === 0) { prevGame = null; nextGame = events[0]; } 
+                        else { prevGame = events[nextGameIndex - 1]; nextGame = events[nextGameIndex]; }
 
-                    // Grab the very last completed game
-                    let prevGame = completedGames.length > 0 ? completedGames[completedGames.length - 1] : null;
-                    
-                    // Grab the very next upcoming game
-                    let nextGame = upcomingGames.length > 0 ? upcomingGames[0] : null;
-                    
-                    // Fallback: If no upcoming games found in events, check teamInfo nextEvent (sometimes populated in off-season transitions)
-                    // Added Optional Chaining here to prevent CRASH if bad data comes back
-                    if (!nextGame && teamInfoData?.team?.nextEvent?.length > 0) {
-                        nextGame = teamInfoData.team.nextEvent[0];
-                    }
-
-                    let liveGame = null;
-
-                    // Check for Live Game specifically
-                    const liveEvent = events.find(e => e.status.type.state === 'in');
-                    if (liveEvent) {
-                        const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${liveEvent.id}`);
-                        const summaryData = await summaryRes.json();
-                        liveGame = summaryData;
-                    }
-
-                    const fetchOpponentRecord = async (oppId) => {
-                        if (!oppId) return null;
-                        try {
-                            const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`);
-                            const d = await res.json();
-                            return d.team?.record?.items?.[0]?.summary || null;
-                        } catch (e) { return null; }
-                    };
-
-                    let prevOppRecord = null;
-                    let nextOppRecord = null;
-                    let prevOppLogo = null;
-                    let nextOppLogo = null;
-
-                    const isMe = (comp) => String(comp.team.id) === idStr || (comp.team.abbreviation && comp.team.abbreviation.toLowerCase() === idStr);
-
-                    if (prevGame && prevGame.competitions) {
-                        const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
-                        if (prevComp) {
-                            if (prevComp.team.logos && prevComp.team.logos.length > 0) { prevOppLogo = prevComp.team.logos[0].href; }
-                            prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
-                        }
-                    }
-
-                    if (nextGame && nextGame.competitions) {
-                        const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
-                        if (nextComp) {
-                            if (nextComp.team.logos && nextComp.team.logos.length > 0) { nextOppLogo = nextComp.team.logos[0].href; }
-                            nextOppRecord = await fetchOpponentRecord(nextComp.team.id);
-                        }
-                    }
-
-                    let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
-                    
-                    mapped.schedule = {
-                        prev: prevGame ? {
-                            opponent: prevGame.competitions[0].competitors.find(c => !isMe(c))?.team?.abbreviation || 'OPP',
-                            opponentLogo: prevOppLogo,
-                            opponentRecord: prevOppRecord,
-                            score: (prevGame.competitions[0].competitors.find(c => isMe(c))?.score?.value || '0') + "-" + (prevGame.competitions[0].competitors.find(c => !isMe(c))?.score?.value || '0'),
-                            result: prevGame.competitions[0].status.type.completed ? (prevGame.competitions[0].competitors.find(c => isMe(c))?.winner ? 'W' : 'L') + " " + prevGame.competitions[0].competitors.find(c => isMe(c))?.score?.value + "-" + prevGame.competitions[0].competitors.find(c => !isMe(c))?.score?.value : 'TBD',
-                            date: new Date(prevGame.date).toLocaleDateString()
-                        } : { opponent: 'None', result: '-', date: '-' },
-                        next: nextGame ? {
-                            opponent: nextGame.competitions[0].competitors.find(c => !isMe(c))?.team?.abbreviation || 'TBD',
-                            opponentLogo: nextOppLogo,
-                            opponentRecord: nextOppRecord,
-                            rawDate: nextGame.date,
-                            id: nextGame.id, 
-                            date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
-                            time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                            location: nextGame.competitions[0].venue?.fullName || 'TBD'
-                        } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
-                    };
-
-                    if (liveGame) {
-                        const comp = liveGame.header.competitions[0];
-                        const myTeam = comp.competitors.find(c => isMe(c));
-                        const oppTeam = comp.competitors.find(c => !isMe(c));
-
-                        let oppLogo = null;
-                        if (oppTeam.team.logos && oppTeam.team.logos.length > 0) {
-                            oppLogo = oppTeam.team.logos[0].href;
-                        } else {
-                            if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
-                            else if (league === 'nhl') { const t = NHL_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${t.id.toLowerCase()}.png`; } 
-                            else if (league === 'mlb') { const t = MLB_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${t.id.toLowerCase()}.png`; }
+                        if (prevGame) {
+                            const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${prevGame.id}`);
+                            const summaryData = await summaryRes.json();
+                            if (summaryData.header?.competitions?.[0]?.status?.type?.state === 'in') { liveGame = summaryData; }
                         }
 
-                        const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
-                        
-                        const liveBase = {
-                            id: liveGame.header.id,
-                            opponent: oppTeam.team.abbreviation,
-                            opponentLogo: oppLogo,
-                            opponentRecord: liveOppRecord,
-                            score: { myScore: myTeam.score, oppScore: oppTeam.score },
-                            time: comp.status.displayClock
+                        const fetchOpponentRecord = async (oppId) => {
+                            if (!oppId) return null;
+                            try {
+                                const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`);
+                                const d = await res.json();
+                                return d.team?.record?.items?.[0]?.summary || null;
+                            } catch (e) { return null; }
                         };
 
-                        if (league === 'nfl' || league === 'college-football') {
-                            mapped.live = { ...liveBase, 
-                                quarter: comp.status.period,
-                                down: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.down : 0,
-                                distance: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.distance : 0,
-                                yardLine: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.yardLine : 50,
-                                possession: isMe(liveGame.drives?.current) ? 'myTeam' : 'oppTeam',
-                                lastPlay: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress"
-                            };
-                        } else if (league === 'nhl') {
-                            mapped.live = { ...liveBase, period: comp.status.period };
-                        } else if (league === 'mlb') {
-                            const sit = liveGame.situation || {};
-                            mapped.live = { ...liveBase, 
-                                inning: comp.status.period,
-                                inningState: comp.status.type.detail || `Inn ${comp.status.period}`,
-                                balls: sit.balls || 0, 
-                                strikes: sit.strikes || 0, 
-                                outs: sit.outs || 0, 
-                                runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird }
-                            };
+                        let prevOppRecord = null;
+                        let nextOppRecord = null;
+                        let prevOppLogo = null;
+                        let nextOppLogo = null;
+
+                        const isMe = (comp) => String(comp.team.id) === idStr || (comp.team.abbreviation && comp.team.abbreviation.toLowerCase() === idStr);
+
+                        if (prevGame) {
+                            const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
+                            if (prevComp) {
+                                if (prevComp.team.logos && prevComp.team.logos.length > 0) { prevOppLogo = prevComp.team.logos[0].href; }
+                                prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
+                            }
                         }
+
+                        if (nextGame) {
+                            const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
+                            if (nextComp) {
+                                if (nextComp.team.logos && nextComp.team.logos.length > 0) { nextOppLogo = nextComp.team.logos[0].href; }
+                                nextOppRecord = await fetchOpponentRecord(nextComp.team.id);
+                            }
+                        }
+
+                        let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
+                        
+                        mapped.schedule = {
+                            prev: prevGame ? {
+                                opponent: prevGame.competitions[0].competitors.find(c => !isMe(c))?.team?.abbreviation || 'OPP',
+                                opponentLogo: prevOppLogo,
+                                opponentRecord: prevOppRecord,
+                                score: (prevGame.competitions[0].competitors.find(c => isMe(c))?.score?.value || '0') + "-" + (prevGame.competitions[0].competitors.find(c => !isMe(c))?.score?.value || '0'),
+                                result: prevGame.competitions[0].status.type.completed ? (prevGame.competitions[0].competitors.find(c => isMe(c))?.winner ? 'W' : 'L') + " " + prevGame.competitions[0].competitors.find(c => isMe(c))?.score?.value + "-" + prevGame.competitions[0].competitors.find(c => !isMe(c))?.score?.value : 'TBD',
+                                date: new Date(prevGame.date).toLocaleDateString()
+                            } : { opponent: 'None', result: '-', date: '-' },
+                            next: nextGame ? {
+                                opponent: nextGame.competitions[0].competitors.find(c => !isMe(c))?.team?.abbreviation || 'TBD',
+                                opponentLogo: nextOppLogo,
+                                opponentRecord: nextOppRecord,
+                                rawDate: nextGame.date,
+                                id: nextGame.id, 
+                                date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
+                                time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                                location: nextGame.competitions[0].venue?.fullName || 'TBD'
+                            } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
+                        };
+
+                        if (liveGame) {
+                            const comp = liveGame.header.competitions[0];
+                            const myTeam = comp.competitors.find(c => isMe(c));
+                            const oppTeam = comp.competitors.find(c => !isMe(c));
+
+                            let oppLogo = null;
+                            if (oppTeam.team.logos && oppTeam.team.logos.length > 0) {
+                                oppLogo = oppTeam.team.logos[0].href;
+                            } else {
+                                if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
+                                else if (league === 'nhl') { const t = NHL_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${t.id.toLowerCase()}.png`; } 
+                                else if (league === 'mlb') { const t = MLB_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${t.id.toLowerCase()}.png`; }
+                            }
+
+                            const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
+                            
+                            const liveBase = {
+                                id: liveGame.header.id,
+                                opponent: oppTeam.team.abbreviation,
+                                opponentLogo: oppLogo,
+                                opponentRecord: liveOppRecord,
+                                score: { myScore: myTeam.score, oppScore: oppTeam.score },
+                                time: comp.status.displayClock
+                            };
+
+                            if (league === 'nfl' || league === 'college-football') {
+                                mapped.live = { ...liveBase, 
+                                    quarter: comp.status.period,
+                                    down: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.down : 0,
+                                    distance: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.distance : 0,
+                                    yardLine: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].end.yardLine : 50,
+                                    possession: isMe(liveGame.drives?.current) ? 'myTeam' : 'oppTeam',
+                                    lastPlay: liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress"
+                                };
+                            } else if (league === 'nhl') {
+                                mapped.live = { ...liveBase, period: comp.status.period };
+                            } else if (league === 'mlb') {
+                                const sit = liveGame.situation || {};
+                                mapped.live = { ...liveBase, 
+                                    inning: comp.status.period,
+                                    inningState: comp.status.type.detail || `Inn ${comp.status.period}`,
+                                    balls: sit.balls || 0, 
+                                    strikes: sit.strikes || 0, 
+                                    outs: sit.outs || 0, 
+                                    runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird }
+                                };
+                            }
+                        }
+                        return { [teamId]: mapped };
                     }
-                    return { [teamId]: mapped };
                 } catch(e) { console.error(e); }
                 return { [teamId]: null };
             };
@@ -1189,12 +1164,21 @@
                     cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> });
                 }
                 
-                // --- FIXED VISIBILITY LOGIC: Show card if user selected team, regardless of date ---
-                // Removed the "isWithinRange" filter. If you pick a team, you see the team.
-                nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
-                nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
-                mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
-                ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
+                const isWithinRange = (data) => {
+                    if (!data) return true;
+                    if (data.status === 'LIVE') return true;
+                    if (!data.schedule?.next?.rawDate) return false;
+                    const nextGameDate = new Date(data.schedule.next.rawDate);
+                    const now = new Date();
+                    const diffTime = nextGameDate - now;
+                    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                    return diffDays <= 13;
+                };
+
+                nflTeamsSelected.forEach(id => { if(isWithinRange(nflData[id])) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
+                nhlTeamsSelected.forEach(id => { if(isWithinRange(nhlData[id])) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
+                mlbTeamsSelected.forEach(id => { if(isWithinRange(mlbData[id])) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
+                ncaafTeamsSelected.forEach(id => { if(isWithinRange(ncaafData[id])) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
                 
                 return cards;
             }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor]);
