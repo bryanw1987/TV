@@ -61,14 +61,26 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- HOOK FOR PERSISTENCE ---
+        // --- HOOK FOR PERSISTENCE WITH MIGRATION SAFETY ---
         const usePersistedState = (key, defaultValue) => {
             const [state, setState] = useState(() => {
                 try {
                     const item = window.localStorage.getItem(key);
-                    return item ? JSON.parse(item) : defaultValue;
+                    if (!item) return defaultValue;
+                    
+                    const parsed = JSON.parse(item);
+
+                    // --- MIGRATION SAFETY CHECK ---
+                    // If we are loading 'zipConfigs' but the data is the old format (Array of Strings)
+                    // We immediately convert it to the new format (Array of Objects) to prevent a crash.
+                    if (key === 'zipConfigs' && Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+                        console.log("Migrating old zip data format...");
+                        return parsed.map(z => ({ id: z, showForecast: false, days: 3 }));
+                    }
+
+                    return parsed;
                 } catch (error) {
-                    console.error(error);
+                    console.error("State load error:", error);
                     return defaultValue;
                 }
             });
@@ -292,6 +304,706 @@
             { id: '275', city: 'Wisconsin', name: 'Badgers', color: '#C5050C' },
             { id: '2751', city: 'Wyoming', name: 'Cowboys', color: '#FFC425' },
         ];
+
+        // --- COMPONENTS ---
+
+        const NFLCard = ({ teamId, realData }) => {
+            const teamConfig = NFL_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId.toLowerCase()}.png` };
+                if (realData) { 
+                    const oppColor = NFL_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
+                    if (realData.live) realData.live.opponentColor = oppColor;
+                    return { ...base, ...realData }; 
+                }
+                return {
+                    ...base, status: 'OFFLINE', record: '0-0',
+                    schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } }
+                };
+            }, [teamId, teamConfig, realData]);
+
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            const containerStyle = { background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` };
+            const fieldTurfStyle = { backgroundColor: '#3f6228', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.8)' };
+
+            return (
+                <div className="h-full w-full flex flex-col relative overflow-hidden text-white font-sans" style={containerStyle}>
+                    <div className="flex-none flex items-center gap-[2vw] p-[3vh] border-b border-gray-800 relative z-10">
+                        <img src={team.logo} alt={team.name} className="h-[8vh] w-[8vh] object-contain drop-shadow-lg" />
+                        <div className="flex flex-col justify-center">
+                            <div className="flex items-baseline gap-[1vw]">
+                                <h2 className="text-[6vmin] font-black uppercase tracking-tighter leading-none text-white">{team.name}</h2>
+                                <span className="text-[3vmin] text-gray-400 font-bold">({team.record})</span>
+                                {isLive && <span className="bg-red-600 text-white text-[1.5vh] font-bold px-[1vw] py-[0.2vh] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider ml-[1vw]">LIVE</span>}
+                            </div>
+                            <p className="text-[2vh] font-bold uppercase tracking-widest mt-[0.5vh]" style={{ color: team.color }}>
+                                {isLive ? "IN PROGRESS" : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-h-0 flex flex-col justify-center p-[2vh] relative z-10 gap-[2vh]">
+                        {isLive ? (
+                            <>
+                                <div className="flex-shrink-0 flex flex-col items-center justify-center bg-white/5 rounded-3xl p-[1vh] border border-white/5 backdrop-blur-md h-[30vh]">
+                                    <div className="flex w-full justify-between items-center px-[2vw] mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <img src={team.logo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold text-gray-400">{team.id}</div>
+                                            <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.record}</div>
+                                            <div className="text-[8vh] font-black leading-none" style={{ textShadow: `0 0 10px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        </div>
+                                        <div className="text-[4vh] font-bold text-gray-400">VS</div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                             {team.live.opponentLogo ? <img src={team.live.opponentLogo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" /> : <div className="h-[8vh] w-[8vh] bg-white/10 rounded-full flex items-center justify-center text-[3vh] font-bold">{team.live.opponent}</div>}
+                                            <div className="text-[3vh] font-bold text-gray-400">{team.live.opponent}</div>
+                                            {team.live.opponentRecord && <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.live.opponentRecord}</div>}
+                                            <div className="text-[8vh] font-black leading-none text-white">{team.live.score.oppScore}</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-[4vh] font-black tracking-tighter text-white leading-none">
+                                        {team.live.quarter}Q <span className="text-gray-400 mx-2">|</span> {team.live.time}
+                                    </div>
+                                </div>
+                                <div className="flex-shrink-0 text-center py-[0.5vh] min-h-[6vh] flex items-center justify-center">
+                                     <div className="text-[2.5vmin] text-gray-300 font-bold tracking-tight px-2 leading-tight whitespace-normal line-clamp-3">
+                                         {team.live.lastPlay}
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-h-0 bg-white/10 rounded-xl p-[1.5vh] border border-white/10 flex flex-col justify-end backdrop-blur-md">
+                                    <div className="flex justify-between items-end mb-[0.5vh] px-2 flex-shrink-0">
+                                        <div>
+                                            <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                                            <div className="text-[3vh] font-black text-white leading-none mt-[0.5vh]">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
+                                            <div className="text-[3vh] font-black leading-none mt-[0.5vh]" style={{ color: team.color }}>{team.live.yardLine > 50 ? `OPP ${100 - team.live.yardLine}` : `OWN ${team.live.yardLine}`}</div>
+                                        </div>
+                                    </div>
+                                    <div className="relative w-full rounded overflow-hidden flex flex-1 min-h-[8vh] max-h-[15vh]" style={fieldTurfStyle}>
+                                        <div className="w-[8%] h-full bg-black/40 border-r-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black -rotate-90 whitespace-nowrap absolute">{team.id}</span></div>
+                                        <div className="flex-1 relative h-full field-lines z-0">
+                                            <div className="absolute bottom-[5%] w-full flex justify-between px-[10%] text-[1.5vh] font-bold text-white/80 font-courier transform -translate-x-[0%]">
+                                                <span>10</span><span>20</span><span>30</span><span>40</span><span className="text-white">50</span><span>40</span><span>30</span><span>20</span><span>10</span>
+                                            </div>
+                                            <div className="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style={{ left: team.live.possession === 'myTeam' ? 0 : 'auto', right: team.live.possession === 'myTeam' ? 'auto' : 0, width: `${team.live.possession === 'myTeam' ? team.live.yardLine : (100 - team.live.yardLine)}%`, flexDirection: team.live.possession === 'myTeam' ? 'row' : 'row-reverse' }}>
+                                               <div className="h-[60%] flex-grow rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] relative flex items-center overflow-visible" style={{ backgroundColor: team.live.possession === 'myTeam' ? team.color : (team.live.opponentColor || '#fff') }}>
+                                                    <div className="absolute h-[5vh] w-[5vh] md:h-[6vh] md:w-[6vh] aspect-square z-20 flex items-center justify-center" style={{ right: team.live.possession === 'myTeam' ? '0' : 'auto', left: team.live.possession === 'myTeam' ? 'auto' : '0', top: '50%', transform: 'translateY(-50%)' }}>
+                                                        <img src={team.live.possession === 'myTeam' ? team.logo : (team.live.opponentLogo || 'https://via.placeholder.com/50')} className="w-full h-full object-contain drop-shadow-md" alt="possession" />
+                                                    </div>
+                                               </div>
+                                            </div>
+                                        </div>
+                                        <div className="w-[8%] h-full bg-black/40 border-l-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black rotate-90 whitespace-nowrap absolute">{team.live.opponent}</span></div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="h-full flex flex-col justify-center gap-[4vh]">
+                                <div className="bg-black/20 rounded-3xl p-[4vh] border border-white/10 backdrop-blur-sm relative overflow-hidden">
+                                    <div className="text-[1.5vh] opacity-50 font-bold mb-[2vh] uppercase tracking-widest text-center">Last Game</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <div className={`text-[5vh] md:text-[7vh] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
+                                                {team.schedule?.prev?.score || '-'}
+                                            </div>
+                                            <div className="text-[3vh] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.prev?.opponentLogo ? (<img src={team.schedule.prev.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.prev?.opponent}</div>)}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.prev?.opponent}</div>
+                                            {team.schedule?.prev?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.prev.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vh] opacity-60 flex items-center justify-center gap-2">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.prev?.date || 'Date Pending'}
+                                    </div>
+                                </div>
+                                <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
+                                    <div className="text-[1.5vh] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="text-[6vh] font-bold text-gray-500 w-[40%] text-center">VS</div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.next?.opponentLogo ? (<img src={team.schedule.next.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.next?.opponent}</div>)}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.next?.opponent}</div>
+                                            {team.schedule?.next?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    </div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const NCAAFCard = ({ teamId, realData }) => {
+            const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId}.png` };
+                if (realData) { 
+                    const oppColor = NCAAF_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
+                    if (realData.live) realData.live.opponentColor = oppColor;
+                    return { ...base, ...realData }; 
+                }
+                return {
+                    ...base, status: 'OFFLINE', record: '0-0',
+                    schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } }
+                };
+            }, [teamId, teamConfig, realData]);
+
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            const containerStyle = { background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` };
+            const fieldTurfStyle = { backgroundColor: '#3f6228', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)', border: '2px solid rgba(255,255,255,0.8)' };
+
+            return (
+                <div className="h-full w-full flex flex-col relative overflow-hidden text-white font-sans" style={containerStyle}>
+                    <div className="flex-none flex items-center gap-[2vw] p-[3vh] border-b border-gray-800 relative z-10">
+                        <img src={team.logo} alt={team.name} className="h-[8vh] w-[8vh] object-contain drop-shadow-lg" />
+                        <div className="flex flex-col justify-center">
+                            <div className="flex items-baseline gap-[1vw]">
+                                <h2 className="text-[5vmin] font-black uppercase tracking-tighter leading-none text-white">{team.city} {team.name}</h2>
+                                <span className="text-[3vmin] text-gray-400 font-bold">({team.record})</span>
+                                {isLive && <span className="bg-red-600 text-white text-[1.5vh] font-bold px-[1vw] py-[0.2vh] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider ml-[1vw]">LIVE</span>}
+                            </div>
+                            <p className="text-[2vh] font-bold uppercase tracking-widest mt-[0.5vh]" style={{ color: team.color }}>
+                                {isLive ? "IN PROGRESS" : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-h-0 flex flex-col justify-center p-[2vh] relative z-10 gap-[2vh]">
+                        {isLive ? (
+                            <>
+                                <div className="flex-shrink-0 flex flex-col items-center justify-center bg-white/5 rounded-3xl p-[1vh] border border-white/5 backdrop-blur-md h-[30vh]">
+                                    <div className="flex w-full justify-between items-center px-[2vw] mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <img src={team.logo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold text-gray-400">{team.city}</div>
+                                            <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.record}</div>
+                                            <div className="text-[8vh] font-black leading-none" style={{ textShadow: `0 0 10px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        </div>
+                                        <div className="text-[4vh] font-bold text-gray-400">VS</div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                             {team.live.opponentLogo ? <img src={team.live.opponentLogo} className="h-[8vh] w-[8vh] object-contain mb-[1vh]" /> : <div className="h-[8vh] w-[8vh] bg-white/10 rounded-full flex items-center justify-center text-[3vh] font-bold">{team.live.opponent}</div>}
+                                            <div className="text-[3vh] font-bold text-gray-400">{team.live.opponent}</div>
+                                            {team.live.opponentRecord && <div className="text-[2vh] font-mono text-gray-500 mb-[1vh]">{team.live.opponentRecord}</div>}
+                                            <div className="text-[8vh] font-black leading-none text-white">{team.live.score.oppScore}</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-[4vh] font-black tracking-tighter text-white leading-none">
+                                        {team.live.quarter}Q <span className="text-gray-400 mx-2">|</span> {team.live.time}
+                                    </div>
+                                </div>
+                                <div className="flex-shrink-0 text-center py-[0.5vh] min-h-[6vh] flex items-center justify-center">
+                                     <div className="text-[2.5vmin] text-gray-300 font-bold tracking-tight px-2 leading-tight whitespace-normal line-clamp-3">
+                                         {team.live.lastPlay}
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-h-0 bg-white/10 rounded-xl p-[1.5vh] border border-white/10 flex flex-col justify-end backdrop-blur-md">
+                                    <div className="flex justify-between items-end mb-[0.5vh] px-2 flex-shrink-0">
+                                        <div>
+                                            <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Situation</div>
+                                            <div className="text-[3vh] font-black text-white leading-none mt-[0.5vh]">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-[1.5vh] text-gray-400 uppercase tracking-widest font-bold">Ball On</div>
+                                            <div className="text-[3vh] font-black leading-none mt-[0.5vh]" style={{ color: team.color }}>{team.live.yardLine > 50 ? `OPP ${100 - team.live.yardLine}` : `OWN ${team.live.yardLine}`}</div>
+                                        </div>
+                                    </div>
+                                    <div className="relative w-full rounded overflow-hidden flex flex-1 min-h-[8vh] max-h-[15vh]" style={fieldTurfStyle}>
+                                        <div className="w-[8%] h-full bg-black/40 border-r-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black -rotate-90 whitespace-nowrap absolute">{team.id}</span></div>
+                                        <div className="flex-1 relative h-full field-lines z-0">
+                                            <div className="absolute bottom-[5%] w-full flex justify-between px-[10%] text-[1.5vh] font-bold text-white/80 font-courier transform -translate-x-[0%]">
+                                                <span>10</span><span>20</span><span>30</span><span>40</span><span className="text-white">50</span><span>40</span><span>30</span><span>20</span><span>10</span>
+                                            </div>
+                                            <div className="absolute top-0 h-full flex items-center transition-all duration-1000 ease-out z-10" style={{ left: team.live.possession === 'myTeam' ? 0 : 'auto', right: team.live.possession === 'myTeam' ? 'auto' : 0, width: `${team.live.possession === 'myTeam' ? team.live.yardLine : (100 - team.live.yardLine)}%`, flexDirection: team.live.possession === 'myTeam' ? 'row' : 'row-reverse' }}>
+                                               <div className="h-[60%] flex-grow rounded-sm shadow-[0_0_10px_rgba(255,255,255,0.4)] relative flex items-center overflow-visible" style={{ backgroundColor: team.live.possession === 'myTeam' ? team.color : (team.live.opponentColor || '#fff') }}>
+                                                    <div className="absolute h-[5vh] w-[5vh] md:h-[6vh] md:w-[6vh] aspect-square z-20 flex items-center justify-center" style={{ right: team.live.possession === 'myTeam' ? '0' : 'auto', left: team.live.possession === 'myTeam' ? 'auto' : '0', top: '50%', transform: 'translateY(-50%)' }}>
+                                                        <img src={team.live.possession === 'myTeam' ? team.logo : (team.live.opponentLogo || 'https://via.placeholder.com/50')} className="w-full h-full object-contain drop-shadow-md" alt="possession" />
+                                                    </div>
+                                               </div>
+                                            </div>
+                                        </div>
+                                        <div className="w-[8%] h-full bg-black/40 border-l-2 border-white/50 flex items-center justify-center z-0"><span className="text-[1vh] font-black rotate-90 whitespace-nowrap absolute">{team.live.opponent}</span></div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="h-full flex flex-col justify-center gap-[4vh]">
+                                <div className="bg-black/20 rounded-3xl p-[4vh] border border-white/10 backdrop-blur-sm relative overflow-hidden">
+                                    <div className="text-[1.5vh] opacity-50 font-bold mb-[2vh] uppercase tracking-widest text-center">Last Game</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.city}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <div className={`text-[5vh] md:text-[7vh] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
+                                                {team.schedule?.prev?.score || '-'}
+                                            </div>
+                                            <div className="text-[3vh] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.prev?.opponentLogo ? (<img src={team.schedule.prev.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.prev?.opponent}</div>)}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.prev?.opponent}</div>
+                                            {team.schedule?.prev?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.prev.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vh] opacity-60 flex items-center justify-center gap-2">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.prev?.date || 'Date Pending'}
+                                    </div>
+                                </div>
+                                <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
+                                    <div className="text-[1.5vh] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.city}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="text-[6vh] font-bold text-gray-500 w-[40%] text-center">VS</div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.next?.opponentLogo ? (<img src={team.schedule.next.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.next?.opponent}</div>)}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.next?.opponent}</div>
+                                            {team.schedule?.next?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    </div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const NHLCard = ({ teamId, realData }) => {
+            const teamConfig = NHL_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/nhl/500/${teamId.toLowerCase()}.png` };
+                if (realData) { return { ...base, ...realData }; }
+                return { ...base, status: 'OFFLINE', record: '0-0-0', schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } } };
+            }, [teamId, teamConfig, realData]);
+
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            const containerStyle = { background: 'radial-gradient(circle at center, #334155 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` };
+
+            return (
+                <div className="h-full w-full flex flex-col relative overflow-hidden text-white font-sans" style={containerStyle}>
+                    <div className="flex-none flex items-center gap-[2vw] p-[3vh] border-b border-gray-800 relative z-10">
+                        <img src={team.logo} alt={team.name} className="h-[8vh] w-[8vh] object-contain drop-shadow-lg" />
+                        <div className="flex flex-col justify-center">
+                            <div className="flex items-baseline gap-[1vw]">
+                                <h2 className="text-[6vh] font-black uppercase tracking-tighter leading-none text-white">{team.name}</h2>
+                                <span className="text-[3vh] text-gray-400 font-bold">({team.record})</span>
+                                {isLive && <span className="bg-red-600 text-white text-[1.5vh] font-bold px-[1vw] py-[0.2vh] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider ml-[1vw]">LIVE</span>}
+                            </div>
+                            <p className="text-[2vh] font-bold uppercase tracking-widest mt-[0.5vh]" style={{ color: team.color }}>
+                                {isLive ? `P${team.live.period} - ${team.live.time}` : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex-1 min-h-0 flex flex-col justify-center p-[2vh] relative z-10 gap-[2vh]">
+                        {isLive ? (
+                            <div className="flex-1 flex flex-col justify-center items-center">
+                                <div className="flex items-center justify-center w-full gap-[2vw]">
+                                    <div className="flex flex-1 items-center justify-end gap-[2vh]">
+                                         <img src={team.logo} className="h-[12vmin] w-[12vmin] object-contain" />
+                                         <div className="text-[20vmin] font-black leading-none text-right tabular-nums" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                    </div>
+                                    <div className="text-[4vh] font-black text-gray-600 px-[2vh]">-</div>
+                                    <div className="flex flex-1 items-center justify-start gap-[2vh]">
+                                         <div className="text-[20vmin] font-black leading-none text-white text-left tabular-nums">{team.live.score.oppScore}</div>
+                                         {team.live.opponentLogo && (<div className="bg-white/15 rounded-full p-[1.5vmin] backdrop-blur-md"><img src={team.live.opponentLogo} className="h-[10vmin] w-[10vmin] object-contain" /></div>)}
+                                    </div>
+                                </div>
+                                <div className="mt-[2vh] text-[3vh] font-bold text-gray-400">{team.id} vs {team.live.opponent}</div>
+                                <div className="mt-[4vh] text-[3vh] font-mono bg-white/10 px-[3vh] py-[1vh] rounded-full backdrop-blur-md">{team.live.time} - Period {team.live.period}</div>
+                            </div>
+                        ) : (
+                            <div className="h-full flex flex-col justify-center gap-[4vh]">
+                                <div className="bg-black/20 rounded-3xl p-[4vh] border border-white/10 backdrop-blur-sm relative overflow-hidden">
+                                    <div className="text-[1.5vmin] opacity-50 font-bold mb-[2vh] uppercase tracking-widest text-center">Last Game</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vmin] font-bold">{team.id}</div>
+                                            <div className="text-[2vmin] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <div className={`text-[7vmin] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
+                                                {team.schedule?.prev?.score || '-'}
+                                            </div>
+                                            <div className="text-[3vmin] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.prev?.opponentLogo ? (<img src={team.schedule.prev.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.prev?.opponent}</div>)}
+                                            <div className="text-[3vmin] font-bold">{team.schedule?.prev?.opponent}</div>
+                                            {team.schedule?.prev?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.prev.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vmin] opacity-60 flex items-center justify-center gap-2">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.prev?.date || 'Date Pending'}
+                                    </div>
+                                </div>
+                                <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
+                                    <div className="text-[1.5vmin] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vmin] font-bold">{team.id}</div>
+                                            <div className="text-[2vmin] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="text-[6vmin] font-bold text-gray-500 w-[40%] text-center">VS</div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.next?.opponentLogo ? (<img src={team.schedule.next.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.next?.opponent}</div>)}
+                                            <div className="text-[3vmin] font-bold">{team.schedule?.next?.opponent}</div>
+                                            {team.schedule?.next?.opponentRecord && <div className="text-[2vmin] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    </div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const MLBCard = ({ teamId, realData }) => {
+            const teamConfig = MLB_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/mlb/500/${teamId.toLowerCase()}.png` };
+                if (realData) { return { ...base, ...realData }; }
+                return { ...base, status: 'OFFLINE', record: '0-0', schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } } };
+            }, [teamId, teamConfig, realData]);
+
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            
+            const Diamond = ({ runners }) => (
+                <div className="relative w-[18vh] h-[18vh] rotate-45 border-4 border-[#8B4513] bg-[#5D4037] mx-auto mb-[2vh]">
+                    <div className="absolute inset-0 border-[0.5vh] border-white/30"></div>
+                    <div className={`absolute top-0 right-0 w-[3vh] h-[3vh] -mt-[1.5vh] -mr-[1.5vh] border-2 border-white transition-colors duration-500 ${runners.first ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
+                    <div className={`absolute top-0 left-0 w-[3vh] h-[3vh] -mt-[1.5vh] -ml-[1.5vh] border-2 border-white transition-colors duration-500 ${runners.second ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
+                    <div className={`absolute bottom-0 left-0 w-[3vh] h-[3vh] -mb-[1.5vh] -ml-[1.5vh] border-2 border-white transition-colors duration-500 ${runners.third ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
+                    <div className="absolute bottom-0 right-0 w-[3vh] h-[3vh] -mb-[1.5vh] -mr-[1.5vh] bg-white" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                </div>
+            );
+
+            const CountDot = ({ filled, color }) => (<div className={`w-[2vh] h-[2vh] rounded-full border-2 border-white/50 ${filled ? color : 'bg-transparent'}`}></div>);
+
+            const InningScoreboard = ({ team1, team2, scores }) => {
+                const innings = scores || Array(9).fill({ score1: 0, score2: 0 });
+                return (
+                    <div className="w-full overflow-x-auto no-scrollbar pb-2">
+                          <div className="grid grid-rows-3 gap-y-2 text-center min-w-[40vh]">
+                            <div className="grid grid-flow-col auto-cols-fr gap-x-2 border-b border-white/10 pb-2">
+                                <div className="w-16 font-bold text-gray-400 text-left pl-2">TEAM</div>
+                                {innings.map((_, i) => <div key={i} className="w-8 font-bold text-gray-500">{i+1}</div>)}
+                                <div className="w-10 font-bold text-white border-l border-white/10">R</div>
+                            </div>
+                            <div className="grid grid-flow-col auto-cols-fr gap-x-2 items-center">
+                                <div className="w-16 font-bold text-white text-left pl-2">{team1.name}</div>
+                                {innings.map((inn, i) => <div key={i} className="w-8 font-mono text-gray-300">{inn.score1 !== undefined ? inn.score1 : '-'}</div>)}
+                                <div className="w-10 font-bold text-yellow-400 border-l border-white/10">{team1.total}</div>
+                            </div>
+                            <div className="border-t border-white/20 w-full my-1"></div>
+                            <div className="grid grid-flow-col auto-cols-fr gap-x-2 items-center">
+                                <div className="w-16 font-bold text-white text-left pl-2">{team2.name}</div>
+                                {innings.map((inn, i) => <div key={i} className="w-8 font-mono text-gray-300">{inn.score2 !== undefined ? inn.score2 : '-'}</div>)}
+                                <div className="w-10 font-bold text-yellow-400 border-l border-white/10">{team2.total}</div>
+                            </div>
+                          </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="h-full w-full flex flex-col relative overflow-hidden text-white font-sans" style={{ background: 'radial-gradient(circle at center, #064E3B 0%, #022c22 100%)', borderLeft: `2vw solid ${team.color}` }}>
+                    <div className="flex-none flex items-center gap-[2vw] p-[3vh] border-b border-gray-800 relative z-10">
+                        <img src={team.logo} alt={team.name} className="h-[8vh] w-[8vh] object-contain drop-shadow-lg" />
+                        <div className="flex flex-col justify-center">
+                            <div className="flex items-baseline gap-[1vw]">
+                                <h2 className="text-[6vh] font-black uppercase tracking-tighter leading-none text-white">{team.name}</h2>
+                                <span className="text-[3vh] text-gray-400 font-bold">({team.record})</span>
+                                {isLive && <span className="bg-red-600 text-white text-[1.5vh] font-bold px-[1vw] py-[0.2vh] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider ml-[1vw]">LIVE</span>}
+                            </div>
+                            <p className="text-[2vh] font-bold uppercase tracking-widest mt-[0.5vh]" style={{ color: team.color }}>
+                                {isLive ? team.live.inningState : (team.status === 'OFFLINE' ? 'Team Report' : team.status)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 min-h-0 flex flex-col justify-center p-[2vh] relative z-10 gap-[2vh]">
+                        {isLive ? (
+                            <div className="flex flex-col h-full gap-[2vh]">
+                                <div className="flex flex-row items-center justify-center gap-[4vh] flex-1">
+                                    <div className="flex flex-col items-center"><Diamond runners={team.live.runners} /></div>
+                                    <div className="flex flex-col gap-[1vh] justify-center">
+                                        <div className="flex items-center gap-[2vh]">
+                                            <span className="text-[2.5vh] font-bold w-[4vh] text-right text-gray-400">B</span>
+                                            <div className="flex gap-[1vh]">{[1,2,3,4].map(i => <CountDot key={i} filled={i <= team.live.balls} color="bg-green-500" />)}</div>
+                                        </div>
+                                        <div className="flex items-center gap-[2vh]">
+                                            <span className="text-[2.5vh] font-bold w-[4vh] text-right text-gray-400">S</span>
+                                            <div className="flex gap-[1vh]">{[1,2,3].map(i => <CountDot key={i} filled={i <= team.live.strikes} color="bg-yellow-500" />)}</div>
+                                        </div>
+                                        <div className="flex items-center gap-[2vh]">
+                                            <span className="text-[2.5vh] font-bold w-[4vh] text-right text-gray-400">O</span>
+                                            <div className="flex gap-[1vh]">{[1,2,3].map(i => <CountDot key={i} filled={i <= team.live.outs} color="bg-red-500" />)}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="bg-black/40 rounded-xl p-[2vh] border border-white/10 backdrop-blur-md">
+                                    <InningScoreboard 
+                                        team1={{ name: team.live.opponent, total: team.live.score.oppScore }} 
+                                        team2={{ name: team.id, total: team.live.score.myScore }}
+                                        scores={[{ score1: 0, score2: 0 }, { score1: 1, score2: 0 }, { score1: 0, score2: 2 }, { score1: 0, score2: 0 }, { score1: 0, score2: 0 }, { score1: 0, score2: 1 }, { score1: 0, score2: 1 }]}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="h-full flex flex-col justify-center gap-[4vh]">
+                                <div className="bg-black/20 rounded-3xl p-[4vh] border border-white/10 backdrop-blur-sm relative overflow-hidden">
+                                    <div className="text-[1.5vh] opacity-50 font-bold mb-[2vh] uppercase tracking-widest text-center">Last Game</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[40%]">
+                                            <div className={`text-[5vh] md:text-[7vh] font-mono font-bold leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-400' : 'text-red-400'}`}>
+                                                {team.schedule?.prev?.score || '-'}
+                                            </div>
+                                            <div className="text-[3vh] font-bold mt-[1vh]">{team.schedule?.prev?.result?.split(' ')[0] || 'FINAL'}</div>
+                                        </div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.prev?.opponentLogo ? (<img src={team.schedule.prev.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.prev?.opponent}</div>)}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.prev?.opponent}</div>
+                                            {team.schedule?.prev?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.prev.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vh] opacity-60 flex items-center justify-center gap-2">
+                                        <CalendarIcon size="2.5vh" /> {team.schedule?.prev?.date || 'Date Pending'}
+                                    </div>
+                                </div>
+                                <div className="bg-white/10 rounded-3xl p-[4vh] border border-white/20 relative overflow-hidden backdrop-blur-md">
+                                    <div className="text-[1.5vh] text-emerald-400 font-bold mb-[2vh] uppercase tracking-widest text-center">Upcoming</div>
+                                    <div className="flex items-center justify-between mb-[2vh]">
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
+                                            <div className="text-[3vh] font-bold">{team.city}</div>
+                                            <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
+                                        </div>
+                                        <div className="text-[6vh] font-bold text-gray-500 w-[40%] text-center">VS</div>
+                                        <div className="flex flex-col items-center w-[30%]">
+                                            {team.schedule?.next?.opponentLogo ? (<img src={team.schedule.next.opponentLogo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />) : (<div className="w-[12vh] h-[12vh] flex items-center justify-center bg-white/10 rounded-full mb-[1vh] text-[5vh] font-bold">{team.schedule?.next?.opponent}</div>)}
+                                            <div className="text-[3vh] font-bold">{team.schedule?.next?.opponent}</div>
+                                            {team.schedule?.next?.opponentRecord && <div className="text-[2vh] text-gray-400 font-mono">{team.schedule.next.opponentRecord}</div>}
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-[2.5vmin] mb-[1vh] flex items-center justify-center gap-2 font-bold text-white/90">
+                                        <CalendarIcon size="2.5vmin" /> {team.schedule?.next?.date || 'Date TBD'}
+                                    </div>
+                                    <div className="flex justify-center gap-[3vh] flex-wrap">
+                                        <div className="flex items-center gap-2 text-[2.5vmin] whitespace-nowrap"><Clock size="2.5vmin" /> {team.schedule?.next?.time || 'Time TBD'}</div>
+                                        <div className="flex items-center gap-2 text-[2.5vmin] opacity-70 whitespace-nowrap"><MapPin size="2.5vmin" /> {team.schedule?.next?.location || 'Location TBD'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const WeatherCard = ({ weatherData }) => {
+            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
+            
+            const getConditionText = (code) => {
+                if (code === 0) return "Clear Sky";
+                if (code <= 3) return "Partly Cloudy";
+                if (code <= 45) return "Foggy";
+                if (code <= 67) return "Rainy";
+                if (code <= 77) return "Snow";
+                if (code >= 95) return "Thunderstorms";
+                return "Cloudy";
+            };
+
+            const getPrecipText = (amount, code) => {
+                if (amount === 0) return '0.00"';
+                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
+                if (amount < 0.01) return `< 0.01" ${type}`;
+                return `${amount.toFixed(2)}" ${type}`;
+            };
+
+            const getAqiColor = (val) => {
+                if (val <= 50) return 'text-green-400';
+                if (val <= 100) return 'text-yellow-400';
+                if (val <= 150) return 'text-orange-400';
+                if (val <= 200) return 'text-red-500';
+                if (val <= 300) return 'text-purple-500';
+                return 'text-rose-900';
+            };
+
+            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
+
+            const high = daily?.temperature_2m_max?.[0];
+            const low = daily?.temperature_2m_min?.[0];
+
+            return (
+                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-gradient-to-br from-blue-600 to-cyan-500 text-white relative overflow-hidden font-sans">
+                    <div className="absolute top-[3vh] left-[3vw] flex items-center gap-[1vh] opacity-80"><MapPin className="w-[2.5vh] h-[2.5vh]" /><span className="text-[2.5vh] font-bold uppercase tracking-wider">{city}</span></div>
+                    <div className="mb-[2vh]">{getWeatherIcon(condition, "w-[20vh] h-[20vh]")}</div>
+                    <h1 className="text-[15vh] font-bold mb-[1vh] tracking-tighter leading-none">{Math.round(temp)}°</h1>
+                    <p className="text-[3vh] font-light opacity-90">{getConditionText(condition)}</p>
+                    {high !== undefined && low !== undefined && (
+                        <div className="flex items-center gap-[4vh] mt-[2vh]">
+                            <div className="flex flex-col items-center"><span className="text-[1.5vh] font-bold uppercase tracking-widest opacity-80 mb-[0.5vh]">High</span><span className="text-[6vh] font-black leading-none">{Math.round(high)}°</span></div>
+                            <div className="w-[1px] h-[6vh] bg-white/30 rounded-full"></div>
+                            <div className="flex flex-col items-center"><span className="text-[1.5vh] font-bold uppercase tracking-widest opacity-80 mb-[0.5vh]">Low</span><span className="text-[6vh] font-black leading-none text-white/90">{Math.round(low)}°</span></div>
+                        </div>
+                    )}
+                    <div className="mt-[4vh] grid grid-cols-3 gap-[2vh] text-center w-full max-w-[60vh] bg-white/20 p-[2vh] rounded-3xl backdrop-blur-md">
+                        <div><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Wind</div><div className="font-bold text-[2.5vh]">{wind} mph</div></div>
+                        <div className="border-l border-white/20"><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Precip</div><div className="font-bold text-[2.5vh] leading-tight">{getPrecipText(precip, condition)}</div></div>
+                        <div className="border-l border-white/20"><div className="opacity-75 text-[1.5vh] uppercase font-bold tracking-wider mb-1">Air Quality</div><div className={`font-black text-[2.5vh] ${getAqiColor(aqi)}`}>{aqi || '--'}</div></div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ForecastCard = ({ weatherData, days }) => {
+            const { daily, loading, error, city } = weatherData;
+            if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
+
+            const forecastItems = [];
+            const limit = Math.min(days, 5);
+            if (daily && daily.time) {
+                for (let i = 1; i <= limit; i++) {
+                    if (daily.time[i]) {
+                        const parts = daily.time[i].split('-');
+                        const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                        forecastItems.push({
+                            date: localDate,
+                            max: Math.round(daily.temperature_2m_max[i]),
+                            min: Math.round(daily.temperature_2m_min[i]),
+                            precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0,
+                            code: daily.weather_code[i]
+                        });
+                    }
+                }
+            }
+
+            const getPrecipLabel = (amount, code) => {
+                if (!amount || amount < 0.01) return null;
+                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
+                return `${amount.toFixed(2)}" ${type}`;
+            };
+
+            return (
+                <div className="h-full w-full flex flex-col p-[4vh] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
+                    <div className="flex items-center gap-[1.5vh] mb-[3vh] relative z-10 flex-none">
+                        <CalendarIcon className="w-[4vh] h-[4vh] text-blue-300" />
+                        <div><h2 className="text-[3vh] font-bold leading-none">Forecast</h2><p className="text-[1.5vh] opacity-70 uppercase tracking-widest">{city}</p></div>
+                    </div>
+                    <div className="flex-1 flex flex-row gap-[2vw] relative z-10 min-h-0">
+                        {forecastItems.map((day, idx) => (
+                            <div key={idx} className="flex-1 flex flex-col items-center justify-between bg-white/10 rounded-3xl p-[2vh] backdrop-blur-md border border-white/5">
+                                <div className="text-[2.5vh] font-bold uppercase text-blue-200 mt-[1vh]">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                                <div className="flex flex-col items-center justify-center flex-1">
+                                    {getWeatherIcon(day.code, "w-[8vh] h-[8vh]")}
+                                    {day.precip > 0.01 && (<div className="text-[1.5vh] font-bold text-white mt-[1.5vh] bg-blue-600/80 px-[1.5vh] py-[0.5vh] rounded-full whitespace-nowrap shadow-md">{getPrecipLabel(day.precip, day.code)}</div>)}
+                                </div>
+                                <div className="text-center mb-[1vh]">
+                                    <div className="text-[5vh] font-black leading-none tracking-tighter">{day.max}°</div>
+                                    <div className="text-[2vh] opacity-60 font-medium">{day.min}°</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="absolute -bottom-10 -right-10 w-[40vh] h-[40vh] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
+                </div>
+            );
+        };
+
+        const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
+            const [time, setTime] = useState(new Date());
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    const now = new Date();
+                    if (timezoneOffset !== null && timezoneOffset !== undefined) {
+                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                        const targetTime = new Date(utc + (1000 * timezoneOffset));
+                        setTime(targetTime);
+                    } else { setTime(now); }
+                }, 1000);
+                return () => clearInterval(timer);
+            }, [timezoneOffset]);
+
+            const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
+            const [hours, minutes] = formatTime(time).split(':');
+            const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
+            const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+
+            return (
+                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
+                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
+                    <div className="relative z-10 flex flex-col items-center">
+                        <div className={`text-[3vh] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
+                        <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
+                            <span className="text-[25vmin] font-bold tracking-tighter drop-shadow-2xl flex items-baseline">{hours}<span className="animate-blink">:</span>{minutes}</span>
+                            <span className="text-[6vh] font-light uppercase opacity-80">{getAmPm(time)}</span>
+                        </div>
+                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vh] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
+                           <div className="w-[1vh] h-[1vh] rounded-full bg-green-500 animate-pulse" />
+                           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
             const [selectedTeam, setSelectedTeam] = useState('');
