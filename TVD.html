@@ -73,7 +73,14 @@
         const CloudLightning = (props) => <IconBase {...props}><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/></IconBase>;
         const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
         const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
-        const Football = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M19.07 4.93C15.93 1.79 10.86 1.79 7.72 4.93C4.59 8.07 4.59 13.14 7.72 16.28L8.78 15.22C6.24 12.68 6.24 8.56 8.78 6.02C11.32 3.48 15.44 3.48 17.98 6.02L19.07 4.93ZM14.8 7.78C12.85 5.83 9.68 5.83 7.73 7.78L16.22 16.27C18.17 14.32 18.17 11.15 16.22 9.2L14.8 7.78ZM11.97 10.61L10.56 9.2L13.39 6.37L14.8 7.78L11.97 10.61ZM9.2 13.44L10.62 14.85L7.79 17.68L6.37 16.27L9.2 13.44ZM4.93 19.07C8.07 22.21 13.14 22.21 16.28 19.07C19.41 15.93 19.41 10.86 16.28 7.72L15.22 8.78C17.76 11.32 17.76 15.44 15.22 17.98C12.68 20.52 8.56 20.52 6.02 17.98L4.93 19.07Z"/></svg>);
+        
+        // UPDATED: Realistic Football Icon with Laces
+        const Football = (props) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" className={props.className} style={props.style} {...props}>
+                <path d="M439.6 72.4c-96-96-252.1-96.5-349 .4l-18.2 18.2c-97 97-96.5 253 .4 349 48.2 47.7 111.4 72 174.5 72 63.6 0 127.2-24.5 175.5-73.5l18.2-18.2c97-96.9 96.5-253-.4-348.9zM256 397.5c-35.3 0-70.6-13.5-97.6-40.5-26.9-26.9-41.8-62.7-41.8-100.8s14.8-73.9 41.8-100.8l18.2-18.2c53.9-53.9 141.4-53.9 195.2 0 26.9 26.9 41.8 62.7 41.8 100.8s-14.8 73.9-41.8 100.8l-18.2 18.2c-27 27-62.3 40.5-97.6 40.5z"/>
+                <path d="M336 224h-48v-48c0-8.8-7.2-16-16-16s-16 7.2-16 16v48h-48c-8.8 0-16 7.2-16 16s7.2 16 16 16h48v48c0 8.8 7.2 16 16 16s16-7.2 16-16v-48h48c8.8 0 16-7.2 16-16s-7.2-16-16-16z"/>
+            </svg>
+        );
 
         const getWeatherIcon = (code, sizeClass, style = {}) => {
             if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} style={style} />;
@@ -125,7 +132,7 @@
             const activeColor = activeTeam.color || '#555';
             const activeLogo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/scoreboard.png`;
 
-            // Calculate width based on yard line (0-100)
+            // Calculate drive bar width and position
             const widthPct = Math.min(Math.max(yardLine, 0), 100);
 
             return (
@@ -137,12 +144,6 @@
                         ) : (
                             <span className="-rotate-90 text-[1.5vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>
                         )}
-                        {/* 1-9 Yard Hash Marks (Left) */}
-                        <div className="absolute right-0 top-0 bottom-0 w-[50%] flex flex-col justify-between py-[1vmin]">
-                             {[...Array(9)].map((_, i) => (
-                                 <div key={`L${i}`} className="w-[40%] h-[1px] bg-white/30 self-end mr-[1px]" style={{position: 'absolute', top: `${(i+1)*10}%`}} />
-                             ))}
-                        </div>
                     </div>
 
                     {/* Playing Field */}
@@ -155,6 +156,20 @@
                             </div>
                         ))}
                         
+                        {/* 1-9 Yard Hash Marks (Near Endzones) */}
+                        {/* Left Side (0-10 yard range) */}
+                        <div className="absolute left-0 top-0 bottom-0 w-[10%] flex flex-col justify-between py-[1vmin]">
+                             {[...Array(4)].map((_, i) => (
+                                 <div key={`LH${i}`} className="w-[20%] h-[1px] bg-white/30 self-start ml-[1px]" style={{position: 'absolute', top: `${(i+1)*20}%`}} />
+                             ))}
+                        </div>
+                        {/* Right Side (90-100 yard range) */}
+                        <div className="absolute right-0 top-0 bottom-0 w-[10%] flex flex-col justify-between py-[1vmin]">
+                             {[...Array(4)].map((_, i) => (
+                                 <div key={`RH${i}`} className="w-[20%] h-[1px] bg-white/30 self-end mr-[1px]" style={{position: 'absolute', top: `${(i+1)*20}%`}} />
+                             ))}
+                        </div>
+
                         {/* Drive Bar */}
                         <div 
                             className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out flex items-center z-20"
@@ -169,7 +184,7 @@
                                 flexDirection: isHome ? 'row' : 'row-reverse' 
                             }}
                         >
-                            {/* Logo at tip */}
+                            {/* Logo Indicator at the tip */}
                             <div className="relative w-[5vmin] h-[5vmin] shrink-0 z-30 transform scale-110">
                                  <img src={activeLogo} className="w-full h-full object-contain drop-shadow-md bg-white rounded-full p-[2px] border-2 border-black" onError={(e) => {e.target.style.display='none'}} />
                             </div>
@@ -183,12 +198,6 @@
                         ) : (
                             <span className="rotate-90 text-[1.5vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>
                         )}
-                         {/* 1-9 Yard Hash Marks (Right) */}
-                         <div className="absolute left-0 top-0 bottom-0 w-[50%] flex flex-col justify-between py-[1vmin]">
-                             {[...Array(9)].map((_, i) => (
-                                 <div key={`R${i}`} className="w-[40%] h-[1px] bg-white/30 self-start ml-[1px]" style={{position: 'absolute', top: `${(i+1)*10}%`}} />
-                             ))}
-                        </div>
                     </div>
                 </div>
             );
@@ -309,7 +318,7 @@
             const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
             const team = useMemo(() => {
                 if (!teamConfig) return null;
-                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId.png}` };
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId}.png` };
                 if (realData) { 
                     const oppColor = NCAAF_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
                     if (realData.live) realData.live.opponentColor = oppColor;
