@@ -74,11 +74,12 @@
         const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
         const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
         
-        // UPDATED: Realistic Football Icon with Laces
+        // NEW Realistic Football Icon
         const Football = (props) => (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor" className={props.className} style={props.style} {...props}>
-                <path d="M439.6 72.4c-96-96-252.1-96.5-349 .4l-18.2 18.2c-97 97-96.5 253 .4 349 48.2 47.7 111.4 72 174.5 72 63.6 0 127.2-24.5 175.5-73.5l18.2-18.2c97-96.9 96.5-253-.4-348.9zM256 397.5c-35.3 0-70.6-13.5-97.6-40.5-26.9-26.9-41.8-62.7-41.8-100.8s14.8-73.9 41.8-100.8l18.2-18.2c53.9-53.9 141.4-53.9 195.2 0 26.9 26.9 41.8 62.7 41.8 100.8s-14.8 73.9-41.8 100.8l-18.2 18.2c-27 27-62.3 40.5-97.6 40.5z"/>
-                <path d="M336 224h-48v-48c0-8.8-7.2-16-16-16s-16 7.2-16 16v48h-48c-8.8 0-16 7.2-16 16s7.2 16 16 16h48v48c0 8.8 7.2 16 16 16s16-7.2 16-16v-48h48c8.8 0 16-7.2 16-16s-7.2-16-16-16z"/>
+                <path fill="#8B4513" d="M381.5 56.6C291-17.7 131.6-11.8 56.6 63.2 26.5 93.3 5.8 131.6 1.3 172.9c-6.1 56 11.4 112.9 47.9 149.4l28.6 28.6c36.5 36.5 93.4 54 149.4 47.9 41.3-4.5 79.6-25.2 109.7-55.3 75-75 80.9-234.4 6.6-324.9-6-7.3-12.7-14.1-20.1-20.1-13.4-10.9-27.9-20.4-42.9-28.5z"/>
+                <path fill="#FFF" d="M112.5 124.6c-4.2-4.2-10.9-4.2-15.1 0L85.6 136.4c-4.2 4.2-4.2 10.9 0 15.1l173.3 173.3c4.2 4.2 10.9 4.2 15.1 0l11.8-11.8c4.2-4.2 4.2-10.9 0-15.1L112.5 124.6z"/>
+                <path fill="#FFF" d="M189.9 164.7l-15.6 15.6c-3.1 3.1-3.1 8.2 0 11.3l11.3 11.3c3.1 3.1 8.2 3.1 11.3 0l15.6-15.6c3.1-3.1 3.1-8.2 0-11.3l-11.3-11.3c-3.1-3.1-8.2-3.1-11.3 0zm28.3 28.3l-15.6 15.6c-3.1 3.1-3.1 8.2 0 11.3l11.3 11.3c3.1 3.1 8.2 3.1 11.3 0l15.6-15.6c3.1-3.1 3.1-8.2 0-11.3l-11.3-11.3c-3.1-3.1-8.2-3.1-11.3 0zm28.3 28.3l-15.6 15.6c-3.1 3.1-3.1 8.2 0 11.3l11.3 11.3c3.1 3.1 8.2 3.1 11.3 0l15.6-15.6c3.1-3.1 3.1-8.2 0-11.3l-11.3-11.3c-3.1-3.1-8.2-3.1-11.3 0z"/>
             </svg>
         );
 
@@ -126,14 +127,24 @@
             </div>
         );
 
+        // UPDATED FOOTBALL FIELD 
         const FootballField = ({ yardLine, possession, homeTeam, awayTeam }) => {
-            const isHome = possession === homeTeam.id;
+            const isHome = String(possession) === String(homeTeam.id);
             const activeTeam = isHome ? homeTeam : awayTeam;
             const activeColor = activeTeam.color || '#555';
+            // Use activeTeam.logo directly if available, fallback to generic
             const activeLogo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/scoreboard.png`;
 
-            // Calculate drive bar width and position
-            const widthPct = Math.min(Math.max(yardLine, 0), 100);
+            // DIRECTION LOGIC:
+            // Home team drives Left -> Right (0 -> 100). Width = yardLine.
+            // Away team drives Right -> Left (100 -> 0). Width = 100 - yardLine.
+            let displayWidth = yardLine;
+            if (!isHome) {
+                displayWidth = 100 - yardLine;
+            }
+            
+            // Clamp value
+            const widthPct = Math.min(Math.max(displayWidth, 0), 100);
 
             return (
                 <div className="w-full max-w-[80vmin] h-[12vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
@@ -156,19 +167,22 @@
                             </div>
                         ))}
                         
-                        {/* 1-9 Yard Hash Marks (Near Endzones) */}
+                        {/* 1-9 Yard Hash Marks (Sideline Ticks) */}
                         {/* Left Side (0-10 yard range) */}
-                        <div className="absolute left-0 top-0 bottom-0 w-[10%] flex flex-col justify-between py-[1vmin]">
-                             {[...Array(4)].map((_, i) => (
-                                 <div key={`LH${i}`} className="w-[20%] h-[1px] bg-white/30 self-start ml-[1px]" style={{position: 'absolute', top: `${(i+1)*20}%`}} />
-                             ))}
-                        </div>
+                        {[...Array(9)].map((_, i) => (
+                            <div key={`L-Tick-${i}`} className="absolute w-[1px] bg-white/40" style={{ left: `${i + 1}%`, top: 0, height: '8%' }} />
+                        ))}
+                        {[...Array(9)].map((_, i) => (
+                            <div key={`L-Tick-B-${i}`} className="absolute w-[1px] bg-white/40" style={{ left: `${i + 1}%`, bottom: 0, height: '8%' }} />
+                        ))}
+
                         {/* Right Side (90-100 yard range) */}
-                        <div className="absolute right-0 top-0 bottom-0 w-[10%] flex flex-col justify-between py-[1vmin]">
-                             {[...Array(4)].map((_, i) => (
-                                 <div key={`RH${i}`} className="w-[20%] h-[1px] bg-white/30 self-end mr-[1px]" style={{position: 'absolute', top: `${(i+1)*20}%`}} />
-                             ))}
-                        </div>
+                        {[...Array(9)].map((_, i) => (
+                            <div key={`R-Tick-${i}`} className="absolute w-[1px] bg-white/40" style={{ left: `${91 + i}%`, top: 0, height: '8%' }} />
+                        ))}
+                        {[...Array(9)].map((_, i) => (
+                            <div key={`R-Tick-B-${i}`} className="absolute w-[1px] bg-white/40" style={{ left: `${91 + i}%`, bottom: 0, height: '8%' }} />
+                        ))}
 
                         {/* Drive Bar */}
                         <div 
@@ -180,13 +194,17 @@
                                 backgroundColor: activeColor,
                                 opacity: 0.9,
                                 boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-                                justifyContent: 'flex-end', // Pushes content to the tip of the bar
+                                justifyContent: 'flex-end', 
                                 flexDirection: isHome ? 'row' : 'row-reverse' 
                             }}
                         >
-                            {/* Logo Indicator at the tip */}
-                            <div className="relative w-[5vmin] h-[5vmin] shrink-0 z-30 transform scale-110">
-                                 <img src={activeLogo} className="w-full h-full object-contain drop-shadow-md bg-white rounded-full p-[2px] border-2 border-black" onError={(e) => {e.target.style.display='none'}} />
+                            {/* Logo Indicator Bubble at the tip */}
+                            <div className="relative w-[5vmin] h-[5vmin] shrink-0 z-30 transform scale-125 translate-x-0">
+                                 <img 
+                                    src={activeLogo} 
+                                    className="w-full h-full object-contain drop-shadow-md bg-white rounded-full p-[2px] border-2 border-black" 
+                                    onError={(e) => {e.target.style.display='none'}} 
+                                 />
                             </div>
                         </div>
                     </div>
@@ -219,10 +237,41 @@
             if (!team) return null;
             const isLive = team.status === 'LIVE' || team.status === 'IN';
             
-            const possessionId = team.live?.possession;
-            const isMyPossession = possessionId === team.id;
-            const isOppPossession = possessionId && possessionId !== team.id;
-            const possessionColor = (isLive && team.live.possession) ? (team.live.possession === team.live.homeTeam?.id ? team.live.homeTeam.color : team.live.awayTeam?.color) : '#fff';
+            const possessionId = String(team.live?.possession);
+            const myId = String(team.id);
+            const isMyPossession = possessionId === myId;
+            const isOppPossession = team.live?.possession && !isMyPossession; 
+            
+            // Logic to determine "OWN" vs "OPP" text correctly based on drive direction
+            let ballOnText = "50";
+            if (isLive && team.live) {
+                const yl = team.live.yardLine;
+                if (yl === 50) ballOnText = "50";
+                else {
+                    // Assuming yardLine is 0-100 absolute (0=Home Endzone)
+                    const isHomeTeam = String(team.live.homeTeam.id) === myId;
+                    const weHaveBall = isMyPossession;
+                    
+                    // Standard logic:
+                    // If Home has ball (going 0->100): <50 is OWN, >50 is OPP
+                    // If Away has ball (going 100->0): >50 is OWN, <50 is OPP
+                    
+                    // We need to know if WE are home or away to display correctly relative to 'us' or 'them'?
+                    // Actually, the card is from perspective of 'team'.
+                    
+                    const possessionIsHome = String(team.live.possession) === String(team.live.homeTeam.id);
+                    
+                    if (possessionIsHome) {
+                         // Driving 0 -> 100
+                         if (yl < 50) ballOnText = `OWN ${yl}`;
+                         else ballOnText = `OPP ${100 - yl}`;
+                    } else {
+                         // Driving 100 -> 0
+                         if (yl > 50) ballOnText = `OWN ${100 - yl}`;
+                         else ballOnText = `OPP ${yl}`;
+                    }
+                }
+            }
 
             return (
                 <SportsCardLayout team={team} isLive={isLive}>
@@ -231,19 +280,19 @@
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
                                 <div className="flex items-center gap-[3vmin]">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="flex items-center gap-1">
-                                            {isMyPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 animate-pulse drop-shadow-md" />}
-                                            <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <div className="flex items-center gap-[1vmin] mb-[1vmin]">
+                                            {isMyPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 drop-shadow-md" />}
+                                            <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain" />
                                         </div>
+                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
                                     </div>
                                     <div className="text-[4vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="flex items-center gap-1">
-                                            <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
-                                            {isOppPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 animate-pulse drop-shadow-md" />}
+                                        <div className="flex items-center gap-[1vmin] mb-[1vmin]">
+                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[8vmin] h-[8vmin] object-contain" />
+                                            {isOppPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 drop-shadow-md" />}
                                         </div>
+                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
                                     </div>
                                 </div>
                                 <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
@@ -270,8 +319,8 @@
                                     </div>
                                     <div className="bg-white/10 p-[1.5vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
                                         <div className="text-[1.5vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div>
-                                        <div className="text-[3vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: possessionColor }}>
-                                            {team.live.yardLine > 50 ? `OPP ${100-team.live.yardLine}` : (team.live.yardLine > 0 ? `OWN ${team.live.yardLine}` : "50")}
+                                        <div className="text-[3vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>
+                                            {ballOnText}
                                         </div>
                                     </div>
                                 </div>
@@ -330,10 +379,26 @@
             if (!team) return null;
             const isLive = team.status === 'LIVE' || team.status === 'IN';
             
-            const possessionId = team.live?.possession;
-            const isMyPossession = possessionId === team.id;
-            const isOppPossession = possessionId && possessionId !== team.id;
-            const possessionColor = (isLive && team.live.possession) ? (team.live.possession === team.live.homeTeam?.id ? team.live.homeTeam.color : team.live.awayTeam?.color) : '#fff';
+            const possessionId = String(team.live?.possession);
+            const myId = String(team.id);
+            const isMyPossession = possessionId === myId;
+            const isOppPossession = team.live?.possession && !isMyPossession; 
+            
+            let ballOnText = "50";
+            if (isLive && team.live) {
+                const yl = team.live.yardLine;
+                if (yl === 50) ballOnText = "50";
+                else {
+                    const possessionIsHome = String(team.live.possession) === String(team.live.homeTeam.id);
+                    if (possessionIsHome) {
+                         if (yl < 50) ballOnText = `OWN ${yl}`;
+                         else ballOnText = `OPP ${100 - yl}`;
+                    } else {
+                         if (yl > 50) ballOnText = `OWN ${100 - yl}`;
+                         else ballOnText = `OPP ${yl}`;
+                    }
+                }
+            }
 
             return (
                 <SportsCardLayout team={team} isLive={isLive}>
@@ -342,19 +407,19 @@
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
                                 <div className="flex items-center gap-[3vmin]">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="flex items-center gap-1">
-                                            {isMyPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 animate-pulse drop-shadow-md" />}
-                                            <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <div className="flex items-center gap-[1vmin] mb-[1vmin]">
+                                            {isMyPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 drop-shadow-md" />}
+                                            <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain" />
                                         </div>
+                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
                                     </div>
                                     <div className="text-[4vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="flex items-center gap-1">
-                                            <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
-                                            {isOppPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 animate-pulse drop-shadow-md" />}
+                                        <div className="flex items-center gap-[1vmin] mb-[1vmin]">
+                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[8vmin] h-[8vmin] object-contain" />
+                                            {isOppPossession && <Football className="w-[3vmin] h-[3vmin] text-yellow-400 drop-shadow-md" />}
                                         </div>
+                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
                                     </div>
                                 </div>
                                 <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
@@ -381,7 +446,7 @@
                                     </div>
                                     <div className="bg-white/10 p-[1.5vmin] rounded-xl text-center backdrop-blur-md">
                                         <div className="text-[1.5vmin] text-gray-400 uppercase font-bold">Ball On</div>
-                                        <div className="text-[3vmin] font-black" style={{ color: possessionColor }}>{team.live.yardLine > 50 ? `OPP ${100-team.live.yardLine}` : `OWN ${team.live.yardLine}`}</div>
+                                        <div className="text-[3vmin] font-black" style={{ color: '#fff' }}>{ballOnText}</div>
                                     </div>
                                 </div>
                             </div>
@@ -1115,7 +1180,7 @@
                                     quarter: comp.status.period,
                                     down: situation.down || 0,
                                     distance: situation.distance || 0,
-                                    yardLine: situation.yardLine || 0,
+                                    yardLine: situation.yardLine || 50,
                                     possession: situation.possession || null, 
                                     lastPlay: lastPlayText,
                                     opponentColor: '#333' 
