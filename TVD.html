@@ -373,14 +373,22 @@
                             {/* Left/Top: Next Game */}
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
                                 <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
+                                {team.schedule?.next?.opponentLogo ? 
+                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                }
+                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
+                                <div className="text-[4vmin] font-bold text-white mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             {/* Right/Bottom: Last Game */}
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
                                 <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[8vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.result}</div>
-                                <div className="text-[2.5vmin] font-bold text-gray-400 mt-[1vmin]">vs {team.schedule?.prev?.opponent}</div>
+                                <div className={`text-[12vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.score}</div>
+                                <div className="flex items-center gap-[2vmin] mt-[1vmin]">
+                                    <span className="text-[3vmin] font-bold text-gray-400">vs</span>
+                                    {team.schedule?.prev?.opponentLogo && <img src={team.schedule.prev.opponentLogo} className="h-[6vmin] w-[6vmin] object-contain" />}
+                                    <span className="text-[3vmin] font-bold text-white">{team.schedule?.prev?.opponent}</span>
+                                </div>
                             </div>
                         </>
                     )}
@@ -434,13 +442,21 @@
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
                                 <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                <div className="text-[10vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
+                                {team.schedule?.next?.opponentLogo ? 
+                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                }
+                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
+                                <div className="text-[4vmin] font-bold text-white mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
                                 <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[8vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.result}</div>
-                                <div className="text-[2.5vmin] font-bold text-gray-400 mt-[1vmin]">vs {team.schedule?.prev?.opponent}</div>
+                                <div className={`text-[12vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.score}</div>
+                                <div className="flex items-center gap-[2vmin] mt-[1vmin]">
+                                    <span className="text-[3vmin] font-bold text-gray-400">vs</span>
+                                    {team.schedule?.prev?.opponentLogo && <img src={team.schedule.prev.opponentLogo} className="h-[6vmin] w-[6vmin] object-contain" />}
+                                    <span className="text-[3vmin] font-bold text-white">{team.schedule?.prev?.opponent}</span>
+                                </div>
                             </div>
                         </>
                     )}
@@ -480,13 +496,21 @@
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
                                 <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                {team.schedule?.next?.opponentLogo ? 
+                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                }
+                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
                                 <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
                                 <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[8vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.result}</div>
-                                <div className="text-[2.5vmin] font-bold text-gray-400 mt-[1vmin]">vs {team.schedule?.prev?.opponent}</div>
+                                <div className={`text-[12vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.score}</div>
+                                <div className="flex items-center gap-[2vmin] mt-[1vmin]">
+                                    <span className="text-[3vmin] font-bold text-gray-400">vs</span>
+                                    {team.schedule?.prev?.opponentLogo && <img src={team.schedule.prev.opponentLogo} className="h-[6vmin] w-[6vmin] object-contain" />}
+                                    <span className="text-[3vmin] font-bold text-white">{team.schedule?.prev?.opponent}</span>
+                                </div>
                             </div>
                         </>
                     )}
@@ -541,13 +565,21 @@
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
                                 <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                {team.schedule?.next?.opponentLogo ? 
+                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                }
+                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
                                 <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
                                 <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[8vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.result}</div>
-                                <div className="text-[2.5vmin] font-bold text-gray-400 mt-[1vmin]">vs {team.schedule?.prev?.opponent}</div>
+                                <div className={`text-[12vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.score}</div>
+                                <div className="flex items-center gap-[2vmin] mt-[1vmin]">
+                                    <span className="text-[3vmin] font-bold text-gray-400">vs</span>
+                                    {team.schedule?.prev?.opponentLogo && <img src={team.schedule.prev.opponentLogo} className="h-[6vmin] w-[6vmin] object-contain" />}
+                                    <span className="text-[3vmin] font-bold text-white">{team.schedule?.prev?.opponent}</span>
+                                </div>
                             </div>
                         </>
                     )}
