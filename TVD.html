@@ -220,6 +220,7 @@
             { id: '356', city: 'Illinois', name: 'Fighting Illini', color: '#E84A27' },
             { id: '2294', city: 'Iowa', name: 'Hawkeyes', color: '#FFCD00' },
             { id: '66',  city: 'Iowa State', name: 'Cyclones', color: '#C8102E' },
+            { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' },
             { id: '55', city: 'Jacksonville State', name: 'Gamecocks', color: '#CC0000' },
             { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' },
             { id: '2305', city: 'Kansas', name: 'Jayhawks', color: '#0051BA' },
@@ -451,8 +452,12 @@
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
                                 <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[8vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.result}</div>
-                                <div className="text-[2.5vmin] font-bold text-gray-400 mt-[1vmin]">vs {team.schedule?.prev?.opponent}</div>
+                                <div className={`text-[12vmin] font-black leading-none ${team.schedule?.prev?.result?.includes('W') ? 'text-green-500' : 'text-red-500'}`}>{team.schedule?.prev?.score}</div>
+                                <div className="flex items-center gap-[2vmin] mt-[1vmin]">
+                                    <span className="text-[3vmin] font-bold text-gray-400">vs</span>
+                                    {team.schedule?.prev?.opponentLogo && <img src={team.schedule.prev.opponentLogo} className="h-[6vmin] w-[6vmin] object-contain" />}
+                                    <span className="text-[3vmin] font-bold text-white">{team.schedule?.prev?.opponent}</span>
+                                </div>
                             </div>
                         </>
                     )}
@@ -958,8 +963,8 @@
             const fetchSportData = async (sport, league, teamId) => {
                 try {
                     const idStr = String(teamId).toLowerCase(); 
+                    const now = new Date();
                     
-                    // ISSUE 1 FIX: Parallel Fetch for Record
                     const [scheduleRes, teamInfoRes] = await Promise.all([
                         fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`),
                         fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`)
@@ -982,18 +987,20 @@
                     }
 
                     if (events.length > 0 || record !== "0-0") {
-                        events.sort((a, b) => new Date(a.date) - new Date(b.date));
-                        const now = new Date();
-                        const nextGameIndex = events.findIndex(e => new Date(e.date) > now);
-                        let prevGame, nextGame, liveGame = null;
-                        if (nextGameIndex === -1) { prevGame = events[events.length - 1]; nextGame = null; } 
-                        else if (nextGameIndex === 0) { prevGame = null; nextGame = events[0]; } 
-                        else { prevGame = events[nextGameIndex - 1]; nextGame = events[nextGameIndex]; }
+                        // Separate Completed vs Upcoming
+                        const completedGames = events.filter(e => e.status.type.completed).sort((a,b) => new Date(a.date) - new Date(b.date));
+                        const upcomingGames = events.filter(e => !e.status.type.completed).sort((a,b) => new Date(a.date) - new Date(b.date));
 
-                        if (prevGame) {
-                            const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${prevGame.id}`);
+                        let prevGame = completedGames.length > 0 ? completedGames[completedGames.length - 1] : null;
+                        let nextGame = upcomingGames.length > 0 ? upcomingGames[0] : null;
+                        let liveGame = null;
+
+                        // Check for Live Game specifically
+                        const liveEvent = events.find(e => e.status.type.state === 'in');
+                        if (liveEvent) {
+                            const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${liveEvent.id}`);
                             const summaryData = await summaryRes.json();
-                            if (summaryData.header?.competitions?.[0]?.status?.type?.state === 'in') { liveGame = summaryData; }
+                            liveGame = summaryData;
                         }
 
                         const fetchOpponentRecord = async (oppId) => {
