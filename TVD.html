@@ -120,85 +120,82 @@
         );
 
         const FootballField = ({ yardLine, possession, homeTeam, awayTeam }) => {
-            const isHomePossession = possession === homeTeam.id;
-            const activeTeam = isHomePossession ? homeTeam : awayTeam;
-            const activeColor = activeTeam.color || '#555';
-            
-            // Safety: fallback to shield if logo missing
-            const activeLogo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/scoreboard.png`;
+            const isHome = possession === homeTeam.id;
+            const activeTeam = isHome ? homeTeam : awayTeam;
+            const color = activeTeam.color || '#555';
+            const logo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/scoreboard.png`;
 
-            // Logic: 
-            // - If Home (Left) has ball: "Own 20" means 20 yards from Left EZ. "Opp 20" means 80 yards from Left EZ.
-            // - If Away (Right) has ball: "Own 20" means 20 yards from Right EZ (absolute 80).
-            // - The API usually provides absolute yardLine (1-100) or we must normalize.
-            // - Assumption: yardLine passed here is 0-100 absolute (0=HomeEZ, 100=AwayEZ).
-            // - BUT ESPN API often gives distance from own endzone.
-            // Let's implement the specific logic requested:
-            // "Away has ball on their 27" -> API likely sends 27. But graphically that's Right side (73).
-            // So if Possession == Away, we flip it: 100 - yardLine.
-            
-            let driveProgress = 0;
-            if (isHomePossession) {
-                // Home (Left) driving Right. 
-                // If API says 27, it means 27 yards from Left EZ.
-                driveProgress = yardLine; 
-            } else {
-                // Away (Right) driving Left.
-                // If API says 27, it means 27 yards from Right EZ.
-                driveProgress = 100 - yardLine;
-            }
-
-            // Clamping to 0-100
-            const clampedProgress = Math.max(0, Math.min(100, driveProgress));
+            // Calculate drive bar width and position
+            const widthPct = Math.min(Math.max(yardLine, 0), 100);
 
             return (
                 <div className="w-full max-w-[80vmin] h-[12vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
-                    {/* Left Endzone (Home) - 8.333% width */}
+                    {/* Left Endzone (Home) */}
                     <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}>
                         {homeTeam.logo ? (
                             <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80" />
                         ) : (
                             <span className="-rotate-90 text-[1.5vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>
                         )}
+                        {/* 1-9 Yard Hash Marks (Left Side) */}
+                        <div className="absolute right-0 top-0 bottom-0 w-full flex flex-col justify-between py-[1vmin] pointer-events-none">
+                             {[...Array(9)].map((_, i) => (
+                                 <div key={`L${i}`} className="w-[20%] h-[1px] bg-white/20 self-end mr-[2px]" style={{position: 'absolute', top: `${(i+1)*10}%`}} />
+                             ))}
+                        </div>
                     </div>
 
-                    {/* Playing Field - 83.334% width */}
+                    {/* Playing Field */}
                     <div className="w-[83.334%] h-full relative z-0">
-                        {/* Yard Lines (10, 20... 50 ... 20, 10) */}
+                        {/* Yard Lines */}
                         {[10, 20, 30, 40, 50, 40, 30, 20, 10].map((num, i) => (
                             <div key={i} className="absolute top-0 bottom-0 border-l border-white/20 flex flex-col justify-between py-[0.5vmin]" style={{ left: `${(i + 1) * 10}%` }}>
                                 <span className="text-[1vmin] text-white/50 font-bold -translate-x-1/2">{num}</span>
                                 <span className="text-[1vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num}</span>
                             </div>
                         ))}
+                        
+                        {/* Small Hash Marks inside field near endzones (1-9 yards) */}
+                        <div className="absolute left-0 top-0 bottom-0 w-[10%] flex flex-col justify-between py-[1vmin]">
+                             {[...Array(4)].map((_, i) => <div key={`LH${i}`} className="w-[20%] h-[1px] bg-white/10 self-start ml-[2px]" style={{position: 'absolute', top: `${(i+1)*20}%`}} />)}
+                        </div>
+                        <div className="absolute right-0 top-0 bottom-0 w-[10%] flex flex-col justify-between py-[1vmin]">
+                             {[...Array(4)].map((_, i) => <div key={`RH${i}`} className="w-[20%] h-[1px] bg-white/10 self-end mr-[2px]" style={{position: 'absolute', top: `${(i+1)*20}%`}} />)}
+                        </div>
 
                         {/* Drive Bar */}
                         <div 
-                            className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out flex items-center"
+                            className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out flex items-center z-20"
                             style={{
-                                left: isHomePossession ? '0%' : 'auto',
-                                right: isHomePossession ? 'auto' : '0%',
-                                width: isHomePossession ? `${clampedProgress}%` : `${100 - clampedProgress}%`,
-                                backgroundColor: activeColor,
+                                left: isHome ? '0%' : 'auto',
+                                right: isHome ? 'auto' : '0%',
+                                width: `${widthPct}%`,
+                                backgroundColor: color,
                                 opacity: 0.9,
                                 boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-                                flexDirection: isHomePossession ? 'row' : 'row-reverse' // Logo at tip
+                                flexDirection: isHome ? 'row' : 'row-reverse' 
                             }}
                         >
-                            {/* Logo at tip */}
-                            <div className="relative w-[5vmin] h-[5vmin] shrink-0 z-20" style={{ [isHomePossession ? 'marginRight' : 'marginLeft']: '-2.5vmin' }}>
-                                 <img src={activeLogo} className="w-full h-full object-contain drop-shadow-md" onError={(e) => {e.target.style.display='none'}} />
+                            {/* Logo Indicator at the tip */}
+                            <div className="relative w-[5vmin] h-[5vmin] shrink-0 z-30" style={{ [isHome ? 'marginRight' : 'marginLeft']: '-2.5vmin' }}>
+                                 <img src={logo} className="w-full h-full object-contain drop-shadow-md" style={{ background: 'white', borderRadius: '50%', padding: '2px' }} onError={(e) => {e.target.style.display='none'}} />
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Endzone (Away) - 8.333% width */}
+                    {/* Right Endzone (Away) */}
                     <div className="w-[8.333%] h-full border-l-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: awayTeam.color }}>
                         {awayTeam.logo ? (
                             <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80" />
                         ) : (
                             <span className="rotate-90 text-[1.5vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>
                         )}
+                         {/* 1-9 Yard Hash Marks (Right Side) */}
+                         <div className="absolute left-0 top-0 bottom-0 w-full flex flex-col justify-between py-[1vmin] pointer-events-none">
+                             {[...Array(9)].map((_, i) => (
+                                 <div key={`R${i}`} className="w-[20%] h-[1px] bg-white/20 self-start ml-[2px]" style={{position: 'absolute', top: `${(i+1)*10}%`}} />
+                             ))}
+                        </div>
                     </div>
                 </div>
             );
@@ -219,6 +216,11 @@
 
             if (!team) return null;
             const isLive = team.status === 'LIVE' || team.status === 'IN';
+            
+            // Possession Check
+            const possessionId = team.live?.possession;
+            const isMyPossession = possessionId === team.id;
+            const isOppPossession = possessionId && possessionId !== team.id;
 
             // Determine Possession Color for "Ball On" text
             const possessionColor = (isLive && team.live.possession) ? (team.live.possession === team.live.homeTeam?.id ? team.live.homeTeam.color : team.live.awayTeam?.color) : '#fff';
@@ -231,12 +233,18 @@
                                 <div className="flex items-center gap-[3vmin]">
                                     <div className="flex flex-col items-center">
                                         <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <div className="flex items-center gap-1">
+                                            {isMyPossession && <Football className="w-[3vmin] h-[3vmin] text-white animate-pulse" />}
+                                            <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        </div>
                                     </div>
                                     <div className="text-[4vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
                                         <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                        <div className="flex items-center gap-1">
+                                            <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                            {isOppPossession && <Football className="w-[3vmin] h-[3vmin] text-white animate-pulse" />}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
@@ -311,7 +319,7 @@
             const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
             const team = useMemo(() => {
                 if (!teamConfig) return null;
-                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId.png}` };
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId}.png` };
                 if (realData) { 
                     const oppColor = NCAAF_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
                     if (realData.live) realData.live.opponentColor = oppColor;
@@ -322,6 +330,10 @@
 
             if (!team) return null;
             const isLive = team.status === 'LIVE' || team.status === 'IN';
+            
+            const possessionId = team.live?.possession;
+            const isMyPossession = possessionId === team.id;
+            const isOppPossession = possessionId && possessionId !== team.id;
             const possessionColor = (isLive && team.live.possession) ? (team.live.possession === team.live.homeTeam?.id ? team.live.homeTeam.color : team.live.awayTeam?.color) : '#fff';
 
             return (
@@ -332,12 +344,18 @@
                                 <div className="flex items-center gap-[3vmin]">
                                     <div className="flex flex-col items-center">
                                         <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <div className="flex items-center gap-1">
+                                            {isMyPossession && <Football className="w-[3vmin] h-[3vmin] text-white animate-pulse" />}
+                                            <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        </div>
                                     </div>
                                     <div className="text-[4vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
                                         <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                        <div className="flex items-center gap-1">
+                                            <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                            {isOppPossession && <Football className="w-[3vmin] h-[3vmin] text-white animate-pulse" />}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
