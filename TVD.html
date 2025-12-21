@@ -46,13 +46,13 @@
             animation: blink 1s step-end infinite;
         }
         
+        /* Scrollbar Hiding */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
@@ -61,7 +61,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // --- HOOK FOR PERSISTENCE WITH MIGRATION SAFETY ---
+        // --- SELF-HEALING PERSISTENCE HOOK ---
         const usePersistedState = (key, defaultValue) => {
             const [state, setState] = useState(() => {
                 try {
@@ -70,17 +70,20 @@
                     
                     const parsed = JSON.parse(item);
 
-                    // --- MIGRATION SAFETY CHECK ---
-                    // If we are loading 'zipConfigs' but the data is the old format (Array of Strings)
-                    // We immediately convert it to the new format (Array of Objects) to prevent a crash.
-                    if (key === 'zipConfigs' && Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
-                        console.log("Migrating old zip data format...");
-                        return parsed.map(z => ({ id: z, showForecast: false, days: 3 }));
+                    // CRITICAL FIX: Data Migration
+                    // If we expect the new ZipConfig object but find old string arrays, convert them.
+                    if (key === 'zipConfigs') {
+                        if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
+                            console.log("Migrating old zip data to new format...");
+                            return parsed.map(z => ({ id: z, showForecast: false, days: 3 }));
+                        }
+                        // If it's not an array at all, force default to prevent crash
+                        if (!Array.isArray(parsed)) return defaultValue;
                     }
 
                     return parsed;
                 } catch (error) {
-                    console.error("State load error:", error);
+                    console.error(`Error loading ${key}, resetting to default.`, error);
                     return defaultValue;
                 }
             });
@@ -107,8 +110,6 @@
         const CalendarIcon = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
         const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
         const Check = (props) => <IconBase {...props}><polyline points="20 6 9 17 4 12"/></IconBase>;
-        
-        // Weather Icons
         const Sun = (props) => <IconBase {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></IconBase>;
         const CloudRain = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></IconBase>;
         const CloudSnow = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></IconBase>;
@@ -137,6 +138,7 @@
             { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
         ];
 
+        // --- TEAMS CONFIG ---
         const NFL_TEAMS = [
             { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' },
             { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' },
@@ -807,7 +809,7 @@
                                     <div className="flex items-center justify-between mb-[2vh]">
                                         <div className="flex flex-col items-center w-[30%]">
                                             <img src={team.logo} className="w-[12vh] h-[12vh] object-contain drop-shadow-md mb-[1vh]" />
-                                            <div className="text-[3vh] font-bold">{team.id}</div>
+                                            <div className="text-[3vh] font-bold">{team.city}</div>
                                             <div className="text-[2vh] text-gray-400 font-mono">{team.record}</div>
                                         </div>
                                         <div className="flex flex-col items-center w-[40%]">
@@ -1082,16 +1084,6 @@
 
             const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3 }]);
             
-            useEffect(() => {
-                const stored = window.localStorage.getItem('zipConfigs');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'string') {
-                        setZipConfigs(parsed.map(z => ({ id: z, showForecast: false, days: 3 })));
-                    }
-                }
-            }, []);
-
             const [weatherDataMap, setWeatherDataMap] = useState({});
             const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -1147,7 +1139,7 @@
                 const targetId = String(teamId).toLowerCase();
 
                 events.forEach(e => {
-                    const comp = e.competitions?.[0]; // Safe access
+                    const comp = e.competitions?.[0];
                     if (comp?.status?.type?.completed) {
                         const myTeam = comp.competitors.find(c => 
                             String(c.team.id) === targetId || 
@@ -1195,7 +1187,6 @@
                     const events = data.events || [];
                     
                     if (events.length > 0) {
-                        // Use the FIXED record calculator
                         const record = calculateRecord(events, teamId, league);
 
                         events.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -1369,17 +1360,20 @@
 
                 // --- Standard Rotation (No Live Games) ---
                 
-                zipConfigs.forEach(config => {
-                    const data = weatherDataMap[config.id];
-                    if (data) {
-                        cards.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
-                        if (config.showForecast) { 
-                            cards.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); 
+                // Safety check: Ensure zipConfigs is an array before iterating
+                if (Array.isArray(zipConfigs)) {
+                    zipConfigs.forEach(config => {
+                        const data = weatherDataMap[config.id];
+                        if (data) {
+                            cards.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
+                            if (config.showForecast) { 
+                                cards.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); 
+                            }
                         }
-                    }
-                });
+                    });
+                }
 
-                if (zipConfigs.length > 0) {
+                if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
                     const firstZip = zipConfigs[0].id;
                     const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
                     cards.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
