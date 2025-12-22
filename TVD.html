@@ -74,18 +74,12 @@
         const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
         const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
         
-        // NEWEST Realistic Football Icon
         const Football = (props) => (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" className={props.className} style={props.style} {...props}>
-                {/* Tilted Axis */}
                 <g transform="rotate(45 50 50)">
-                    {/* Ball Body - Brown */}
                     <ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" />
-                    {/* White Stripe Top */}
                     <path d="M30 18 Q 50 10 70 18 L 70 24 Q 50 16 30 24 Z" fill="white" />
-                    {/* White Stripe Bottom */}
                     <path d="M30 82 Q 50 90 70 82 L 70 76 Q 50 84 30 76 Z" fill="white" />
-                    {/* Laces */}
                     <path d="M48 35 L 48 65" stroke="white" strokeWidth="3" strokeLinecap="round" />
                     <path d="M42 40 L 54 40" stroke="white" strokeWidth="3" strokeLinecap="round" />
                     <path d="M42 45 L 54 45" stroke="white" strokeWidth="3" strokeLinecap="round" />
@@ -261,7 +255,6 @@
             const isAwayPossession = possessionId === awayId;
             
             // Determine if "I" (the main team on the card) have possession
-            // "My" ID is team.id (e.g., "PIT"). We need to check if "PIT" matches the Home Abbrev or Away Abbrev
             const myAbbrev = String(team.id);
             const isHomeTeamMe = String(team.live?.homeTeam?.abbrev) === myAbbrev;
             const isAwayTeamMe = String(team.live?.awayTeam?.abbrev) === myAbbrev;
@@ -274,8 +267,6 @@
                 const yl = team.live.yardLine;
                 if (yl === 50) ballOnText = "50";
                 else {
-                    // Logic: If possession is Home (driving left->right), <50 is Own.
-                    // If possession is Away (driving right->left), >50 is Own.
                     if (isHomePossession) {
                          if (yl < 50) ballOnText = `OWN ${yl}`;
                          else ballOnText = `OPP ${100 - yl}`;
@@ -404,9 +395,6 @@
             const isAwayPossession = possessionId === awayId;
             
             const myAbbrev = String(team.id);
-            const isHomeTeamMe = String(team.live?.homeTeam?.id) === myAbbrev; // NCAAF uses IDs not abbrevs typically in this map, simplified
-            // For NCAA, teamId is the number.
-            
             const isMyPossession = possessionId === myAbbrev;
             const isOppPossession = !isMyPossession && possessionId !== 'null' && possessionId !== '';
             
@@ -1101,7 +1089,12 @@
                         return null;
                     };
 
-                    const isMe = (comp) => String(comp.team.id) === idStr || (comp.team.abbreviation && comp.team.abbreviation.toLowerCase() === idStr);
+                    const isMe = (comp) => {
+                        const target = String(teamId).toLowerCase();
+                        const compId = String(comp.team.id).toLowerCase();
+                        const compAbbrev = comp.team.abbreviation ? comp.team.abbreviation.toLowerCase() : '';
+                        return compId === target || compAbbrev === target;
+                    };
 
                     let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null;
                     let prevGameData = null;
@@ -1180,10 +1173,23 @@
                             const awayComp = comp.competitors.find(c => c.homeAway === 'away');
 
                             let oppLogo = null;
-                            if (oppTeam.team.logos?.length > 0) oppLogo = oppTeam.team.logos[0].href;
-                            else {
-                                if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id === oppTeam.team.abbreviation); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
+                            // IMPROVED: Strict Fallback Logic for NHL/MLB/NCAA where live feed misses logos
+                            if (oppTeam.team.logos?.length > 0) {
+                                oppLogo = oppTeam.team.logos[0].href;
+                            } else {
+                                const abbrev = oppTeam.team.abbreviation ? oppTeam.team.abbreviation.toLowerCase() : '';
+                                if (league === 'nfl') {
+                                    const t = NFL_TEAMS.find(x => x.id.toLowerCase() === abbrev);
+                                    if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`;
+                                } else if (league === 'nhl') {
+                                    oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${abbrev}.png`;
+                                } else if (league === 'mlb') {
+                                    oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${abbrev}.png`;
+                                } else if (league === 'college-football') {
+                                    oppLogo = `https://a.espncdn.com/i/teamlogos/ncaa/500/${oppTeam.team.id}.png`;
+                                }
                             }
+
                             const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
                             
                             const liveBase = {
