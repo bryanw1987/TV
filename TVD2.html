@@ -356,29 +356,48 @@
             );
         };
 
-        // --- 5. W1 PAHS SCOREBOARD ---
+        // --- 5. W1 PAHS SCOREBOARD (With Restored Live Drive) ---
         const W1FootballIcon = ({ className }) => (<svg viewBox="0 0 32 32" className={className} xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}><g transform="rotate(-45 16 16)"><ellipse cx="16" cy="16" rx="15" ry="10" fill="#8B4513" stroke="#FFFFFF" strokeWidth="1.5" /><path d="M6 16H26" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /><path d="M11 11V21" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /><path d="M16 11V21" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /><path d="M21 11V21" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /></g></svg>);
+        
         const W1LiveDrive = ({ game }) => {
-            if (!game.ballOn || game.status === 'PREGAME' || game.status === 'FINAL' || game.status === 'HALF') return null;
+            // NOTE: If ballOn is empty/null, this widget returns NULL and disappears. 
+            // It only shows when there is active drive data.
+            if (!game.ballOn || game.status === 'PREGAME' || game.status === 'FINAL' || game.status === 'HALF' || game.status === 'UPCOMING') return null;
+            
             const yardInt = parseInt(game.ballOn) || 0;
             const isOpp = (game.ownOpp || "").toUpperCase() === "OPP";
             let percentage = yardInt === 50 ? 50 : (isOpp ? 100 - yardInt : yardInt);
             percentage = Math.max(0, Math.min(100, percentage));
             const isHomePossession = game.possession === 'home';
             const teamColor = isHomePossession ? (game.color2 || '#facc15') : (game.awayc2 || '#facc15');
+            const homeColorBg = game.color1 || '#000000';
+            const awayColorBg = game.awayc1 || '#000000';
+
             return (
                 <div className="mt-[2vmin] mb-[1vmin] w-full max-w-[80vmin]">
                      <div className="relative w-full h-[8vmin] w1-drive-field rounded-md border-2 border-white/10 shadow-inner overflow-hidden flex">
-                        <div className="relative h-full w-[10%] border-r border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: game.color1 || '#000' }}><span className="text-[1.5vmin] font-black text-white/70">HOM</span></div>
+                        {/* LEFT ENDZONE */}
+                        <div className="relative h-full w-[10%] border-r border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: homeColorBg }}>
+                            {game.homeLogo ? <img src={game.homeLogo} className="w-[80%] h-[80%] object-contain opacity-90" /> : <span className="text-[1.5vmin] font-black text-white/70">{game.home ? game.home.substring(0,3).toUpperCase() : 'HOM'}</span>}
+                        </div>
+                        
+                        {/* FIELD */}
                         <div className="relative h-full flex-1">
                             {[10, 20, 30, 40, 50, 40, 30, 20, 10].map((yard, i) => (<div key={i} className="absolute top-0 bottom-0 w-px flex flex-col items-center justify-center z-0" style={{ left: `${(i + 1) * 10}%`, transform: 'translateX(-50%)' }}><div className="absolute top-0 bottom-0 w-px bg-white/30"></div><span className="relative bg-[#1a472a] px-0.5 text-[1.5vmin] font-mono font-bold text-white/60 z-10">{yard}</span></div>))}
-                            <div className="absolute top-0 bottom-0 z-10 transition-all duration-700 ease-out flex items-center" style={{ left: isHomePossession ? '0' : 'auto', right: isHomePossession ? 'auto' : '0', width: `${percentage}%`, background: `linear-gradient(${isHomePossession ? '90deg' : '-90deg'}, ${teamColor}44, ${teamColor})`, borderRight: isHomePossession ? `2px solid #fff` : 'none', borderLeft: !isHomePossession ? `2px solid #fff` : 'none' }}><div className={`absolute top-1/2 -translate-y-1/2 flex items-center ${isHomePossession ? 'flex-row' : 'flex-row-reverse'}`} style={{ [isHomePossession ? 'right' : 'left']: '-2vmin' }}><W1FootballIcon className="w-[3vmin] h-[3vmin] drop-shadow-md relative z-10" /></div></div>
+                            <div className="absolute top-0 bottom-0 z-10 transition-all duration-700 ease-out flex items-center" style={{ left: isHomePossession ? '0' : 'auto', right: isHomePossession ? 'auto' : '0', width: `${percentage}%`, background: `linear-gradient(${isHomePossession ? '90deg' : '-90deg'}, ${teamColor}44, ${teamColor})`, borderRight: isHomePossession ? `2px solid #fff` : 'none', borderLeft: !isHomePossession ? `2px solid #fff` : 'none' }}>
+                                <div className={`absolute top-1/2 -translate-y-1/2 flex items-center ${isHomePossession ? 'flex-row' : 'flex-row-reverse'}`} style={{ [isHomePossession ? 'right' : 'left']: '-2vmin' }}><W1FootballIcon className="w-[3vmin] h-[3vmin] drop-shadow-md relative z-10" /></div>
+                            </div>
                         </div>
-                        <div className="relative h-full w-[10%] border-l border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: game.awayc1 || '#000' }}><span className="text-[1.5vmin] font-black text-white/70">AWY</span></div>
+                        
+                        {/* RIGHT ENDZONE */}
+                        <div className="relative h-full w-[10%] border-l border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: awayColorBg }}>
+                            {game.awayLogo ? <img src={game.awayLogo} className="w-[80%] h-[80%] object-contain opacity-90" /> : <span className="text-[1.5vmin] font-black text-white/70">{game.away ? game.away.substring(0,3).toUpperCase() : 'AWY'}</span>}
+                        </div>
                     </div>
                 </div>
             );
         };
+
         const W1Card = ({ game }) => {
             const homeBg = game.color1 || 'transparent'; const homeAccent = game.color2 || '#facc15'; const awayBg = game.awayc1 || 'transparent'; const awayAccent = game.awayc2 || '#facc15';
             const isLive = game.status !== 'FINAL' && game.status !== 'UPCOMING';
