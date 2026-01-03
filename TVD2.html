@@ -1,246 +1,669 @@
-/* =========================================
-   SECTION 1: CSS STYLES - START COPYING
-   ========================================= */
-
-:root {
-    --primary-color: #007bff;
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --text-color: #ffffff;
-    --text-muted: #b0b0b0;
-    --border-color: #333;
-}
-
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 20px;
-}
-
-/* --- WIDGET CONTAINER --- */
-.scoreboard-container {
-    max-width: 1200px;
-    margin: 0 auto 30px auto;
-    background: var(--card-bg);
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-
-.scoreboard-title {
-    text-align: center;
-    margin-bottom: 15px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--primary-color);
-}
-
-/* This targets the iframe Scorestream loads to try and keep it contained */
-.scorestream-widget-container iframe {
-    width: 100% !important;
-    border-radius: 4px;
-}
-
-/* --- MODAL (POPUP) STYLES --- */
-.modal-overlay {
-    display: none; /* Hidden by default */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: var(--card-bg);
-    width: 90%;
-    max-width: 500px;
-    border-radius: 10px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-}
-
-/* --- UPDATED HEADER STYLES (Your Request) --- */
-.modal-header {
-    padding: 20px;
-    text-align: center;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sports & Smart Dashboard</title>
     
-    /* 1. Background is dark (same as card) */
-    background-color: var(--card-bg); 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    /* 2. Text color is the Team Color variable */
-    color: var(--modal-team-color, #fff); 
-    
-    /* 3. Thin outline using Team Color */
-    border: 2px solid var(--modal-team-color, #fff); 
-    border-radius: 8px;
-    margin: 10px; /* Spacing so the border doesn't touch the edge */
-    
-    position: relative;
-}
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    
-    /* 4. VISIBILITY FIX: 
-       If the team color is black/dark, this white glow makes it readable. */
-    text-shadow: 0 0 3px rgba(255, 255, 255, 0.3), 1px 1px 2px #000;
-}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: white; overflow: hidden; height: 100dvh; width: 100vw; margin: 0; padding: 0; touch-action: none; }
+        #root { height: 100%; width: 100%; }
+        
+        /* UTILITIES */
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .animate-blink { animation: blink 1s step-end infinite; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    color: var(--text-color);
-    background: rgba(0,0,0,0.5);
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 50%;
-    text-align: center;
-    z-index: 10;
-}
+        /* YEAR PROGRESS SHIMMER */
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .animate-shimmer { background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0) 100%); background-size: 200% 100%; animation: shimmer 3s infinite; }
 
-.modal-body {
-    padding: 20px;
-}
+        /* W1 SCOREBOARD STYLES */
+        .w1-gold-glow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.15); }
+        @keyframes w1-colorPulse { 0% { text-shadow: none; transform: scale(1); } 50% { color: var(--pulse-color, #facc15); text-shadow: 0 0 25px var(--pulse-color, rgba(234, 179, 8, 0.8)); transform: scale(1.05); } 100% { text-shadow: none; transform: scale(1); } }
+        .w1-score-pulse { animation: w1-colorPulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; display: inline-block; }
+        @keyframes w1-fadeInOut { 0% { opacity: 0; transform: scale(0.95); } 15% { opacity: 1; transform: scale(1); } 85% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.05); } }
+        .w1-animate-overlay-sequence { animation: w1-fadeInOut 3s ease-in-out forwards; }
+        @keyframes w1-middle-out-horizontal { 0% { clip-path: inset(0 50% 0 50%); opacity: 0; } 15% { opacity: 1; } 70% { clip-path: inset(0 0 0 0); opacity: 1; } 100% { clip-path: inset(0 0 0 0); opacity: 0; } }
+        @keyframes w1-marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .w1-animate-marquee { display: inline-block; white-space: nowrap; animation: w1-marquee 15s linear infinite; padding-left: 10%; }
+        .w1-scoring-active { position: relative; overflow: hidden; z-index: 20; border-radius: 0.5rem; box-shadow: 0 0 40px var(--team-accent-dim, rgba(255,255,255,0.1)); }
+        .w1-scoring-active::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, var(--team-accent) 0%, transparent 50%, var(--team-accent) 100%); animation: w1-middle-out-horizontal 1.5s ease-out infinite; z-index: -2; }
+        .w1-scoring-active::after { content: ''; position: absolute; inset: 4px; background: var(--team-bg); border-radius: 0.3rem; z-index: -1; }
+        .w1-drive-field { background-color: #1a472a; background-image: linear-gradient(0deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
 
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border-color);
-}
+        const usePersistedState = (key, defaultValue) => {
+            const [state, setState] = useState(() => {
+                try {
+                    const item = window.localStorage.getItem(key);
+                    if (!item) return defaultValue;
+                    return JSON.parse(item);
+                } catch (error) { return defaultValue; }
+            });
+            useEffect(() => { try { window.localStorage.setItem(key, JSON.stringify(state)); } catch (e) {} }, [key, state]);
+            return [state, setState];
+        };
 
-.info-row:last-child {
-    border-bottom: none;
-}
+        // --- TEAM ARRAYS ---
+        const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
+        const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
+        const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
+        const NCAAF_TEAMS = [ { id: '2005', city: 'Air Force', name: 'Falcons', color: '#003087' }, { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '2026', city: 'Appalachian State', name: 'Mountaineers', color: '#FFCC00' }, { id: '8',   city: 'Arkansas', name: 'Razorbacks', color: '#9D2235' }, { id: '2032', city: 'Arkansas State', name: 'Red Wolves', color: '#CC092F' }, { id: '349', city: 'Army', name: 'Black Knights', color: '#D4BF91' }, { id: '2',   city: 'Auburn', name: 'Tigers', color: '#0C2340' }, { id: '239', city: 'Baylor', name: 'Bears', color: '#154734' }, { id: '68', city: 'Boise State', name: 'Broncos', color: '#0033A0' }, { id: '2084', city: 'Buffalo', name: 'Bulls', color: '#005BBB' }, { id: '25',  city: 'California', name: 'Golden Bears', color: '#003262' }, { id: '2429', city: 'Charlotte', name: '49ers', color: '#046A38' }, { id: '228', city: 'Clemson', name: 'Tigers', color: '#F56600' }, { id: '324', city: 'Coastal Carolina', name: 'Chanticleers', color: '#006991' }, { id: '38',  city: 'Colorado', name: 'Buffaloes', color: '#CFB87C' }, { id: '36', city: 'Colorado State', name: 'Rams', color: '#1E4D2B' }, { id: '150', city: 'Duke', name: 'Blue Devils', color: '#003087' }, { id: '151', city: 'East Carolina', name: 'Pirates', color: '#592A8A' }, { id: '143', city: 'FAU', name: 'Owls', color: '#0033A0' }, { id: '2229', city: 'FIU', name: 'Panthers', color: '#B6862C' }, { id: '57',  city: 'Florida', name: 'Gators', color: '#0021A5' }, { id: '52',  city: 'Florida State', name: 'Seminoles', color: '#782F40' }, { id: '278', city: 'Fresno State', name: 'Bulldogs', color: '#DB0032' }, { id: '61',  city: 'Georgia', name: 'Bulldogs', color: '#BA0C2F' }, { id: '290', city: 'Georgia Southern', name: 'Eagles', color: '#011E41' }, { id: '2247', city: 'Georgia State', name: 'Panthers', color: '#0039A6' }, { id: '59',  city: 'Georgia Tech', name: 'Yellow Jackets', color: '#B3A369' }, { id: '62', city: 'Hawaii', name: 'Rainbow Warriors', color: '#024731' }, { id: '356', city: 'Illinois', name: 'Fighting Illini', color: '#E84A27' }, { id: '2294', city: 'Iowa', name: 'Hawkeyes', color: '#FFCD00' }, { id: '66',  city: 'Iowa State', name: 'Cyclones', color: '#C8102E' }, { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' }, { id: '55', city: 'Jacksonville State', name: 'Gamecocks', color: '#CC0000' }, { id: '2305', city: 'Kansas', name: 'Jayhawks', color: '#0051BA' }, { id: '2306', city: 'Kansas State', name: 'Wildcats', color: '#512888' }, { id: '96',  city: 'Kentucky', name: 'Wildcats', color: '#0033A0' }, { id: '2335', city: 'Liberty', name: 'Flames', color: '#002D62' }, { id: '309', city: 'Louisiana', name: 'Ragin\' Cajuns', color: '#CE181D' }, { id: '97',  city: 'Louisville', name: 'Cardinals', color: '#AD0000' }, { id: '99',  city: 'LSU', name: 'Tigers', color: '#461D7C' }, { id: '276', city: 'Marshall', name: 'Thundering Herd', color: '#00B140' }, { id: '235', city: 'Memphis', name: 'Tigers', color: '#003087' }, { id: '2390', city: 'Miami', name: 'Hurricanes', color: '#F47321' }, { id: '193', city: 'Miami (OH)', name: 'RedHawks', color: '#B61E2E' }, { id: '130', city: 'Michigan', name: 'Wolverines', color: '#00274C' }, { id: '127', city: 'Michigan State', name: 'Spartans', color: '#18453B' }, { id: '2393', city: 'Middle Tennessee', name: 'Blue Raiders', color: '#0066CC' }, { id: '135', city: 'Minnesota', name: 'Golden Gophers', color: '#7A0019' }, { id: '344', city: 'Mississippi State', name: 'Bulldogs', color: '#660000' }, { id: '142', city: 'Missouri', name: 'Tigers', color: '#F1B82D' }, { id: '2426', city: 'Navy', name: 'Midshipmen', color: '#00205B' }, { id: '158', city: 'Nebraska', name: 'Cornhuskers', color: '#E41C38' }, { id: '2440', city: 'Nevada', name: 'Wolf Pack', color: '#002E62' }, { id: '166', city: 'New Mexico', name: 'Lobos', color: '#CE0037' }, { id: '164', city: 'New Mexico State', name: 'Aggies', color: '#882345' }, { id: '153', city: 'North Carolina', name: 'Tar Heels', color: '#7BAFD4' }, { id: '152', city: 'NC State', name: 'Wolfpack', color: '#CC0000' }, { id: '249', city: 'North Texas', name: 'Mean Green', color: '#00853E' }, { id: '2459', city: 'Northern Illinois', name: 'Huskies', color: '#BA0C2F' }, { id: '87',  city: 'Notre Dame', name: 'Fighting Irish', color: '#0C2340' }, { id: '195', city: 'Ohio', name: 'Bobcats', color: '#00694E' }, { id: '194', city: 'Ohio State', name: 'Buckeyes', color: '#BB0000' }, { id: '201', city: 'Oklahoma', name: 'Sooners', color: '#841617' }, { id: '197', city: 'Oklahoma State', name: 'Cowboys', color: '#FF7300' }, { id: '295', city: 'Old Dominion', name: 'Monarchs', color: '#003057' }, { id: '145', city: 'Ole Miss', name: 'Rebels', color: '#CE1126' }, { id: '2483', city: 'Oregon', name: 'Ducks', color: '#154733' }, { id: '204', city: 'Oregon State', name: 'Beavers', color: '#DC4405' }, { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' }, { id: '221', city: 'Pittsburgh', name: 'Panthers', color: '#FFB81C' }, { id: '2509', city: 'Purdue', name: 'Boilermakers', color: '#CEB888' }, { id: '242', city: 'Rice', name: 'Owls', color: '#00205B' }, { id: '2534', city: 'Sam Houston', name: 'Bearkats', color: '#F26522' }, { id: '21', city: 'San Diego State', name: 'Aztecs', color: '#A6192E' }, { id: '23', city: 'San Jose State', name: 'Spartans', color: '#0055A2' }, { id: '2567', city: 'SMU', name: 'Mustangs', color: '#354C8C' }, { id: '6', city: 'South Alabama', name: 'Jaguars', color: '#00205B' }, { id: '2579', city: 'South Carolina', name: 'Gamecocks', color: '#73000A' }, { id: '58', city: 'South Florida', name: 'Bulls', color: '#006747' }, { id: '2572', city: 'Southern Miss', name: 'Golden Eagles', color: '#FFC425' }, { id: '252', city: 'TCU', name: 'Horned Frogs', color: '#4d1979' }, { id: '218', city: 'Temple', name: 'Owls', color: '#9D2235' }, { id: '2633', city: 'Tennessee', name: 'Volunteers', color: '#FF8200' }, { id: '251', city: 'Texas', name: 'Longhorns', color: '#BF5700' }, { id: '245', city: 'Texas A&M', name: 'Aggies', color: '#500000' }, { id: '326', city: 'Texas State', name: 'Bobcats', color: '#501214' }, { id: '2641', city: 'Texas Tech', name: 'Red Raiders', color: '#CC0000' }, { id: '2649', city: 'Toledo', name: 'Rockets', color: '#15397F' }, { id: '2653', city: 'Troy', name: 'Trojans', color: '#8A2432' }, { id: '2655', city: 'Tulane', name: 'Green Wave', color: '#006747' }, { id: '202', city: 'Tulsa', name: 'Golden Hurricane', color: '#C5B783' }, { id: '5', city: 'UAB', name: 'Blazers', color: '#1E6B52' }, { id: '26',  city: 'UCLA', name: 'Bruins', color: '#2D68C4' }, { id: '41', city: 'UConn', name: 'Huskies', color: '#000E2F' }, { id: '2433', city: 'UL Monroe', name: 'Warhawks', color: '#840029' }, { id: '113', city: 'UMass', name: 'Minutemen', color: '#881c1c' }, { id: '2439', city: 'UNLV', name: 'Rebels', color: '#CF0A2C' }, { id: '30',  city: 'USC', name: 'Trojans', color: '#990000' }, { id: '254', city: 'Utah', name: 'Utes', color: '#CC0000' }, { id: '328', city: 'Utah State', name: 'Aggies', color: '#00375E' }, { id: '2638', city: 'UTEP', name: 'Miners', color: '#FF7F00' }, { id: '2636', city: 'UTSA', name: 'Roadrunners', color: '#F15A22' }, { id: '259', city: 'Virginia Tech', name: 'Hokies', color: '#630031' }, { id: '265', city: 'Washington', name: 'Huskies', color: '#4B2E83' }, { id: '264', city: 'Washington State', name: 'Cougars', color: '#981E32' }, { id: '277', city: 'West Virginia', name: 'Mountaineers', color: '#002855' }, { id: '98', city: 'Western Kentucky', name: 'Hilltoppers', color: '#C60C30' }, { id: '275', city: 'Wisconsin', name: 'Badgers', color: '#C5050C' }, { id: '2751', city: 'Wyoming', name: 'Cowboys', color: '#FFC425' } ];
+        // --- ICONS ---
+        const IconBase = ({ children, className, size = 24, ...props }) => (<svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}>{children}</svg>);
+        const Settings = (props) => <IconBase {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
+        const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
+        const Plus = (props) => <IconBase {...props}><path d="M5 12h14"/><path d="M12 5v14"/></IconBase>;
+        const Check = (props) => <IconBase {...props}><polyline points="20 6 9 17 4 12"/></IconBase>;
+        const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
+        const CalendarIcon = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
+        const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
+        const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
+        const Sun = (props) => <IconBase {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></IconBase>;
+        const CloudRain = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></IconBase>;
+        const CloudSnow = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></IconBase>;
+        const CloudLightning = (props) => <IconBase {...props}><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/></IconBase>;
+        const Football = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" className={props.className} {...props}><g transform="rotate(45 50 50)"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M30 18 Q 50 10 70 18 L 70 24 Q 50 16 30 24 Z" fill="white" /><path d="M30 82 Q 50 90 70 82 L 70 76 Q 50 84 30 76 Z" fill="white" /><path d="M48 35 L 48 65" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 40 L 54 40" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 45 L 54 45" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 50 L 54 50" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 55 L 54 55" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 60 L 54 60" stroke="white" strokeWidth="3" strokeLinecap="round" /></g></svg>);
 
-.info-label {
-    color: var(--text-muted);
-    font-weight: 500;
-}
+        const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
 
-.info-value {
-    font-weight: 700;
-    color: var(--text-color);
-}
-
-/* =========================================
-   SECTION 1: CSS STYLES - END COPYING
-   ========================================= */
-   <div class="scoreboard-container">
-    <h2 class="scoreboard-title">PA High School Football Scores</h2>
-    
-    <div class="scorestream-widget-container" 
-         data-ss-widget-id="YOUR_WIDGET_ID_HERE">
-    </div>
-</div>
-
-<div style="text-align:center; margin-top: 50px;">
-    <p>Test Buttons (Click to see new colors):</p>
-    
-    <button onclick="openTeamModal('North Allegheny', 'Tigers', '#FFD700', '10-1', '6A')">
-        Test Yellow Team
-    </button>
-    
-    <button onclick="openTeamModal('Mount Lebanon', 'Blue Devils', '#000080', '5-5', '6A')">
-        Test Dark Blue Team
-    </button>
-    
-    <button onclick="openTeamModal('Upper St. Clair', 'Panthers', '#000000', '8-2', '5A')">
-        Test Black Team
-    </button>
-</div>
-
-<div id="teamModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header" id="modalHeader">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2 id="modalTeamName">Team Name</h2>
-        </div>
-        <div class="modal-body">
-            <div class="info-row">
-                <span class="info-label">Mascot</span>
-                <span class="info-value" id="modalMascot">Mascot</span>
+        const SportsCardLayout = ({ team, isLive, children }) => (
+            <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
+                <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
+                    <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md" />
+                    <div><h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2><div className="flex items-center gap-[1vmin]"><span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>{isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}</div></div>
+                </div>
+                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[8vmin]">{children}</div>
             </div>
-            <div class="info-row">
-                <span class="info-label">Record</span>
-                <span class="info-value" id="modalRecord">0-0</span>
+        );
+
+        const FootballField = ({ yardLine, possession, homeTeam, awayTeam }) => {
+            const isHome = String(possession) === String(homeTeam.id);
+            const activeTeam = isHome ? homeTeam : awayTeam;
+            const activeColor = activeTeam.color || '#555';
+            const activeLogo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/${activeTeam.abbrev ? activeTeam.abbrev.toLowerCase() : 'scoreboard'}.png`;
+            const teamAbbrev = activeTeam.abbrev || (activeTeam.name ? activeTeam.name.substring(0,3).toUpperCase() : '');
+            let displayWidth = isHome ? yardLine : 100 - yardLine;
+            const widthPct = Math.min(Math.max(displayWidth, 0), 100);
+            return (
+                <div className="w-[90%] h-[15vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
+                    <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}><img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80" /></div>
+                    <div className="w-[83.334%] h-full relative z-0">
+                        {[5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95].map(num => (<div key={num} className={`absolute top-0 bottom-0 border-l flex flex-col justify-between py-[0.5vmin] ${num % 10 === 0 ? 'border-white/40' : 'border-white/10'}`} style={{ left: `${num}%` }}>{num % 10 === 0 && <span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span>}</div>))}
+                        <div className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out z-20 flex items-center overflow-visible" style={{ left: isHome ? '0%' : 'auto', right: isHome ? 'auto' : '0%', width: `${widthPct}%`, backgroundColor: activeColor, opacity: 0.9, justifyContent: isHome ? 'flex-end' : 'flex-start' }}><div className={`w-[8vmin] h-[8vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}><img src={activeLogo} className="w-full h-full object-contain" /></div></div>
+                    </div>
+                    <div className="w-[8.333%] h-full border-l-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: awayTeam.color }}><img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80" /></div>
+                </div>
+            );
+        };
+
+        const NFLCard = ({ teamId, realData }) => {
+            const teamConfig = NFL_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId.toLowerCase()}.png` };
+                return realData ? { ...base, ...realData } : { ...base, status: 'OFFLINE', record: '0-0', schedule: { prev: {}, next: {} } };
+            }, [teamId, teamConfig, realData]);
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            const myAbbrev = String(team.id);
+            const isMyPossession = team.live && String(team.live.possession) === myAbbrev;
+            return (
+                <SportsCardLayout team={team} isLive={isLive}>
+                    {isLive ? (
+                        <>
+                            <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
+                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><div className="flex items-center gap-[1vmin] mb-[1vmin]">{isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}<img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain" /></div><div className="text-[14vmin] font-black leading-none tracking-tighter">{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><div className="flex items-center gap-[1vmin] mb-[1vmin]"><img src={team.live.opponentLogo} className="w-[10vmin] h-[10vmin] object-contain" />{!isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}</div><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div>
+                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
+                            </div>
+                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
+                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay}</div>
+                                {team.live.homeTeam && team.live.awayTeam && <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} />}
+                                <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]"><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md"><div className="text-[2vmin] text-gray-400 uppercase font-bold">Down & Dist</div><div className="text-[4vmin] font-black">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div></div><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md"><div className="text-[2vmin] text-gray-400 uppercase font-bold">Ball On</div><div className="text-[4vmin] font-black">{team.live.yardLine}</div></div></div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center text-center"><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[2vmin]">Next Game</div><div className="text-[12vmin] font-black text-white">VS {team.schedule?.next?.opponent || 'TBD'}</div><div className="text-[6vmin] font-bold text-gray-400">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div></div>
+                    )}
+                </SportsCardLayout>
+            );
+        };
+
+        const NCAAFCard = ({ teamId, realData }) => {
+             const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
+             const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId}.png` };
+                return realData ? { ...base, ...realData } : { ...base, status: 'OFFLINE', record: '0-0', schedule: { prev: {}, next: {} } };
+            }, [teamId, teamConfig, realData]);
+            if (!team) return null;
+            return <NFLCard teamId={teamId} realData={realData} />;
+        };
+
+        const NHLCard = ({ teamId, realData }) => {
+            const teamConfig = NHL_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/nhl/500/${teamId.toLowerCase()}.png` };
+                return realData ? { ...base, ...realData } : { ...base, status: 'OFFLINE', record: '0-0-0' };
+            }, [teamId, teamConfig, realData]);
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            return (
+                <SportsCardLayout team={team} isLive={isLive}>
+                    {isLive ? (
+                        <div className="flex flex-col items-center gap-[2vmin]"><div className="flex items-center gap-[4vmin]"><span className="text-[15vmin] font-bold">{team.live.score.myScore}</span><span className="text-[8vmin] text-gray-500">-</span><span className="text-[15vmin] font-bold text-gray-400">{team.live.score.oppScore}</span></div><div className="text-[5vmin] font-bold text-white uppercase">{team.live.time} - P{team.live.period}</div><div className="text-[4vmin] text-gray-400">VS {team.live.opponent}</div></div>
+                    ) : (
+                        <div className="flex flex-col items-center"><div className="text-[4vmin] text-blue-400 uppercase tracking-widest">Next Game</div><div className="text-[10vmin] font-black">VS {team.schedule?.next?.opponent}</div><div className="text-[5vmin] text-gray-400">{team.schedule?.next?.date}</div></div>
+                    )}
+                </SportsCardLayout>
+            );
+        };
+
+        const MLBCard = ({ teamId, realData }) => {
+            const teamConfig = MLB_TEAMS.find(t => t.id === teamId);
+            const team = useMemo(() => {
+                if (!teamConfig) return null;
+                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/mlb/500/${teamId.toLowerCase()}.png` };
+                return realData ? { ...base, ...realData } : { ...base, status: 'OFFLINE', record: '0-0' };
+            }, [teamId, teamConfig, realData]);
+            if (!team) return null;
+            const isLive = team.status === 'LIVE' || team.status === 'IN';
+            const Diamond = ({ runners }) => (
+                <div className="relative w-[15vmin] h-[15vmin] rotate-45 border-2 border-[#8B4513] bg-[#5D4037] mx-auto mb-[2vmin]"><div className={`absolute top-0 right-0 w-[3vmin] h-[3vmin] -mt-[1.5vmin] -mr-[1.5vmin] border border-white ${runners.first ? 'bg-yellow-400' : 'bg-white'}`}></div><div className={`absolute top-0 left-0 w-[3vmin] h-[3vmin] -mt-[1.5vmin] -ml-[1.5vmin] border border-white ${runners.second ? 'bg-yellow-400' : 'bg-white'}`}></div><div className={`absolute bottom-0 left-0 w-[3vmin] h-[3vmin] -mb-[1.5vmin] -ml-[1.5vmin] border border-white ${runners.third ? 'bg-yellow-400' : 'bg-white'}`}></div></div>
+            );
+            return (
+                <SportsCardLayout team={team} isLive={isLive}>
+                    {isLive ? (
+                        <div className="flex flex-col items-center"><Diamond runners={team.live.runners} /><div className="text-[10vmin] font-black">{team.live.score.myScore} - {team.live.score.oppScore}</div><div className="text-[4vmin] font-bold uppercase">{team.live.inningState}</div><div className="flex gap-[2vmin] mt-[1vmin]"><span className="bg-white/20 px-2 rounded">B: {team.live.balls}</span><span className="bg-white/20 px-2 rounded">S: {team.live.strikes}</span><span className="bg-red-500/50 px-2 rounded">O: {team.live.outs}</span></div></div>
+                    ) : (
+                        <div className="flex flex-col items-center"><div className="text-[4vmin] text-blue-400 uppercase">Next Game</div><div className="text-[10vmin] font-black">VS {team.schedule?.next?.opponent}</div></div>
+                    )}
+                </SportsCardLayout>
+            );
+        };
+        // --- 1. CLOCK ---
+        const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
+            const [time, setTime] = useState(new Date());
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    const now = new Date();
+                    if (timezoneOffset !== null && timezoneOffset !== undefined) {
+                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                        setTime(new Date(utc + (1000 * timezoneOffset)));
+                    } else { setTime(now); }
+                }, 1000);
+                return () => clearInterval(timer);
+            }, [timezoneOffset]);
+            const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(/ AM| PM/, '');
+            const [hours, minutes] = formatTime(time).split(':');
+            return (
+                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full">
+                        <div className={`text-[4vw] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{time.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+                        <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
+                            <span className="text-[35vw] font-bold tracking-tighter drop-shadow-2xl flex items-baseline leading-[0.8]">{hours}<span className="animate-blink">:</span>{minutes}</span>
+                            <span className="text-[8vw] font-light uppercase opacity-80 self-end mb-[4vw]">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2)}</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 2. WEATHER (FULL) ---
+        const getWeatherIcon = (code, sizeClass, style = {}) => {
+            if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} style={style} />;
+            if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} style={style} fill="currentColor" />;
+            if (code <= 3) return <div className="relative" style={style}><Sun className={`${sizeClass} text-yellow-400`} fill="currentColor" /><div className={`absolute bottom-[-10%] right-[-10%] ${sizeClass} scale-75 text-gray-100`}><CloudFilled className="w-full h-full" /></div></div>;
+            if (code <= 48) return <CloudFilled className={`${sizeClass} text-gray-200`} style={style} />;
+            if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} style={style} fill="currentColor" />;
+            if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} style={style} fill="currentColor" />;
+            if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} style={style} fill="currentColor" />;
+            return <CloudFilled className={`${sizeClass} text-gray-200`} style={style} />;
+        };
+
+        const WeatherCard = ({ weatherData }) => {
+            if (!weatherData) return null;
+            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
+            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+            const getConditionText = (code) => {
+                if (code === 0) return "Clear Sky";
+                if (code <= 3) return "Partly Cloudy";
+                if (code <= 45) return "Foggy";
+                if (code <= 67) return "Rainy";
+                if (code <= 77) return "Snow";
+                if (code >= 95) return "Thunderstorms";
+                return "Cloudy";
+            };
+            const getPrecipText = (amt) => (amt < 0.01 ? `<.01"` : `${amt.toFixed(2)}"`);
+            const high = daily?.temperature_2m_max?.[0];
+            const low = daily?.temperature_2m_min?.[0];
+            
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
+                    <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1vmin] opacity-80 z-20">
+                        <MapPin className="w-[4vmin] h-[4vmin]" /><span className="text-[4vmin] font-bold uppercase tracking-wider">{city}</span>
+                    </div>
+                    <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10">
+                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10">
+                            <div className="drop-shadow-2xl filter">{getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}</div>
+                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">{Math.round(temp)}°</h1>
+                        </div>
+                        <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[4vmin] gap-[4vmin]">
+                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">{getConditionText(condition)}</div>
+                            {high !== undefined && (
+                                <div className="flex items-center gap-[8vmin]">
+                                    <div className="flex flex-col items-center landscape:items-start"><span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span><span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span></div>
+                                    <div className="w-[1px] h-[12vmin] bg-white/30 rounded-full"></div>
+                                    <div className="flex flex-col items-center landscape:items-start"><span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span><span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span></div>
+                                </div>
+                            )}
+                            <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[3vmin] rounded-3xl backdrop-blur-md w-full max-w-[80vmin] border border-white/10 mt-[1vmin]">
+                                <div className="text-center"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div><div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div></div>
+                                <div className="text-center border-l border-white/20"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div><div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip)}</div></div>
+                                <div className="text-center border-l border-white/20"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div><div className="font-black text-[5vmin] leading-none">{aqi || '--'}</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 3. FORECAST CARD ---
+        const ForecastCard = ({ weatherData, days }) => {
+            if (!weatherData || !weatherData.daily) return null;
+            const { daily, city } = weatherData;
+            const limit = Math.min(days, 5);
+            const items = [];
+            for (let i = 1; i <= limit; i++) {
+                if (daily.time[i]) {
+                    const parts = daily.time[i].split('-');
+                    items.push({ date: new Date(parts[0], parts[1]-1, parts[2]), max: Math.round(daily.temperature_2m_max[i]), min: Math.round(daily.temperature_2m_min[i]), precip: daily.precipitation_sum[i], code: daily.weather_code[i] });
+                }
+            }
+            return (
+                <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
+                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none">
+                        <CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" /><div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
+                    </div>
+                    <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
+                        {items.map((d, i) => (
+                            <div key={i} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl">
+                                <div className="text-center mt-[1vmin]"><div className="text-[4vmin] font-black uppercase text-blue-200 leading-none">{d.date.toLocaleDateString('en-US', { weekday: 'short' })}</div><div className="text-[2vmin] font-bold text-blue-300 mt-[0.5vmin]">{d.date.getDate()}</div></div>
+                                <div className="flex flex-col items-center justify-center flex-1 w-full">{getWeatherIcon(d.code, "", { width: '12vmin', height: '12vmin' })}{d.precip > 0.01 && <div className="text-[1.5vmin] font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[1vmin] rounded-full">{d.precip.toFixed(2)}"</div>}</div>
+                                <div className="text-center mb-[1vmin]"><div className="text-[8vmin] font-black leading-none drop-shadow-lg">{d.max}°</div><div className="text-[4vmin] opacity-60 font-medium text-blue-100">{d.min}°</div></div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 4. YEAR PROGRESS WIDGET ---
+        const YearProgressCard = () => {
+            const [progress, setProgress] = useState(0);
+            const [timeLeft, setTimeLeft] = useState("");
+            useEffect(() => {
+                const update = () => {
+                    const now = new Date();
+                    const start = new Date(now.getFullYear(), 0, 1);
+                    const end = new Date(now.getFullYear() + 1, 0, 1);
+                    const pct = ((now - start) / (end - start)) * 100;
+                    setProgress(pct);
+                    const diff = end - now;
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    setTimeLeft(`${days} Days Left`);
+                };
+                update();
+                const timer = setInterval(update, 60000);
+                return () => clearInterval(timer);
+            }, []);
+            return (
+                <div className="h-full w-full flex flex-col justify-center items-center p-[5vmin] bg-neutral-900 text-white relative font-sans">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-800 via-gray-900 to-black"></div>
+                    <div className="relative z-10 w-full max-w-[80vmin] text-center">
+                        <h2 className="text-[6vmin] font-black uppercase tracking-tighter mb-[4vmin] text-gray-400">{new Date().getFullYear()} Progress</h2>
+                        <div className="w-full h-[8vmin] bg-gray-800 rounded-full p-[1vmin] border border-gray-700 shadow-inner relative overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-full relative transition-all duration-1000 ease-out flex items-center justify-end pr-[2vmin]" style={{ width: `${progress}%` }}>
+                                <div className="absolute inset-0 animate-shimmer"></div>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-end mt-[2vmin]">
+                            <div className="text-[12vmin] font-bold leading-none">{progress.toFixed(1)}%</div>
+                            <div className="text-[4vmin] font-mono text-gray-500 uppercase tracking-widest mb-[1vmin]">{timeLeft}</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 5. W1 PAHS SCOREBOARD (With Restored Live Drive) ---
+        const W1FootballIcon = ({ className }) => (<svg viewBox="0 0 32 32" className={className} xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}><g transform="rotate(-45 16 16)"><ellipse cx="16" cy="16" rx="15" ry="10" fill="#8B4513" stroke="#FFFFFF" strokeWidth="1.5" /><path d="M6 16H26" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /><path d="M11 11V21" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /><path d="M16 11V21" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /><path d="M21 11V21" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" /></g></svg>);
+        
+        const W1LiveDrive = ({ game }) => {
+            // NOTE: If ballOn is empty/null, this widget returns NULL and disappears. 
+            // It only shows when there is active drive data.
+            if (!game.ballOn || game.status === 'PREGAME' || game.status === 'FINAL' || game.status === 'HALF' || game.status === 'UPCOMING') return null;
+            
+            const yardInt = parseInt(game.ballOn) || 0;
+            const isOpp = (game.ownOpp || "").toUpperCase() === "OPP";
+            let percentage = yardInt === 50 ? 50 : (isOpp ? 100 - yardInt : yardInt);
+            percentage = Math.max(0, Math.min(100, percentage));
+            const isHomePossession = game.possession === 'home';
+            const teamColor = isHomePossession ? (game.color2 || '#facc15') : (game.awayc2 || '#facc15');
+            const homeColorBg = game.color1 || '#000000';
+            const awayColorBg = game.awayc1 || '#000000';
+
+            return (
+                <div className="mt-[2vmin] mb-[1vmin] w-full max-w-[80vmin]">
+                     <div className="relative w-full h-[8vmin] w1-drive-field rounded-md border-2 border-white/10 shadow-inner overflow-hidden flex">
+                        {/* LEFT ENDZONE */}
+                        <div className="relative h-full w-[10%] border-r border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: homeColorBg }}>
+                            {game.homeLogo ? <img src={game.homeLogo} className="w-[80%] h-[80%] object-contain opacity-90" /> : <span className="text-[1.5vmin] font-black text-white/70">{game.home ? game.home.substring(0,3).toUpperCase() : 'HOM'}</span>}
+                        </div>
+                        
+                        {/* FIELD */}
+                        <div className="relative h-full flex-1">
+                            {[10, 20, 30, 40, 50, 40, 30, 20, 10].map((yard, i) => (<div key={i} className="absolute top-0 bottom-0 w-px flex flex-col items-center justify-center z-0" style={{ left: `${(i + 1) * 10}%`, transform: 'translateX(-50%)' }}><div className="absolute top-0 bottom-0 w-px bg-white/30"></div><span className="relative bg-[#1a472a] px-0.5 text-[1.5vmin] font-mono font-bold text-white/60 z-10">{yard}</span></div>))}
+                            <div className="absolute top-0 bottom-0 z-10 transition-all duration-700 ease-out flex items-center" style={{ left: isHomePossession ? '0' : 'auto', right: isHomePossession ? 'auto' : '0', width: `${percentage}%`, background: `linear-gradient(${isHomePossession ? '90deg' : '-90deg'}, ${teamColor}44, ${teamColor})`, borderRight: isHomePossession ? `2px solid #fff` : 'none', borderLeft: !isHomePossession ? `2px solid #fff` : 'none' }}>
+                                <div className={`absolute top-1/2 -translate-y-1/2 flex items-center ${isHomePossession ? 'flex-row' : 'flex-row-reverse'}`} style={{ [isHomePossession ? 'right' : 'left']: '-2vmin' }}><W1FootballIcon className="w-[3vmin] h-[3vmin] drop-shadow-md relative z-10" /></div>
+                            </div>
+                        </div>
+                        
+                        {/* RIGHT ENDZONE */}
+                        <div className="relative h-full w-[10%] border-l border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: awayColorBg }}>
+                            {game.awayLogo ? <img src={game.awayLogo} className="w-[80%] h-[80%] object-contain opacity-90" /> : <span className="text-[1.5vmin] font-black text-white/70">{game.away ? game.away.substring(0,3).toUpperCase() : 'AWY'}</span>}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const W1Card = ({ game }) => {
+            const homeBg = game.color1 || 'transparent'; const homeAccent = game.color2 || '#facc15'; const awayBg = game.awayc1 || 'transparent'; const awayAccent = game.awayc2 || '#facc15';
+            const isLive = game.status !== 'FINAL' && game.status !== 'UPCOMING';
+            return (
+                <div className="h-full w-full bg-[#111] relative overflow-hidden flex flex-col items-center justify-center p-[4vmin]">
+                    <div className="absolute top-0 left-0 w-full bg-neutral-900/80 border-b border-white/10 p-[2vmin] flex justify-between items-center z-20">
+                        <div className="bg-yellow-500 text-black text-[2vmin] font-black uppercase px-[1.5vmin] py-[0.5vmin] rounded-sm">PAHS FOOTBALL</div>
+                        {isLive && <div className="flex items-center gap-[2vmin] bg-white/10 px-[2vmin] rounded py-[0.5vmin]"><span className="text-white font-mono text-[2.5vmin] font-bold">DOWN: {game.down}</span><span className="text-white font-mono text-[2.5vmin] font-bold">TO GO: {game.togo}</span><span className="text-white font-mono text-[2.5vmin] font-bold">BALL: {game.ownOpp} {game.ballOn}</span></div>}
+                        <div className="text-white font-mono font-bold text-[3vmin] animate-pulse">{game.status === 'UPCOMING' ? game.clock : (game.status === 'FINAL' ? 'FINAL' : `${game.clock} - Q${game.quarter}`)}</div>
+                    </div>
+                    <div className="w-full max-w-5xl flex flex-col gap-[4vmin] relative z-10">
+                        {game.ticker && <div className="bg-yellow-900/30 border border-yellow-500/50 rounded p-[1vmin] flex items-center overflow-hidden"><div className="text-yellow-400 font-bold mr-[2vmin] text-[2vmin]">UPDATE:</div><div className="text-white text-[2vmin] font-mono uppercase tracking-widest w1-animate-marquee">{game.ticker}</div></div>}
+                        <div className="flex items-center justify-between p-[2vmin] rounded-xl relative overflow-hidden" style={{ backgroundColor: homeBg, border: game.possession === 'home' ? `2px solid ${homeAccent}` : '2px solid transparent' }}><div className="flex items-center gap-[3vmin] z-10 relative">{game.homeLogo && <img src={game.homeLogo} className="w-[12vmin] h-[12vmin] object-contain bg-black rounded-full border-2 border-white/20" />}<div><div className="text-[6vmin] font-black text-white leading-none uppercase">{game.home}</div><div className="text-[2.5vmin] font-bold text-white/70">{game.homeRecord}</div></div></div><div className="text-[12vmin] font-mono font-bold text-white z-10 relative">{game.homeScore}</div></div>
+                        <div className="flex items-center justify-between p-[2vmin] rounded-xl relative overflow-hidden" style={{ backgroundColor: awayBg, border: game.possession === 'away' ? `2px solid ${awayAccent}` : '2px solid transparent' }}><div className="flex items-center gap-[3vmin] z-10 relative">{game.awayLogo && <img src={game.awayLogo} className="w-[12vmin] h-[12vmin] object-contain bg-black rounded-full border-2 border-white/20" />}<div><div className="text-[6vmin] font-black text-white leading-none uppercase">{game.away}</div><div className="text-[2.5vmin] font-bold text-white/70">{game.awayRecord}</div></div></div><div className="text-[12vmin] font-mono font-bold text-white z-10 relative">{game.awayScore}</div></div>
+                        <div className="flex justify-center"><W1LiveDrive game={game} /></div>
+                    </div>
+                </div>
+            );
+        };
+        const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => (
+            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                <h3 className="font-bold text-white mb-2">{title}</h3>
+                <div className="flex flex-wrap gap-2 mb-3">
+                    {selected.map(id => (<span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">{teams.find(t=>t.id===id)?.city} {teams.find(t=>t.id===id)?.name} <button onClick={() => onRemove(id)}><X size={14} /></button></span>))}
+                </div>
+                <div className="flex gap-2">
+                    <select id={`sel-${title}`} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white"><option value="">Select Team</option>{teams.sort((a,b)=>a.city.localeCompare(b.city)).map(t => <option key={t.id} value={t.id}>{t.city} {t.name}</option>)}</select>
+                    <button onClick={() => { const val = document.getElementById(`sel-${title}`).value; if(val && !selected.includes(val)) onAdd(val); }} className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button>
+                </div>
             </div>
-            <div class="info-row">
-                <span class="info-label">Class</span>
-                <span class="info-value" id="modalClass">N/A</span>
-            </div>
-        </div>
-    </div>
-</div>
-/* =========================================
-   SECTION 3: JAVASCRIPT - START COPYING
-   ========================================= */
+        );
 
-// 1. Load Scorestream Script Asynchronously
-(function(d, s) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  js = d.createElement(s);
-  js.src = "https://scorestream.com/apiJs.js";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, "script"));
+        // --- WIDGET REGISTRY ---
+        // Add new simple cards here to make them appear in settings and slideshow
+        const WIDGET_DEFINITIONS = [
+            { id: 'year_progress', label: 'Year Progress', Component: YearProgressCard, default: false }
+        ];
 
+        const App = () => {
+            // -- State for Sports --
+            const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
+            const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
+            const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
+            const [ncaafTeamsSelected, setNcaafTeamsSelected] = usePersistedState('ncaafTeams', []);
+            const [nflData, setNflData] = useState({});
+            const [nhlData, setNhlData] = useState({});
+            const [mlbData, setMlbData] = useState({});
+            const [ncaafData, setNcaafData] = useState({});
 
-// 2. Modal Logic with Color Handling
-function openTeamModal(schoolName, mascot, colorHex, record, classification) {
-    const modal = document.getElementById('teamModal');
-    const modalHeader = document.getElementById('modalHeader');
-    
-    // Set Text Content
-    document.getElementById('modalTeamName').innerText = schoolName;
-    document.getElementById('modalMascot').innerText = mascot;
-    document.getElementById('modalRecord').innerText = record;
-    document.getElementById('modalClass').innerText = classification;
+            // -- State for Weather & W1 --
+            const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3 }]);
+            const [weatherDataMap, setWeatherDataMap] = useState({});
+            const [showPahs, setShowPahs] = usePersistedState('showPahsScoreboard', false);
+            const [pahsGames, setPahsGames] = useState([]);
 
-    // --- COLOR LOGIC START ---
-    
-    // Default to white if data is missing
-    let teamColor = colorHex || '#ffffff';
-    
-    // Apply the CSS Variable for the Team Color
-    // This pushes the color to the CSS rules we wrote in Section 1
-    modalHeader.style.setProperty('--modal-team-color', teamColor);
+            // -- State for Widget Registry --
+            const [enabledWidgets, setEnabledWidgets] = usePersistedState('enabledWidgets', {}); 
 
-    // --- COLOR LOGIC END ---
+            const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+            const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+            const [showControls, setShowControls] = useState(false);
+            const controlsTimeoutRef = useRef(null);
 
-    // Show Modal
-    modal.style.display = 'flex';
-}
+            const handleInteraction = () => {
+                setShowControls(true);
+                if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+                controlsTimeoutRef.current = setTimeout(() => { setShowControls(false); }, 5000);
+            };
+            useEffect(() => { handleInteraction(); }, []);
 
-function closeModal() {
-    document.getElementById('teamModal').style.display = 'none';
-}
+            // 1. Weather Fetcher
+            useEffect(() => {
+                const fetchW = async (zip) => {
+                    try {
+                        const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
+                        const zData = await res.json();
+                        const { latitude, longitude, "place name": city, state } = zData.places[0];
+                        const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
+                        const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=us_aqi`);
+                        const wData = await wRes.json();
+                        const aData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }};
+                        setWeatherDataMap(prev => ({...prev, [zip]: { temp: wData.current.temperature_2m, condition: wData.current.weather_code, wind: wData.current.wind_speed_10m, precip: wData.current.precipitation, city: `${city}, ${state}`, daily: wData.daily, aqi: aData.current.us_aqi, loading: false }}));
+                    } catch(e) { console.error(e); }
+                };
+                zipConfigs.forEach(c => fetchW(c.id));
+            }, [zipConfigs]);
 
-// Close modal if clicking outside the box
-window.onclick = function(event) {
-    const modal = document.getElementById('teamModal');
-    if (event.target == modal) {
-        closeModal();
-    }
-}
+            // 2. PAHS Fetcher
+            useEffect(() => {
+                if (!showPahs) return;
+                if (!firebase.apps.length) { try { firebase.initializeApp({ databaseURL: "https://pahsfootball-d35c2-default-rtdb.firebaseio.com/" }); } catch (e) {} }
+                const db = firebase.database();
+                const rootRef = db.ref('games');
+                const unsubscribe = rootRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        const gamesArray = Array.isArray(data) ? data : Object.values(data);
+                        const processed = gamesArray.map((entry, i) => ({
+                            ...entry, id: entry.id || i,
+                            home: entry.home||"Home", away: entry.away||"Away",
+                            homeScore: entry.homeScore||0, awayScore: entry.awayScore||0,
+                            status: (entry.status||"UPCOMING").toUpperCase(),
+                            possession: (entry.possession||"").toLowerCase(),
+                            ballOn: entry.ballon || entry.ballOn || "",
+                            ownOpp: (entry.ownopp || entry.OwnOpp || "").toUpperCase(),
+                            color1: entry.color1, color2: entry.color2, awayc1: entry.awayc1, awayc2: entry.awayc2,
+                            homeLogo: entry.homeLogo, awayLogo: entry.awayLogo, ticker: entry.message || entry.ticker || ""
+                        }));
+                        setPahsGames(processed);
+                    }
+                });
+                return () => rootRef.off('value', unsubscribe);
+            }, [showPahs]);
 
-/* =========================================
-   SECTION 3: JAVASCRIPT - END COPYING
-   ========================================= */
-   
+            // 3. Sports Fetcher
+            const fetchSportData = async (sport, league, teamId) => {
+                try {
+                    const idStr = String(teamId).toLowerCase();
+                    const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
+                    const sbData = await sbRes.json();
+                    let liveGame = sbData.events?.find(e => e.competitions[0].competitors.some(c => String(c.team.id) === idStr) && e.status.type.state === 'in');
+                    if (liveGame) {
+                        const comp = liveGame.competitions[0];
+                        const myTeam = comp.competitors.find(c => String(c.team.id) === idStr);
+                        const oppTeam = comp.competitors.find(c => c.id !== myTeam.id);
+                        const baseData = { status: 'LIVE', live: { score: { myScore: myTeam.score.value, oppScore: oppTeam.score.value }, opponent: oppTeam.team.abbreviation, opponentLogo: oppTeam.team.logo, time: comp.status.displayClock, period: comp.status.period, lastPlay: liveGame.competitions[0].situation?.lastPlay?.text || "Game in progress", down: liveGame.competitions[0].situation?.down, distance: liveGame.competitions[0].situation?.distance, yardLine: liveGame.competitions[0].situation?.yardLine, possession: liveGame.competitions[0].situation?.possession, homeTeam: { id: comp.competitors.find(c=>c.homeAway==='home').team.id, color: '#333', logo: comp.competitors.find(c=>c.homeAway==='home').team.logo }, awayTeam: { id: comp.competitors.find(c=>c.homeAway==='away').team.id, color: '#fff', logo: comp.competitors.find(c=>c.homeAway==='away').team.logo } }};
+                        // Add baseball specific fields
+                        if (league === 'mlb') {
+                            const sit = liveGame.competitions[0].situation || {};
+                            baseData.live.inningState = comp.status.type.detail;
+                            baseData.live.balls = sit.balls; baseData.live.strikes = sit.strikes; baseData.live.outs = sit.outs;
+                            baseData.live.runners = { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird };
+                        }
+                        return { [teamId]: baseData };
+                    }
+                    const schedRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`);
+                    const schedData = await schedRes.json();
+                    const nextGame = schedData.events?.find(e => new Date(e.date) > new Date());
+                    return { [teamId]: { status: 'OFFLINE', schedule: { next: { opponent: nextGame?.competitions[0].competitors.find(c => String(c.team.id) !== idStr)?.team?.abbreviation || 'TBD', date: nextGame ? new Date(nextGame.date).toLocaleDateString() : '-', time: nextGame ? new Date(nextGame.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '-' }}}};
+                } catch(e) { return { [teamId]: null }; }
+            };
+
+            useEffect(() => {
+                const loadAll = () => {
+                    nflTeamsSelected.forEach(id => fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d}))));
+                    nhlTeamsSelected.forEach(id => fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d}))));
+                    mlbTeamsSelected.forEach(id => fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d}))));
+                    ncaafTeamsSelected.forEach(id => fetchSportData('football', 'college-football', id).then(d => setNcaafData(prev => ({...prev, ...d}))));
+                };
+                loadAll();
+                const interval = setInterval(loadAll, 60000);
+                return () => clearInterval(interval);
+            }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
+
+            // --- BUILD CARD DECK ---
+            const allCards = useMemo(() => {
+                const liveCards = [];
+                const normalCards = [];
+                
+                // 1. W1 Games
+                if (showPahs) pahsGames.forEach(g => {
+                    const card = { id: `pahs-${g.id}`, component: <W1Card game={g} /> };
+                    if(g.status !== 'FINAL' && g.status !== 'UPCOMING') liveCards.push(card);
+                    else normalCards.push(card);
+                });
+
+                // 2. Major Sports Games
+                const processSport = (selected, data, Component, type) => {
+                    selected.forEach(id => {
+                        if (data[id]) {
+                            const card = { id: `${type}-${id}`, component: <Component teamId={id} realData={data[id]} type={type} /> };
+                            if (data[id].status === 'LIVE') liveCards.push(card);
+                            else normalCards.push(card);
+                        }
+                    });
+                };
+                processSport(nflTeamsSelected, nflData, NFLCard, 'nfl');
+                processSport(nhlTeamsSelected, nhlData, NHLCard, 'nhl');
+                processSport(mlbTeamsSelected, mlbData, MLBCard, 'mlb');
+                processSport(ncaafTeamsSelected, ncaafData, NCAAFCard, 'ncaaf');
+
+                // LIVE TAKEOVER LOGIC: If any live games exist, ONLY show them.
+                if (liveCards.length > 0) return liveCards;
+
+                // Otherwise, show standard rotation
+                const deck = [];
+                deck.push({ id: 'clock', component: <ClockCard /> });
+                zipConfigs.forEach(c => { 
+                    if(weatherDataMap[c.id]) {
+                        deck.push({ id: `weather-${c.id}`, component: <WeatherCard weatherData={weatherDataMap[c.id]} /> });
+                        if(c.showForecast) deck.push({ id: `forecast-${c.id}`, component: <ForecastCard weatherData={weatherDataMap[c.id]} days={c.days} /> });
+                    }
+                });
+                WIDGET_DEFINITIONS.forEach(def => { if (enabledWidgets[def.id]) deck.push({ id: def.id, component: <def.Component /> }); });
+                
+                return [...deck, ...normalCards]; // Append non-live sports to end of deck
+            }, [showPahs, pahsGames, weatherDataMap, zipConfigs, enabledWidgets, nflData, nhlData, mlbData, ncaafData, nflTeamsSelected]);
+
+            useEffect(() => {
+                if (allCards.length === 0) return;
+                if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
+                if (allCards.length <= 1 || isSettingsOpen) return;
+                const interval = setInterval(() => { setCurrentSlideIndex(prev => (prev + 1) % allCards.length); }, 8000);
+                return () => clearInterval(interval);
+            }, [allCards.length, isSettingsOpen, currentSlideIndex]);
+
+            return (
+                <div className="w-full h-[100dvh] bg-black text-white overflow-hidden font-sans" onMouseMove={handleInteraction} onClick={handleInteraction}>
+                    <div className="w-full h-full relative">
+                        {allCards.map((card, index) => (
+                            <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === currentSlideIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
+                                {card.component}
+                            </div>
+                        ))}
+                    </div>
+                    <button onClick={() => setIsSettingsOpen(true)} className={`absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full border border-white/10 ${showControls ? 'opacity-100' : 'opacity-0'}`}><Settings className="w-6 h-6 text-white" /></button>
+                    
+                    {isSettingsOpen && (
+                        <div className="absolute inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+                            <div className="bg-slate-900 w-full max-w-lg rounded-2xl border border-slate-700 p-6 shadow-2xl flex flex-col h-[80vh]">
+                                <div className="flex justify-between items-center mb-6 shrink-0"><h2 className="text-2xl font-bold">Settings</h2><button onClick={() => setIsSettingsOpen(false)}><X size={24} /></button></div>
+                                <div className="space-y-6 overflow-y-auto custom-scrollbar flex-1 pr-2 pb-[300px]">
+                                    {/* PAHS Toggle */}
+                                    <div className="bg-yellow-900/20 border border-yellow-600/30 p-4 rounded-xl flex items-center justify-between">
+                                        <div><div className="font-bold text-yellow-500">PAHS Scoreboard</div><div className="text-xs text-yellow-200/60">Toggle High School Feeds</div></div>
+                                        <button onClick={() => setShowPahs(!showPahs)} className={`w-12 h-6 rounded-full relative transition-colors ${showPahs ? 'bg-yellow-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${showPahs ? 'translate-x-6' : 'translate-x-0'}`} /></button>
+                                    </div>
+                                    
+                                    {/* Widget Registry Toggles */}
+                                    {WIDGET_DEFINITIONS.map(widget => (
+                                        <div key={widget.id} className="bg-slate-800 p-4 rounded-xl flex items-center justify-between">
+                                            <div className="font-bold">{widget.label}</div>
+                                            <button onClick={() => setEnabledWidgets({...enabledWidgets, [widget.id]: !enabledWidgets[widget.id]})} className={`w-12 h-6 rounded-full relative transition-colors ${enabledWidgets[widget.id] ? 'bg-blue-600' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${enabledWidgets[widget.id] ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                    ))}
+
+                                    <div className="bg-slate-800 p-4 rounded-xl">
+                                        <div className="font-bold mb-2">Weather ZIPs</div>
+                                        <div className="flex gap-2 mb-2 flex-wrap">{zipConfigs.map(z => (<div key={z.id} className="bg-slate-700 px-3 py-1 rounded-full text-sm flex items-center gap-2">{z.id} <button onClick={() => setZipConfigs(zipConfigs.filter(x => x.id !== z.id))}><X size={12}/></button></div>))}</div>
+                                        <div className="flex gap-2"><input id="zipInput" type="text" maxLength="5" placeholder="12345" className="bg-slate-950 border border-slate-600 rounded px-2 py-1 flex-1" /><button onClick={() => { const val = document.getElementById('zipInput').value; if(val.length===5) { setZipConfigs([...zipConfigs, {id:val, showForecast:false, days:3}]); document.getElementById('zipInput').value=''; }}} className="bg-blue-600 px-3 rounded"><Plus size={16}/></button></div>
+                                        <div className="mt-3 text-xs text-slate-400">Tap existing ZIPs to toggle Forecast</div>
+                                        <div className="flex gap-2 flex-wrap mt-2">
+                                            {zipConfigs.map(z => (
+                                                <button key={z.id} onClick={() => setZipConfigs(zipConfigs.map(x => x.id===z.id ? {...x, showForecast: !x.showForecast} : x))} className={`px-2 py-1 text-xs rounded border ${z.showForecast ? 'border-blue-500 bg-blue-500/20 text-blue-200' : 'border-slate-600 text-slate-500'}`}>
+                                                    {z.id} Forecast: {z.showForecast ? 'ON' : 'OFF'}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
+                                    <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
+                                    <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
+                                    <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
+                                </div>
+                                <button onClick={() => setIsSettingsOpen(false)} className="w-full bg-blue-600 py-3 rounded-xl font-bold mt-4 shrink-0">Done</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
