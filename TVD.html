@@ -1310,6 +1310,16 @@
                 // LIVE TAKEOVER: If any games are live, ONLY show them.
                 if (liveCards.length > 0) return liveCards; 
 
+                // --- CHANGE: Push Clock FIRST ---
+                if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
+                    const firstZip = zipConfigs[0].id;
+                    const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
+                    cards.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
+                } else { 
+                    cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); 
+                }
+                
+                // Then push weather cards
                 if (Array.isArray(zipConfigs)) {
                     zipConfigs.forEach(config => {
                         const data = weatherDataMap[config.id];
@@ -1319,11 +1329,6 @@
                         }
                     });
                 }
-                if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
-                    const firstZip = zipConfigs[0].id;
-                    const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
-                    cards.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
-                } else { cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); }
                 
                 nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
                 nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
@@ -1365,17 +1370,22 @@
                                     <button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button>
                                 </div>
                                 <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
-                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 mt-4">
+                                    {/* --- MOVED CLOCK COLOR HERE --- */}
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <label className="block text-sm text-slate-400 mb-2">Clock Color</label>
                                         <select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">
                                             {CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                                         </select>
                                     </div>
-                                    <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
-                                    <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
-                                    <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
-                                    <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
+
+                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
+                                    
+                                    <div className="mt-4 space-y-8">
+                                        <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
+                                        <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
+                                        <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
+                                        <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
+                                    </div>
                                 </div>
                                 <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end">
                                     <button 
