@@ -15,6 +15,7 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
         
         body { 
             font-family: 'Inter', sans-serif; 
@@ -54,7 +55,7 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
-        /* SCA Specific Classes */
+        /* PAHS Widget Specifics */
         .w1-particle {
             position: absolute; top: 50%; left: 50%; width: 4px; height: 4px;
             background-color: #facc15; border-radius: 50%; pointer-events: none; opacity: 0;
@@ -77,7 +78,7 @@
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        // FIREBASE INIT
+        // --- FIREBASE INIT ---
         const firebaseConfig = { databaseURL: "https://pahsfootball-d35c2-default-rtdb.firebaseio.com/" };
         if (!firebase.apps.length) { try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error("Firebase Init Error:", e); } }
 
@@ -96,7 +97,7 @@
             return [state, setState];
         };
 
-        // --- ICONS & UTILS ---
+        // --- SHARED ICONS & UTILS ---
         const IconBase = ({ children, className, style, size = 24, ...props }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style} {...props}>{children}</svg>
         );
@@ -104,28 +105,17 @@
         const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
         const Plus = (props) => <IconBase {...props}><path d="M5 12h14"/><path d="M12 5v14"/></IconBase>;
         const Check = (props) => <IconBase {...props}><polyline points="20 6 9 17 4 12"/></IconBase>;
-        const Megaphone = (props) => <IconBase {...props}><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></IconBase>;
-        
-        // --- WEATHER ICONS & DATA ---
+        const CalendarIcon = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
+        const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
         const Sun = (props) => <IconBase {...props}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></IconBase>;
         const CloudRain = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></IconBase>;
         const CloudSnow = (props) => <IconBase {...props}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></IconBase>;
         const CloudLightning = (props) => <IconBase {...props}><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/></IconBase>;
         const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
         const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
-        const MapPin = (props) => <IconBase {...props}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></IconBase>;
-        const CalendarIcon = (props) => <IconBase {...props}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></IconBase>;
-
-        const getWeatherIcon = (code, sizeClass, style = {}) => {
-            if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} style={style} />;
-            if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} style={style} fill="currentColor" />;
-            if (code <= 3) return <div className="relative" style={style}><Sun className={`${sizeClass} text-yellow-400`} fill="currentColor" /><div className={`absolute bottom-[-10%] right-[-10%] ${sizeClass} scale-75 text-gray-100`}><CloudFilled className="w-full h-full" /></div></div>;
-            if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} style={style} fill="currentColor" />;
-            if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} style={style} fill="currentColor" />;
-            if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} style={style} fill="currentColor" />;
-            return <CloudFilled className={`${sizeClass} text-gray-200`} style={style} />;
-        };
-      const Football = (props) => (
+        const Megaphone = (props) => <IconBase {...props}><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></IconBase>;
+        
+        const Football = (props) => (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" className={props.className} style={props.style} {...props}>
                 <g transform="rotate(45 50 50)">
                     <ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" />
@@ -141,33 +131,22 @@
             </svg>
         );
 
-        // --- TEAM DATA (Simplified for brevity, assume the original full lists are here or fetched) ---
-        // For this example, I'm including a small subset to ensure it runs. 
-        // In the final file, paste the FULL lists from your original code.
-        const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
-        const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' } ]; // Abbreviated for space
-        const MLB_TEAMS = [ { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' } ]; // Abbreviated
-        const NCAAF_TEAMS = [ { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' } ]; // Abbreviated
+        const getWeatherIcon = (code, sizeClass, style = {}) => {
+            if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} style={style} />;
+            if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} style={style} fill="currentColor" />;
+            if (code <= 3) return <div className="relative" style={style}><Sun className={`${sizeClass} text-yellow-400`} fill="currentColor" /><div className={`absolute bottom-[-10%] right-[-10%] ${sizeClass} scale-75 text-gray-100`}><CloudFilled className="w-full h-full" /></div></div>;
+            if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} style={style} fill="currentColor" />;
+            if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} style={style} fill="currentColor" />;
+            if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} style={style} fill="currentColor" />;
+            return <CloudFilled className={`${sizeClass} text-gray-200`} style={style} />;
+        };
+        // --- TEAMS DATA ---
+        const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
+        const NHL_TEAMS = [ { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' } ];
+        const MLB_TEAMS = [ { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' } ];
+        const NCAAF_TEAMS = [ { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' }, { id: '194', city: 'Ohio State', name: 'Buckeyes', color: '#BB0000' } ];
 
-        const SportsCardLayout = ({ team, isLive, children }) => (
-            <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
-                <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
-                    <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md" />
-                    <div>
-                        <h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2>
-                        <div className="flex items-center gap-[1vmin]">
-                            <span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>
-                            {isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse tracking-wider">LIVE</span>}
-                        </div>
-                    </div>
-                </div>
-                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[8vmin]">
-                    {children}
-                </div>
-            </div>
-        );
-
-        // --- WEATHER & CLOCK CARDS (Unchanged from your code) ---
+        // --- ORIGINAL COMPONENTS ---
         const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
             const [time, setTime] = useState(new Date());
             useEffect(() => {
@@ -197,7 +176,7 @@
 
         const WeatherCard = ({ weatherData }) => {
             if (!weatherData) return null;
-            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
+            const { temp, condition, wind, city, loading } = weatherData;
             if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
             return (
                 <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
@@ -225,7 +204,7 @@
             for (let i = 1; i <= Math.min(days, 5); i++) {
                 if (weatherData.daily.time[i]) {
                     const d = new Date(weatherData.daily.time[i]);
-                    d.setDate(d.getDate() + 1); // Fix timezone offset issue crudely
+                    d.setDate(d.getDate() + 1);
                     items.push({ date: d, max: Math.round(weatherData.daily.temperature_2m_max[i]), min: Math.round(weatherData.daily.temperature_2m_min[i]), code: weatherData.daily.weather_code[i] });
                 }
             }
@@ -244,12 +223,29 @@
             );
         };
 
-        // --- SIMPLIFIED CARD WRAPPERS (Full implementation assumed from your original code) ---
-        const NFLCard = ({ teamId, realData }) => <div className="h-full w-full bg-slate-900 text-white flex items-center justify-center">NFL Card: {teamId} (Paste full code here)</div>; 
-        // NOTE: In the final file, you would paste the full NFLCard, NHLCard, etc functions from your first snippet here.
-        // For this demo to work, I will use placeholders, but you should use your real ones.
-      // =========================================================================
-        // SCA FOOTBALL SPECIFIC COMPONENTS
+        // Standard Sports Card (NFL/NHL/etc) - Uses standard colored border logic
+        const SportsCard = ({ team, isLive, sport, children }) => (
+            <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
+                <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
+                    <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md" onError={(e)=>{e.target.style.display='none'}} />
+                    <div>
+                        <h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2>
+                        <div className="flex items-center gap-[1vmin]">
+                            <span className="text-[3.5vmin] font-bold text-gray-400">({team.record || "0-0"})</span>
+                            {isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse tracking-wider">LIVE</span>}
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[8vmin]">
+                    {/* Placeholder content for standard sports */}
+                    <div className="text-[4vmin] text-gray-500">
+                        {team.schedule?.next ? `Next: vs ${team.schedule.next.opponent}` : "Loading..."}
+                    </div>
+                </div>
+            </div>
+        );
+        // =========================================================================
+        // PAHS LIVE GAME WIDGET (Single Live View with Drive Tracker)
         // =========================================================================
 
         const W1ParticleExplosion = ({ color }) => {
@@ -259,12 +255,12 @@
                     {particles.map((_, i) => {
                         const angle = Math.random() * 360;
                         const distance = Math.random() * 40 + 20;
-                        const tx = Math.cos(angle * Math.PI / 180) * distance + 'px';
-                        const ty = Math.sin(angle * Math.PI / 180) * distance + 'px';
                         const r = Math.random() * 360 + 'deg';
                         return (
                             <div key={i} className="w1-particle" style={{ 
-                                '--tx': tx, '--ty': ty, '--r': r, 
+                                '--tx': Math.cos(angle * Math.PI / 180) * distance + 'px', 
+                                '--ty': Math.sin(angle * Math.PI / 180) * distance + 'px', 
+                                '--r': r, 
                                 animation: `particleExplosion ${Math.random() * 1 + 0.8}s ease-out ${Math.random() * 0.5}s infinite`,
                                 backgroundColor: color || '#facc15'
                             }} />
@@ -275,7 +271,7 @@
         };
 
         const W1LiveDrive = ({ game }) => {
-            if (!game.ballOn || game.status === 'PREGAME' || game.status === 'FINAL' || game.status === 'HALF' || game.status === 'UPCOMING') return null;
+            if (!game.ballOn || game.status === 'FINAL' || game.status === 'UPCOMING') return null;
             const yardInt = parseInt(game.ballOn) || 0;
             const isOpp = (game.ownOpp || "").toUpperCase() === "OPP";
             let percentage = yardInt === 50 ? 50 : (isOpp ? 100 - yardInt : yardInt);
@@ -285,152 +281,144 @@
             const yardMarkers = [10, 20, 30, 40, 50, 40, 30, 20, 10];
 
             return (
-                <div className="mt-[2vmin] mb-[1vmin] w-full max-w-[80vmin]">
-                    <div className="relative w-full h-[8vmin] w1-drive-field rounded-md border-2 border-white/10 shadow-inner overflow-hidden flex">
-                        <div className="relative h-full w-[10%] border-r border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: game.color1 || '#000' }}>
-                            <span className="text-[1.5vmin] font-black text-white/70">{game.home.substring(0,3).toUpperCase()}</span>
+                <div className="mt-[2vmin] mb-[1vmin] w-full max-w-[90vmin]">
+                    <div className="text-gray-500 text-[1.5vmin] font-bold mb-[0.5vmin] tracking-widest uppercase">Live Drive Tracker</div>
+                    <div className="relative w-full h-[10vmin] w1-drive-field rounded-xl border border-white/20 shadow-inner overflow-hidden flex">
+                        {/* Home Endzone */}
+                        <div className="relative h-full w-[10%] border-r border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: '#000' }}>
+                            <img src={game.homeLogo} className="w-[5vmin] h-[5vmin] object-contain" onError={(e) => e.target.style.display='none'} />
                         </div>
+                        {/* Field */}
                         <div className="relative h-full flex-1">
                             {yardMarkers.map((yard, i) => (
                                 <div key={i} className="absolute top-0 bottom-0 w-px flex flex-col items-center justify-center z-0" style={{ left: `${(i + 1) * 10}%`, transform: 'translateX(-50%)' }}>
-                                    <div className="absolute top-0 bottom-0 w-px bg-white/30"></div>
-                                    <span className="relative bg-[#1a472a] px-0.5 text-[1vmin] font-mono font-bold text-white/60 z-10">{yard}</span>
+                                    <div className="absolute top-0 bottom-0 w-px bg-white/20"></div>
+                                    <span className="relative text-[1.2vmin] font-mono font-bold text-white/50 z-10">{yard}</span>
                                 </div>
                             ))}
+                            {/* Drive Bar */}
                             <div className="absolute top-0 bottom-0 z-10 transition-all duration-700 ease-out flex items-center"
-                                 style={{ left: isHomePossession ? '0' : 'auto', right: isHomePossession ? 'auto' : '0', width: `${percentage}%`, background: `linear-gradient(${isHomePossession ? '90deg' : '-90deg'}, ${teamColor}44, ${teamColor})` }}>
-                                <div className={`absolute top-1/2 -translate-y-1/2 flex items-center ${isHomePossession ? 'flex-row' : 'flex-row-reverse'}`} style={{ [isHomePossession ? 'right' : 'left']: '-1.5vmin' }}>
-                                    <Football className="w-[3vmin] h-[3vmin] drop-shadow-md relative z-10" />
+                                 style={{ left: isHomePossession ? '0' : 'auto', right: isHomePossession ? 'auto' : '0', width: `${percentage}%`, background: `linear-gradient(${isHomePossession ? '90deg' : '-90deg'}, ${teamColor}88, ${teamColor})` }}>
+                                <div className={`absolute top-1/2 -translate-y-1/2 flex items-center ${isHomePossession ? 'flex-row' : 'flex-row-reverse'}`} style={{ [isHomePossession ? 'right' : 'left']: '-2vmin' }}>
+                                    <Football className="w-[4vmin] h-[4vmin] drop-shadow-md relative z-10 text-white" />
                                 </div>
                             </div>
                         </div>
-                        <div className="relative h-full w-[10%] border-l border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: game.awayc1 || '#000' }}>
-                            <span className="text-[1.5vmin] font-black text-white/70">{game.away.substring(0,3).toUpperCase()}</span>
+                        {/* Away Endzone */}
+                        <div className="relative h-full w-[10%] border-l border-white/30 flex items-center justify-center shrink-0 z-10" style={{ backgroundColor: '#000' }}>
+                            <img src={game.awayLogo} className="w-[5vmin] h-[5vmin] object-contain" onError={(e) => e.target.style.display='none'} />
                         </div>
                     </div>
                 </div>
             );
         };
 
-        const SCAGameCard = ({ game }) => {
-            const [homeUpdating, setHomeUpdating] = useState(false);
-            const [awayUpdating, setAwayUpdating] = useState(false);
-            const prevHomeScore = useRef(game.homeScore);
-            const prevAwayScore = useRef(game.awayScore);
-
-            useEffect(() => {
-                if (game.homeScore > prevHomeScore.current) { setHomeUpdating(true); setTimeout(() => setHomeUpdating(false), 20000); }
-                prevHomeScore.current = game.homeScore;
-            }, [game.homeScore]);
-
-            useEffect(() => {
-                if (game.awayScore > prevAwayScore.current) { setAwayUpdating(true); setTimeout(() => setAwayUpdating(false), 20000); }
-                prevAwayScore.current = game.awayScore;
-            }, [game.awayScore]);
-
-            // STYLING LOGIC: Black Background + Colored Outline
+        const PAHSLiveCard = ({ game }) => {
             const homeAccent = game.color2 || '#facc15';
             const awayAccent = game.awayc2 || '#facc15';
             
-            const TeamSection = ({ name, score, accent, isUpdating, isPossession, record }) => (
-                <div className={`flex flex-col items-center justify-center transition-all duration-500 p-[2vmin] rounded-xl relative overflow-hidden w-[40%] ${isUpdating ? 'scale-105' : ''}`}
-                     style={{ 
-                         backgroundColor: '#000000', 
-                         border: `0.4vmin solid ${accent}`,
-                         boxShadow: isUpdating ? `0 0 50px ${accent}` : `0 0 20px ${accent}44` 
-                     }}>
-                    {isUpdating && <W1ParticleExplosion color={accent} />}
-                    {isPossession && <div className="absolute top-2 right-2"><Football className="w-[3vmin] h-[3vmin] animate-pulse" /></div>}
-                    <h2 className="text-[4vmin] font-black uppercase text-white leading-none text-center mb-[1vmin]" style={{ textShadow: `0 0 10px ${accent}` }}>{name}</h2>
-                    <div className="text-[2vmin] font-bold text-gray-400 mb-[1vmin]">({record})</div>
-                    <div className="text-[12vmin] font-mono font-bold leading-none tracking-tighter" style={{ color: accent, textShadow: `0 0 20px ${accent}` }}>{score}</div>
+            // Replicating the exact "black card with yellow/colored outline" style from your request
+            const TeamRow = ({ name, score, logo, record, classInfo, accent, isPossession }) => (
+                <div className={`flex items-center justify-between p-[2vmin] rounded-xl mb-[1vmin] border-[0.3vmin] relative bg-black`} style={{ borderColor: accent, boxShadow: `0 0 15px ${accent}44` }}>
+                    <div className="flex items-center gap-[2vmin]">
+                        <img src={logo} className="w-[8vmin] h-[8vmin] object-contain" onError={(e) => e.target.style.display='none'} />
+                        <div>
+                            <h2 className="text-[4vmin] font-black uppercase text-white leading-none">{name}</h2>
+                            <div className="flex gap-[1vmin] text-[2vmin] font-bold text-gray-400 mt-[0.5vmin]">
+                                <span>({record})</span>
+                                <span style={{color: accent}}>{classInfo}</span>
+                            </div>
+                        </div>
+                        {isPossession && <Football className="w-[3vmin] h-[3vmin] text-white animate-pulse ml-[1vmin]" />}
+                    </div>
+                    <div className="text-[8vmin] font-mono font-bold leading-none text-white">{score}</div>
                 </div>
             );
 
             return (
-                <div className="h-full w-full flex flex-col items-center justify-center p-[2vmin] relative bg-black">
-                    {/* Ticker */}
-                    {game.ticker && <div className="absolute top-[2vmin] left-0 w-full overflow-hidden bg-yellow-900/20 border-y border-yellow-500/30 py-[1vmin]"><div className="w1-animate-marquee text-[2.5vmin] font-bold text-yellow-400 uppercase">{game.ticker}</div></div>}
-                    
-                    {/* Score Area */}
-                    <div className="flex w-full items-center justify-center gap-[4vmin] mt-[4vmin]">
-                        <TeamSection name={game.home} score={game.homeScore} accent={homeAccent} isUpdating={homeUpdating} isPossession={game.possession === 'home'} record={game.homeRecord} />
-                        <div className="flex flex-col items-center">
-                            <div className="text-[4vmin] font-bold text-gray-600">VS</div>
-                            <div className="bg-white/10 px-[2vmin] py-[1vmin] rounded text-[2.5vmin] font-mono font-bold mt-[2vmin] text-white border border-white/20">
-                                {game.status === 'FINAL' ? 'FINAL' : `${game.clock} | Q${game.quarter}`}
-                            </div>
+                <div className="h-full w-full flex flex-col items-center justify-center p-[2vmin] relative bg-[#050505] font-sans">
+                    {/* Header */}
+                    <div className="w-full max-w-[90vmin] flex justify-between items-center mb-[2vmin] bg-[#1a1a1a] p-[1.5vmin] rounded-lg border border-white/10">
+                        <div className="bg-yellow-500 text-black text-[2vmin] font-black px-[1vmin] rounded">WEEK {game.week}</div>
+                        <div className="flex gap-[3vmin] text-[2vmin] font-mono text-white font-bold">
+                            <div>DOWN <span className="text-white">{game.down}</span></div>
+                            <div>TO GO <span className="text-white">{game.togo}</span></div>
+                            <div>BALL <span className="text-white">{game.ownOpp} {game.ballOn}</span></div>
                         </div>
-                        <TeamSection name={game.away} score={game.awayScore} accent={awayAccent} isUpdating={awayUpdating} isPossession={game.possession === 'away'} record={game.awayRecord} />
+                        <div className="text-right">
+                            <div className="bg-red-600 text-white text-[1.5vmin] font-bold px-[1vmin] rounded inline-block mb-[0.5vmin]">{game.status}</div>
+                            <div className="text-[2.5vmin] font-black leading-none">{game.clock} {game.quarter !== 1 && `Q${game.quarter}`}</div>
+                        </div>
                     </div>
 
-                    {/* Drive Chart */}
-                    <W1LiveDrive game={game} />
+                    {/* Ticker */}
+                    {game.ticker && <div className="w-full max-w-[90vmin] mb-[2vmin] overflow-hidden bg-yellow-900/20 border border-yellow-500/30 rounded py-[0.5vmin] px-[1vmin] flex items-center">
+                        <Megaphone className="w-[2vmin] h-[2vmin] text-yellow-500 mr-[1vmin]" />
+                        <div className="w1-animate-marquee text-[1.8vmin] font-bold text-yellow-400 uppercase">{game.ticker}</div>
+                    </div>}
                     
-                    {/* Status Bar */}
-                    <div className="mt-[2vmin] flex gap-[4vmin] text-[2.5vmin] font-bold text-gray-400 uppercase tracking-widest">
-                        <div>Down: <span className="text-white">{game.down}</span></div>
-                        <div>To Go: <span className="text-white">{game.togo}</span></div>
-                        <div>Ball: <span className="text-white">{game.ownOpp} {game.ballOn}</span></div>
+                    {/* Teams */}
+                    <div className="w-full max-w-[90vmin]">
+                        <TeamRow name={game.home} score={game.homeScore} logo={game.homeLogo} record={game.homeRecord} classInfo={game.homeClass} accent={homeAccent} isPossession={game.possession === 'home'} />
+                        <TeamRow name={game.away} score={game.awayScore} logo={game.awayLogo} record={game.awayRecord} classInfo={game.awayClass} accent={awayAccent} isPossession={game.possession === 'away'} />
                     </div>
+
+                    {/* Drive Tracker */}
+                    <W1LiveDrive game={game} />
                 </div>
             );
         };
 
         // --- MAIN APP ---
         const App = () => {
+            // STATE
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
-            // ... (Add other leagues if you pasted them)
+            const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
+            const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
+            const [ncaafTeamsSelected, setNcaafTeamsSelected] = usePersistedState('ncaafTeams', []);
             const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3 }]);
-            const [showScaScoreboard, setShowScaScoreboard] = usePersistedState('showSca', true); // TOGGLE STATE
+            const [showPahs, setShowPahs] = usePersistedState('showPahs', true); // THE TOGGLE
             const [clockColor, setClockColor] = usePersistedState('clockColor', 'text-white');
             
             const [weatherDataMap, setWeatherDataMap] = useState({});
+            const [scaGames, setScaGames] = useState([]);
             const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-            const [scaGames, setScaGames] = useState([]);
 
-            // Fetch SCA Games
+            // Fetch PAHS Data
             useEffect(() => {
-                if (!showScaScoreboard) return;
+                if (!showPahs) return;
                 const db = firebase.database();
                 const rootRef = db.ref('games');
                 const unsubscribe = rootRef.on('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
                         const arr = Array.isArray(data) ? data : Object.values(data);
-                        // Basic mapping
-                        const mapped = arr.map((entry, idx) => ({
+                        setScaGames(arr.map((entry, idx) => ({
                             id: entry.id || idx,
-                            home: entry.home || entry.Home || "Home",
-                            away: entry.away || entry.Away || "Away",
-                            homeScore: entry.homeScore || entry["Home Score"] || 0,
-                            awayScore: entry.awayScore || entry["Away Score"] || 0,
-                            color1: entry.color1 || '#000',
-                            color2: entry.color2 || '#facc15', // Home Accent
-                            awayc1: entry.awayc1 || '#000',
-                            awayc2: entry.awayc2 || '#facc15', // Away Accent
+                            home: entry.home || "Home", away: entry.away || "Away",
+                            homeScore: entry.homeScore || 0, awayScore: entry.awayScore || 0,
+                            homeLogo: entry.homeLogo, awayLogo: entry.awayLogo,
+                            color2: entry.color2 || '#facc15', awayc2: entry.awayc2 || '#facc15',
                             status: (entry.status || "UPCOMING").toUpperCase(),
-                            clock: entry.clock || "00:00",
-                            quarter: entry.quarter || 1,
+                            clock: entry.clock || "00:00", quarter: entry.quarter || 1,
                             possession: (entry.possession || "").toLowerCase(),
                             down: entry.down || "-", togo: entry.togo || "-", ballOn: entry.ballOn || "-", ownOpp: entry.ownOpp || "",
-                            homeRecord: entry.homeRecord || "", awayRecord: entry.awayRecord || "",
-                            ticker: entry.message || entry.ticker || ""
-                        }));
-                        setScaGames(mapped);
+                            week: entry.week || "1", homeRecord: entry.homeRecord || "0-0", awayRecord: entry.awayRecord || "0-0",
+                            homeClass: entry.homeClass || "", awayClass: entry.awayClass || "", ticker: entry.message || ""
+                        })));
                     }
                 });
                 return () => rootRef.off('value', unsubscribe);
-            }, [showScaScoreboard]);
+            }, [showPahs]);
 
-            // Fetch Weather (Simplified)
+            // Fetch Weather
             useEffect(() => {
                 zipConfigs.forEach(async (conf) => {
                     try {
                         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.00&current=temperature_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`);
                         const data = await res.json();
-                        setWeatherDataMap(prev => ({...prev, [conf.id]: { temp: data.current.temperature_2m, condition: data.current.weather_code, wind: data.current.wind_speed_10m, daily: data.daily, loading: false, city: "Sample City" } }));
+                        setWeatherDataMap(prev => ({...prev, [conf.id]: { temp: data.current.temperature_2m, condition: data.current.weather_code, wind: data.current.wind_speed_10m, daily: data.daily, loading: false, city: "NYC" } }));
                     } catch(e) {}
                 });
             }, [zipConfigs]);
@@ -440,11 +428,9 @@
                 // 1. Clock
                 cards.push({ id: 'clock', component: <ClockCard color={clockColor} /> });
                 
-                // 2. SCA Games (New)
-                if (showScaScoreboard) {
-                    scaGames.forEach(game => {
-                        cards.push({ id: `sca-${game.id}`, component: <SCAGameCard game={game} /> });
-                    });
+                // 2. PAHS Games (If Toggled)
+                if (showPahs) {
+                    scaGames.forEach(game => cards.push({ id: `pahs-${game.id}`, component: <PAHSLiveCard game={game} /> }));
                 }
 
                 // 3. Weather
@@ -455,11 +441,18 @@
                     }
                 });
 
-                // 4. Other Teams (Placeholders)
-                nflTeamsSelected.forEach(id => cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} /> }));
-
+                // 4. Sports
+                nflTeamsSelected.forEach(id => { 
+                    const t = NFL_TEAMS.find(x => x.id === id); 
+                    if(t) cards.push({ id: `nfl-${id}`, component: <SportsCard team={{...t, logo: `https://a.espncdn.com/i/teamlogos/nfl/500/${id.toLowerCase()}.png`}} /> }); 
+                });
+                nhlTeamsSelected.forEach(id => { 
+                    const t = NHL_TEAMS.find(x => x.id === id); 
+                    if(t) cards.push({ id: `nhl-${id}`, component: <SportsCard team={{...t, logo: `https://a.espncdn.com/i/teamlogos/nhl/500/${id.toLowerCase()}.png`}} /> }); 
+                });
+                
                 return cards;
-            }, [scaGames, showScaScoreboard, zipConfigs, weatherDataMap, nflTeamsSelected, clockColor]);
+            }, [scaGames, showPahs, zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, clockColor]);
 
             // Carousel Logic
             useEffect(() => {
@@ -478,10 +471,8 @@
                         ))}
                     </div>
                     
-                    {/* Settings Button */}
                     <button onClick={() => setIsSettingsOpen(true)} className="absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full hover:bg-white/20 border border-white/10"><Settings className="w-6 h-6 text-white" /></button>
 
-                    {/* Settings Modal */}
                     {isSettingsOpen && (
                         <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                             <div className="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-700 shadow-2xl p-6 h-[80vh] flex flex-col">
@@ -490,15 +481,19 @@
                                     <button onClick={() => setIsSettingsOpen(false)}><X size={24} /></button>
                                 </div>
                                 <div className="overflow-y-auto flex-1 space-y-6">
-                                    {/* SCA Toggle */}
+                                    
+                                    {/* PAHS TOGGLE */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex justify-between items-center">
-                                        <span className="font-bold text-white">Show PA HS Football</span>
-                                        <button onClick={() => setShowScaScoreboard(!showScaScoreboard)} className={`w-12 h-6 rounded-full relative transition-colors ${showScaScoreboard ? 'bg-green-500' : 'bg-slate-600'}`}>
-                                            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${showScaScoreboard ? 'translate-x-6' : 'translate-x-0'}`} />
+                                        <div>
+                                            <div className="font-bold text-white">Show PA HS Football</div>
+                                            <div className="text-xs text-gray-400">Enables live game view with drive tracker</div>
+                                        </div>
+                                        <button onClick={() => setShowPahs(!showPahs)} className={`w-12 h-6 rounded-full relative transition-colors ${showPahs ? 'bg-green-500' : 'bg-slate-600'}`}>
+                                            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${showPahs ? 'translate-x-6' : 'translate-x-0'}`} />
                                         </button>
                                     </div>
 
-                                    {/* Clock Color */}
+                                    {/* CLOCK COLOR */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <label className="block text-sm text-slate-400 mb-2">Clock Color</label>
                                         <select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded text-white p-2">
@@ -508,12 +503,19 @@
                                             <option value="text-yellow-400">Yellow</option>
                                         </select>
                                     </div>
-                                    
-                                    {/* Existing Zip/Team Selectors would go here */}
+
+                                    {/* OTHER SELECTORS (Simplified for brevity) */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-2">Locations</h3>
-                                        {zipConfigs.map(z => <div key={z.id} className="flex justify-between bg-slate-900 p-2 rounded mb-2"><span>{z.id}</span><button onClick={() => setZipConfigs(zipConfigs.filter(x => x.id !== z.id))} className="text-red-400"><X size={16}/></button></div>)}
+                                        <h3 className="font-bold text-white mb-2">NFL Teams</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {nflTeamsSelected.map(id => <span key={id} className="bg-blue-600 px-2 rounded flex items-center gap-1 text-sm">{id} <button onClick={()=>setNflTeamsSelected(nflTeamsSelected.filter(x=>x!==id))}><X size={12}/></button></span>)}
+                                        </div>
+                                        <select onChange={(e) => {if(e.target.value) setNflTeamsSelected([...nflTeamsSelected, e.target.value])}} className="w-full mt-2 bg-slate-950 border border-slate-600 rounded p-2 text-white">
+                                            <option value="">Add Team...</option>
+                                            {NFL_TEAMS.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                        </select>
                                     </div>
+                                    
                                 </div>
                                 <div className="mt-4 flex justify-end">
                                     <button onClick={() => setIsSettingsOpen(false)} className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-6 rounded-xl">Done</button>
