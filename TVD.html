@@ -20,7 +20,13 @@
             overflow: hidden; 
             height: 100dvh; 
             width: 100vw;
+            margin: 0;
+            padding: 0;
             touch-action: none;
+        }
+        #root {
+            height: 100%;
+            width: 100%;
         }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .animate-blink { animation: blink 1s step-end infinite; }
@@ -117,18 +123,18 @@
         const NCAAF_TEAMS = [ { id: '2005', city: 'Air Force', name: 'Falcons', color: '#003087' }, { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '2026', city: 'Appalachian State', name: 'Mountaineers', color: '#FFCC00' }, { id: '8',   city: 'Arkansas', name: 'Razorbacks', color: '#9D2235' }, { id: '2032', city: 'Arkansas State', name: 'Red Wolves', color: '#CC092F' }, { id: '349', city: 'Army', name: 'Black Knights', color: '#D4BF91' }, { id: '2',   city: 'Auburn', name: 'Tigers', color: '#0C2340' }, { id: '239', city: 'Baylor', name: 'Bears', color: '#154734' }, { id: '68', city: 'Boise State', name: 'Broncos', color: '#0033A0' }, { id: '2084', city: 'Buffalo', name: 'Bulls', color: '#005BBB' }, { id: '25',  city: 'California', name: 'Golden Bears', color: '#003262' }, { id: '2429', city: 'Charlotte', name: '49ers', color: '#046A38' }, { id: '228', city: 'Clemson', name: 'Tigers', color: '#F56600' }, { id: '324', city: 'Coastal Carolina', name: 'Chanticleers', color: '#006991' }, { id: '38',  city: 'Colorado', name: 'Buffaloes', color: '#CFB87C' }, { id: '36', city: 'Colorado State', name: 'Rams', color: '#1E4D2B' }, { id: '150', city: 'Duke', name: 'Blue Devils', color: '#003087' }, { id: '151', city: 'East Carolina', name: 'Pirates', color: '#592A8A' }, { id: '143', city: 'FAU', name: 'Owls', color: '#0033A0' }, { id: '2229', city: 'FIU', name: 'Panthers', color: '#B6862C' }, { id: '57',  city: 'Florida', name: 'Gators', color: '#0021A5' }, { id: '52',  city: 'Florida State', name: 'Seminoles', color: '#782F40' }, { id: '278', city: 'Fresno State', name: 'Bulldogs', color: '#DB0032' }, { id: '61',  city: 'Georgia', name: 'Bulldogs', color: '#BA0C2F' }, { id: '290', city: 'Georgia Southern', name: 'Eagles', color: '#011E41' }, { id: '2247', city: 'Georgia State', name: 'Panthers', color: '#0039A6' }, { id: '59',  city: 'Georgia Tech', name: 'Yellow Jackets', color: '#B3A369' }, { id: '62', city: 'Hawaii', name: 'Rainbow Warriors', color: '#024731' }, { id: '356', city: 'Illinois', name: 'Fighting Illini', color: '#E84A27' }, { id: '2294', city: 'Iowa', name: 'Hawkeyes', color: '#FFCD00' }, { id: '66',  city: 'Iowa State', name: 'Cyclones', color: '#C8102E' }, { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' }, { id: '55', city: 'Jacksonville State', name: 'Gamecocks', color: '#CC0000' }, { id: '2305', city: 'Kansas', name: 'Jayhawks', color: '#0051BA' }, { id: '2306', city: 'Kansas State', name: 'Wildcats', color: '#512888' }, { id: '96',  city: 'Kentucky', name: 'Wildcats', color: '#0033A0' }, { id: '2335', city: 'Liberty', name: 'Flames', color: '#002D62' }, { id: '309', city: 'Louisiana', name: 'Ragin\' Cajuns', color: '#CE181D' }, { id: '97',  city: 'Louisville', name: 'Cardinals', color: '#AD0000' }, { id: '99',  city: 'LSU', name: 'Tigers', color: '#461D7C' }, { id: '276', city: 'Marshall', name: 'Thundering Herd', color: '#00B140' }, { id: '235', city: 'Memphis', name: 'Tigers', color: '#003087' }, { id: '2390', city: 'Miami', name: 'Hurricanes', color: '#F47321' }, { id: '193', city: 'Miami (OH)', name: 'RedHawks', color: '#B61E2E' }, { id: '130', city: 'Michigan', name: 'Wolverines', color: '#00274C' }, { id: '127', city: 'Michigan State', name: 'Spartans', color: '#18453B' }, { id: '2393', city: 'Middle Tennessee', name: 'Blue Raiders', color: '#0066CC' }, { id: '135', city: 'Minnesota', name: 'Golden Gophers', color: '#7A0019' }, { id: '344', city: 'Mississippi State', name: 'Bulldogs', color: '#660000' }, { id: '142', city: 'Missouri', name: 'Tigers', color: '#F1B82D' }, { id: '2426', city: 'Navy', name: 'Midshipmen', color: '#00205B' }, { id: '158', city: 'Nebraska', name: 'Cornhuskers', color: '#E41C38' }, { id: '2440', city: 'Nevada', name: 'Wolf Pack', color: '#002E62' }, { id: '166', city: 'New Mexico', name: 'Lobos', color: '#CE0037' }, { id: '164', city: 'New Mexico State', name: 'Aggies', color: '#882345' }, { id: '153', city: 'North Carolina', name: 'Tar Heels', color: '#7BAFD4' }, { id: '152', city: 'NC State', name: 'Wolfpack', color: '#CC0000' }, { id: '249', city: 'North Texas', name: 'Mean Green', color: '#00853E' }, { id: '2459', city: 'Northern Illinois', name: 'Huskies', color: '#BA0C2F' }, { id: '87',  city: 'Notre Dame', name: 'Fighting Irish', color: '#0C2340' }, { id: '195', city: 'Ohio', name: 'Bobcats', color: '#00694E' }, { id: '194', city: 'Ohio State', name: 'Buckeyes', color: '#BB0000' }, { id: '201', city: 'Oklahoma', name: 'Sooners', color: '#841617' }, { id: '197', city: 'Oklahoma State', name: 'Cowboys', color: '#FF7300' }, { id: '295', city: 'Old Dominion', name: 'Monarchs', color: '#003057' }, { id: '145', city: 'Ole Miss', name: 'Rebels', color: '#CE1126' }, { id: '2483', city: 'Oregon', name: 'Ducks', color: '#154733' }, { id: '204', city: 'Oregon State', name: 'Beavers', color: '#DC4405' }, { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' }, { id: '221', city: 'Pittsburgh', name: 'Panthers', color: '#FFB81C' }, { id: '2509', city: 'Purdue', name: 'Boilermakers', color: '#CEB888' }, { id: '242', city: 'Rice', name: 'Owls', color: '#00205B' }, { id: '2534', city: 'Sam Houston', name: 'Bearkats', color: '#F26522' }, { id: '21', city: 'San Diego State', name: 'Aztecs', color: '#A6192E' }, { id: '23', city: 'San Jose State', name: 'Spartans', color: '#0055A2' }, { id: '2567', city: 'SMU', name: 'Mustangs', color: '#354C8C' }, { id: '6', city: 'South Alabama', name: 'Jaguars', color: '#00205B' }, { id: '2579', city: 'South Carolina', name: 'Gamecocks', color: '#73000A' }, { id: '58', city: 'South Florida', name: 'Bulls', color: '#006747' }, { id: '2572', city: 'Southern Miss', name: 'Golden Eagles', color: '#FFC425' }, { id: '252', city: 'TCU', name: 'Horned Frogs', color: '#4d1979' }, { id: '218', city: 'Temple', name: 'Owls', color: '#9D2235' }, { id: '2633', city: 'Tennessee', name: 'Volunteers', color: '#FF8200' }, { id: '251', city: 'Texas', name: 'Longhorns', color: '#BF5700' }, { id: '245', city: 'Texas A&M', name: 'Aggies', color: '#500000' }, { id: '326', city: 'Texas State', name: 'Bobcats', color: '#501214' }, { id: '2641', city: 'Texas Tech', name: 'Red Raiders', color: '#CC0000' }, { id: '2649', city: 'Toledo', name: 'Rockets', color: '#15397F' }, { id: '2653', city: 'Troy', name: 'Trojans', color: '#8A2432' }, { id: '2655', city: 'Tulane', name: 'Green Wave', color: '#006747' }, { id: '202', city: 'Tulsa', name: 'Golden Hurricane', color: '#C5B783' }, { id: '5', city: 'UAB', name: 'Blazers', color: '#1E6B52' }, { id: '26',  city: 'UCLA', name: 'Bruins', color: '#2D68C4' }, { id: '41', city: 'UConn', name: 'Huskies', color: '#000E2F' }, { id: '2433', city: 'UL Monroe', name: 'Warhawks', color: '#840029' }, { id: '113', city: 'UMass', name: 'Minutemen', color: '#881c1c' }, { id: '2439', city: 'UNLV', name: 'Rebels', color: '#CF0A2C' }, { id: '30',  city: 'USC', name: 'Trojans', color: '#990000' }, { id: '254', city: 'Utah', name: 'Utes', color: '#CC0000' }, { id: '328', city: 'Utah State', name: 'Aggies', color: '#00375E' }, { id: '2638', city: 'UTEP', name: 'Miners', color: '#FF7F00' }, { id: '2636', city: 'UTSA', name: 'Roadrunners', color: '#F15A22' }, { id: '259', city: 'Virginia Tech', name: 'Hokies', color: '#630031' }, { id: '265', city: 'Washington', name: 'Huskies', color: '#4B2E83' }, { id: '264', city: 'Washington State', name: 'Cougars', color: '#981E32' }, { id: '277', city: 'West Virginia', name: 'Mountaineers', color: '#002855' }, { id: '98', city: 'Western Kentucky', name: 'Hilltoppers', color: '#C60C30' }, { id: '275', city: 'Wisconsin', name: 'Badgers', color: '#C5050C' }, { id: '2751', city: 'Wyoming', name: 'Cowboys', color: '#FFC425' } ];
 
         const SportsCardLayout = ({ team, isLive, children }) => (
-            <div className="h-full w-full relative overflow-hidden font-sans p-[2vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
+            <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
                 <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
-                    <img src={team.logo} className="h-[6vmin] w-[6vmin] object-contain drop-shadow-md" />
+                    <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md" />
                     <div>
-                        <h2 className="text-[4vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2>
+                        <h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2>
                         <div className="flex items-center gap-[1vmin]">
-                            <span className="text-[2.5vmin] font-bold text-gray-400">({team.record})</span>
-                            {isLive && <span className="bg-red-600 text-white text-[1.5vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}
+                            <span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>
+                            {isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-center gap-[4vmin] relative z-10 pt-[8vmin]">
+                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[10vmin]">
                     {children}
                 </div>
             </div>
@@ -162,13 +168,13 @@
             const [logoError, setLogoError] = useState(false);
 
             return (
-                <div className="w-full max-w-[80vmin] h-[12vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
+                <div className="w-[90%] h-[15vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
                     {/* Left Endzone (Home) */}
                     <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}>
                         {homeTeam.logo ? (
                             <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80" />
                         ) : (
-                            <span className="-rotate-90 text-[1.5vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>
+                            <span className="-rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>
                         )}
                     </div>
 
@@ -182,8 +188,8 @@
                                 <div key={num} className={`absolute top-0 bottom-0 border-l flex flex-col justify-between py-[0.5vmin] ${isTen ? 'border-white/40' : 'border-white/10'}`} style={{ left: `${num}%` }}>
                                     {isTen && (
                                         <>
-                                            <span className="text-[1vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span>
-                                            <span className="text-[1vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span>
+                                            <span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span>
+                                            <span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span>
                                         </>
                                     )}
                                 </div>
@@ -203,7 +209,7 @@
                                 justifyContent: isHome ? 'flex-end' : 'flex-start'
                             }}
                         >
-                             <div className={`w-[5vmin] h-[5vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}>
+                             <div className={`w-[8vmin] h-[8vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}>
                                 {!logoError ? (
                                     <img 
                                         src={activeLogo} 
@@ -223,7 +229,7 @@
                         {awayTeam.logo ? (
                             <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80" />
                         ) : (
-                            <span className="rotate-90 text-[1.5vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>
+                            <span className="rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>
                         )}
                     </div>
                 </div>
@@ -286,28 +292,28 @@
                                     {/* My Team (Left) */}
                                     <div className="flex flex-col items-center">
                                         <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            {isMyPossession && <Football className="w-[4vmin] h-[4vmin] drop-shadow-md animate-pulse" />}
-                                            <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain" />
+                                            {isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
+                                            <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain" />
                                         </div>
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
                                     </div>
                                     
-                                    <div className="text-[4vmin] font-bold text-gray-600">-</div>
+                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
                                     
                                     {/* Opponent (Right) */}
                                     <div className="flex flex-col items-center">
                                         <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[8vmin] h-[8vmin] object-contain" />
-                                            {isOppPossession && <Football className="w-[4vmin] h-[4vmin] drop-shadow-md animate-pulse" />}
+                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[10vmin] h-[10vmin] object-contain" />
+                                            {isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
                                         </div>
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
                                     </div>
                                 </div>
-                                <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
+                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
                             </div>
                             
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[2vmin]">
-                                <div className="text-[2.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[60vmin] opacity-90 mb-[1vmin]">
+                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
+                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">
                                     {team.live.lastPlay || "Coverage starting..."}
                                 </div>
                                 
@@ -320,14 +326,14 @@
                                     />
                                 )}
 
-                                <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[50vmin]">
-                                    <div className="bg-white/10 p-[1.5vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
-                                        <div className="text-[1.5vmin] text-gray-400 uppercase font-bold tracking-widest">Down & Dist</div>
-                                        <div className="text-[3vmin] font-black">{team.live.down > 0 ? `${team.live.down}${getOrdinal(team.live.down)} & ${team.live.distance}` : "1st & 10"}</div>
+                                <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]">
+                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
+                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Down & Dist</div>
+                                        <div className="text-[4vmin] font-black">{team.live.down > 0 ? `${team.live.down}${getOrdinal(team.live.down)} & ${team.live.distance}` : "1st & 10"}</div>
                                     </div>
-                                    <div className="bg-white/10 p-[1.5vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
-                                        <div className="text-[1.5vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div>
-                                        <div className="text-[3vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>
+                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
+                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div>
+                                        <div className="text-[4vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>
                                             {ballOnText}
                                         </div>
                                     </div>
@@ -337,31 +343,31 @@
                     ) : (
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
-                                <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
+                                <div className="text-[3vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
                                 {team.schedule?.next?.opponentLogo ? 
-                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
-                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                    <img src={team.schedule.next.opponentLogo} className="h-[20vmin] w-[20vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[10vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
                                 }
-                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
-                                <div className="text-[4vmin] font-bold text-white mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
+                                <div className="text-[5vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
+                                <div className="text-[6vmin] font-bold text-white mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
-                                <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[6vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className="text-[3vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
+                                <div className={`text-[8vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
                                     {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
                                 </div>
-                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[2vmin] rounded-2xl backdrop-blur-sm border border-white/5">
+                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[4vmin] rounded-2xl backdrop-blur-sm border border-white/5">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" />
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
+                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
                                     </div>
-                                    <div className="text-[3vmin] font-bold text-gray-400">-</div>
+                                    <div className="text-[4vmin] font-bold text-gray-400">-</div>
                                     <div className="flex flex-col items-center">
                                         {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" /> :
-                                            <span className="text-[2vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
+                                            <img src={team.schedule.prev.opponentLogo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" /> :
+                                            <span className="text-[3vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
                                         }
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
                             </div>
@@ -421,25 +427,25 @@
                                 <div className="flex items-center gap-[3vmin]">
                                     <div className="flex flex-col items-center">
                                         <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            {isMyPossession && <Football className="w-[4vmin] h-[4vmin] drop-shadow-md animate-pulse" />}
-                                            <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain" />
+                                            {isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
+                                            <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain" />
                                         </div>
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
                                     </div>
-                                    <div className="text-[4vmin] font-bold text-gray-600">-</div>
+                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
                                         <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[8vmin] h-[8vmin] object-contain" />
-                                            {isOppPossession && <Football className="w-[4vmin] h-[4vmin] drop-shadow-md animate-pulse" />}
+                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[10vmin] h-[10vmin] object-contain" />
+                                            {isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
                                         </div>
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
                                     </div>
                                 </div>
-                                <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
+                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
                             </div>
                             
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[2vmin]">
-                                <div className="text-[2.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[60vmin] opacity-90 mb-[1vmin]">
+                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
+                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">
                                     {team.live.lastPlay}
                                 </div>
                                 
@@ -452,14 +458,14 @@
                                     />
                                 )}
 
-                                <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[50vmin]">
-                                    <div className="bg-white/10 p-[1.5vmin] rounded-xl text-center backdrop-blur-md">
-                                        <div className="text-[1.5vmin] text-gray-400 uppercase font-bold">Down & Dist</div>
-                                        <div className="text-[3vmin] font-black">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
+                                <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]">
+                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md">
+                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold">Down & Dist</div>
+                                        <div className="text-[4vmin] font-black">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
                                     </div>
-                                    <div className="bg-white/10 p-[1.5vmin] rounded-xl text-center backdrop-blur-md">
-                                        <div className="text-[1.5vmin] text-gray-400 uppercase font-bold">Ball On</div>
-                                        <div className="text-[3vmin] font-black" style={{ color: '#fff' }}>{ballOnText}</div>
+                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md">
+                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold">Ball On</div>
+                                        <div className="text-[4vmin] font-black" style={{ color: '#fff' }}>{ballOnText}</div>
                                     </div>
                                 </div>
                             </div>
@@ -467,31 +473,31 @@
                     ) : (
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
-                                <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
+                                <div className="text-[3vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
                                 {team.schedule?.next?.opponentLogo ? 
-                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
-                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                    <img src={team.schedule.next.opponentLogo} className="h-[20vmin] w-[20vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[10vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
                                 }
-                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
-                                <div className="text-[4vmin] font-bold text-white mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
+                                <div className="text-[5vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
+                                <div className="text-[6vmin] font-bold text-white mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
-                                <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[6vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className="text-[3vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
+                                <div className={`text-[8vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
                                     {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
                                 </div>
-                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[2vmin] rounded-2xl backdrop-blur-sm border border-white/5">
+                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[4vmin] rounded-2xl backdrop-blur-sm border border-white/5">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" />
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
+                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
                                     </div>
-                                    <div className="text-[3vmin] font-bold text-gray-400">-</div>
+                                    <div className="text-[4vmin] font-bold text-gray-400">-</div>
                                     <div className="flex flex-col items-center">
                                         {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" /> :
-                                            <span className="text-[2vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
+                                            <img src={team.schedule.prev.opponentLogo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" /> :
+                                            <span className="text-[3vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
                                         }
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
                             </div>
@@ -520,49 +526,49 @@
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full">
                                 <div className="flex items-center gap-[3vmin]">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
                                     </div>
-                                    <div className="text-[4vmin] font-bold text-gray-600">-</div>
+                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nhl/500/nhl.png`} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nhl/500/nhl.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
                                     </div>
                                 </div>
-                                <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.time} | P{team.live.period}</div>
+                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.time} | P{team.live.period}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]">
-                                <div className="text-[4vmin] font-bold text-white">vs {team.live.opponent}</div>
+                                <div className="text-[6vmin] font-bold text-white">vs {team.live.opponent}</div>
                             </div>
                         </>
                     ) : (
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
-                                <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
+                                <div className="text-[3vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
                                 {team.schedule?.next?.opponentLogo ? 
-                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
-                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                    <img src={team.schedule.next.opponentLogo} className="h-[20vmin] w-[20vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[10vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
                                 }
-                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
+                                <div className="text-[5vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
+                                <div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
-                                <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[6vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className="text-[3vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
+                                <div className={`text-[8vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
                                     {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
                                 </div>
-                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[2vmin] rounded-2xl backdrop-blur-sm border border-white/5">
+                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[4vmin] rounded-2xl backdrop-blur-sm border border-white/5">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" />
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
+                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
                                     </div>
-                                    <div className="text-[3vmin] font-bold text-gray-400">-</div>
+                                    <div className="text-[4vmin] font-bold text-gray-400">-</div>
                                     <div className="flex flex-col items-center">
                                         {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" /> :
-                                            <span className="text-[2vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
+                                            <img src={team.schedule.prev.opponentLogo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" /> :
+                                            <span className="text-[3vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
                                         }
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
                             </div>
@@ -585,12 +591,12 @@
             const isLive = team.status === 'LIVE' || team.status === 'IN';
             
             const Diamond = ({ runners }) => (
-                <div className="relative w-[15vmin] h-[15vmin] rotate-45 border-4 border-[#8B4513] bg-[#5D4037] mx-auto">
+                <div className="relative w-[20vmin] h-[20vmin] rotate-45 border-4 border-[#8B4513] bg-[#5D4037] mx-auto">
                     <div className="absolute inset-0 border-[0.5vmin] border-white/30"></div>
-                    <div className={`absolute top-0 right-0 w-[2.5vmin] h-[2.5vmin] -mt-[1.25vmin] -mr-[1.25vmin] border-2 border-white transition-colors duration-500 ${runners.first ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
-                    <div className={`absolute top-0 left-0 w-[2.5vmin] h-[2.5vmin] -mt-[1.25vmin] -ml-[1.25vmin] border-2 border-white transition-colors duration-500 ${runners.second ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
-                    <div className={`absolute bottom-0 left-0 w-[2.5vmin] h-[2.5vmin] -mb-[1.25vmin] -ml-[1.25vmin] border-2 border-white transition-colors duration-500 ${runners.third ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
-                    <div className="absolute bottom-0 right-0 w-[2.5vmin] h-[2.5vmin] -mb-[1.25vmin] -mr-[1.25vmin] bg-white" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                    <div className={`absolute top-0 right-0 w-[3vmin] h-[3vmin] -mt-[1.5vmin] -mr-[1.5vmin] border-2 border-white transition-colors duration-500 ${runners.first ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
+                    <div className={`absolute top-0 left-0 w-[3vmin] h-[3vmin] -mt-[1.5vmin] -ml-[1.5vmin] border-2 border-white transition-colors duration-500 ${runners.second ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
+                    <div className={`absolute bottom-0 left-0 w-[3vmin] h-[3vmin] -mb-[1.5vmin] -ml-[1.5vmin] border-2 border-white transition-colors duration-500 ${runners.third ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
+                    <div className="absolute bottom-0 right-0 w-[3vmin] h-[3vmin] -mb-[1.5vmin] -mr-[1.5vmin] bg-white" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
                 </div>
             );
 
@@ -601,54 +607,54 @@
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full">
                                 <div className="flex items-center gap-[3vmin]">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
+                                        <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
                                     </div>
-                                    <div className="text-[4vmin] font-bold text-gray-600">-</div>
+                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/mlb/500/mlb.png`} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[10vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
+                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/mlb/500/mlb.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
+                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
                                     </div>
                                 </div>
-                                <div className="text-[3vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.inningState}</div>
+                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.inningState}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]">
                                 <Diamond runners={team.live.runners} />
                                 <div className="flex gap-[2vmin] mt-[2vmin]">
-                                    <div className="text-[2vmin] font-bold bg-white/10 px-[1.5vmin] py-[0.5vmin] rounded-full">B: {team.live.balls}</div>
-                                    <div className="text-[2vmin] font-bold bg-white/10 px-[1.5vmin] py-[0.5vmin] rounded-full">S: {team.live.strikes}</div>
-                                    <div className="text-[2vmin] font-bold bg-white/10 px-[1.5vmin] py-[0.5vmin] rounded-full text-red-400">O: {team.live.outs}</div>
+                                    <div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">B: {team.live.balls}</div>
+                                    <div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">S: {team.live.strikes}</div>
+                                    <div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full text-red-400">O: {team.live.outs}</div>
                                 </div>
                             </div>
                         </>
                     ) : (
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right">
-                                <div className="text-[2vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
+                                <div className="text-[3vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
                                 {team.schedule?.next?.opponentLogo ? 
-                                    <img src={team.schedule.next.opponentLogo} className="h-[15vmin] w-[15vmin] object-contain my-[1vmin]" /> : 
-                                    <div className="text-[8vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
+                                    <img src={team.schedule.next.opponentLogo} className="h-[20vmin] w-[20vmin] object-contain my-[1vmin]" /> : 
+                                    <div className="text-[10vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
                                 }
-                                <div className="text-[3vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
+                                <div className="text-[5vmin] font-bold text-gray-300">VS {team.schedule?.next?.opponent}</div>
+                                <div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full text-center landscape:text-left">
-                                <div className="text-[2vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                <div className={`text-[6vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
+                                <div className="text-[3vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
+                                <div className={`text-[8vmin] font-black uppercase mb-[1vmin] ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`}>
                                     {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
                                 </div>
-                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[2vmin] rounded-2xl backdrop-blur-sm border border-white/5">
+                                <div className="flex items-center gap-[4vmin] bg-white/10 p-[4vmin] rounded-2xl backdrop-blur-sm border border-white/5">
                                     <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" />
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
+                                        <img src={team.logo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" />
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
                                     </div>
-                                    <div className="text-[3vmin] font-bold text-gray-400">-</div>
+                                    <div className="text-[4vmin] font-bold text-gray-400">-</div>
                                     <div className="flex flex-col items-center">
                                         {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[6vmin] h-[6vmin] object-contain mb-[1vmin]" /> :
-                                            <span className="text-[2vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
+                                            <img src={team.schedule.prev.opponentLogo} className="w-[8vmin] h-[8vmin] object-contain mb-[1vmin]" /> :
+                                            <span className="text-[3vmin] font-bold text-gray-400 mb-[1vmin]">{team.schedule?.prev?.opponent}</span>
                                         }
-                                        <span className="text-[5vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
+                                        <span className="text-[6vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
                             </div>
@@ -697,47 +703,47 @@
             return (
                 <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
                     <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1vmin] opacity-80 z-20">
-                        <MapPin className="w-[3vmin] h-[3vmin]" />
-                        <span className="text-[3vmin] font-bold uppercase tracking-wider">{city}</span>
+                        <MapPin className="w-[4vmin] h-[4vmin]" />
+                        <span className="text-[4vmin] font-bold uppercase tracking-wider">{city}</span>
                     </div>
-                    <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-center gap-[4vmin] relative z-10">
-                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10">
+                    <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10">
+                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10">
                             <div className="drop-shadow-2xl filter">
-                                {getWeatherIcon(condition, "w-[25vmin] h-[25vmin]")}
+                                {getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}
                             </div>
-                            <h1 className="text-[35vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[2vmin]">
+                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">
                                 {Math.round(temp)}°
                             </h1>
                         </div>
-                        <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[2vmin] gap-[3vmin]">
-                            <div className="text-[7vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">
+                        <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[4vmin] gap-[4vmin]">
+                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">
                                 {getConditionText(condition)}
                             </div>
                             {high !== undefined && low !== undefined && (
-                                <div className="flex items-center gap-[6vmin]">
+                                <div className="flex items-center gap-[8vmin]">
                                     <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[2vmin] font-bold uppercase tracking-widest opacity-70">High</span>
-                                        <span className="text-[8vmin] font-black leading-none">{Math.round(high)}°</span>
+                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span>
+                                        <span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span>
                                     </div>
-                                    <div className="w-[1px] h-[8vmin] bg-white/30 rounded-full"></div>
+                                    <div className="w-[1px] h-[12vmin] bg-white/30 rounded-full"></div>
                                     <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[2vmin] font-bold uppercase tracking-widest opacity-70">Low</span>
-                                        <span className="text-[8vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span>
+                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span>
+                                        <span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span>
                                     </div>
                                 </div>
                             )}
-                            <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[2.5vmin] rounded-3xl backdrop-blur-md w-full max-w-[60vmin] border border-white/10 mt-[1vmin]">
+                            <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[3vmin] rounded-3xl backdrop-blur-md w-full max-w-[80vmin] border border-white/10 mt-[1vmin]">
                                 <div className="text-center">
-                                    <div className="opacity-75 text-[1.8vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div>
-                                    <div className="font-bold text-[3vmin] leading-none">{wind} <span className="text-[1.5vmin] opacity-70">mph</span></div>
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div>
+                                    <div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div>
                                 </div>
                                 <div className="text-center border-l border-white/20">
-                                    <div className="opacity-75 text-[1.8vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div>
-                                    <div className="font-bold text-[3vmin] leading-none">{getPrecipText(precip, condition)}</div>
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div>
+                                    <div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip, condition)}</div>
                                 </div>
                                 <div className="text-center border-l border-white/20">
-                                    <div className="opacity-75 text-[1.8vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div>
-                                    <div className={`font-black text-[3vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div>
+                                    <div className={`font-black text-[5vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
                                 </div>
                             </div>
                         </div>
@@ -757,7 +763,7 @@
 
             const limit = Math.min(days, 5);
             // Dynamic Font Sizing Logic - Bigger if 3 days, Smaller if 5
-            const baseScale = days === 3 ? 1.4 : 1.0; 
+            const baseScale = days === 3 ? 1.6 : 1.2; 
             
             const forecastItems = [];
             if (daily && daily.time) {
@@ -785,26 +791,26 @@
             return (
                 <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
                     <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none">
-                        <CalendarIcon className="w-[4vmin] h-[4vmin] text-blue-300" />
-                        <div><h2 className="text-[3vmin] font-bold leading-none">Forecast</h2><p className="text-[1.5vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
+                        <CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" />
+                        <div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
                     </div>
                     
                     {/* Main Forecast Container - Uses flex-1 to fill remaining space */}
                     <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
                         {forecastItems.map((day, idx) => (
-                            <div key={idx} className="flex-1 flex flex-col items-center justify-between bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
+                            <div key={idx} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
                                 
                                 {/* Date Section */}
                                 <div className="text-center mt-[1vmin]">
-                                    <div style={{ fontSize: `clamp(1rem, ${3.5 * baseScale}vmin, 3rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                                    <div style={{ fontSize: `clamp(0.8rem, ${1.5 * baseScale}vmin, 1.5rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                    <div style={{ fontSize: `clamp(1.5rem, ${4.5 * baseScale}vmin, 5rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                                    <div style={{ fontSize: `clamp(1rem, ${2 * baseScale}vmin, 2rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
                                 </div>
                                 
                                 {/* Icon Section */}
                                 <div className="flex flex-col items-center justify-center flex-1 w-full">
-                                    {getWeatherIcon(day.code, "", { width: `${10 * baseScale}vmin`, height: `${10 * baseScale}vmin` })}
+                                    {getWeatherIcon(day.code, "", { width: `${15 * baseScale}vmin`, height: `${15 * baseScale}vmin` })}
                                     {day.precip > 0.01 && (
-                                        <div style={{ fontSize: `clamp(0.7rem, ${1.5 * baseScale}vmin, 1.2rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[1.5vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">
+                                        <div style={{ fontSize: `clamp(0.8rem, ${2 * baseScale}vmin, 1.5rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[2vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">
                                             {getPrecipLabel(day.precip, day.code)}
                                         </div>
                                     )}
@@ -812,8 +818,8 @@
 
                                 {/* Temps Section */}
                                 <div className="text-center mb-[1vmin]">
-                                    <div style={{ fontSize: `clamp(2rem, ${7 * baseScale}vmin, 8rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div>
-                                    <div style={{ fontSize: `clamp(1rem, ${3 * baseScale}vmin, 3rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div>
+                                    <div style={{ fontSize: `clamp(3rem, ${10 * baseScale}vmin, 12rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div>
+                                    <div style={{ fontSize: `clamp(1.5rem, ${5 * baseScale}vmin, 5rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div>
                                 </div>
                             </div>
                         ))}
@@ -845,14 +851,14 @@
             return (
                 <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
                     <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
-                    <div className="relative z-10 flex flex-col items-center">
-                        <div className={`text-[3vh] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full">
+                        <div className={`text-[4vw] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
                         <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
-                            <span className="text-[25vmin] font-bold tracking-tighter drop-shadow-2xl flex items-baseline">{hours}<span className="animate-blink">:</span>{minutes}</span>
-                            <span className="text-[6vh] font-light uppercase opacity-80">{getAmPm(time)}</span>
+                            <span className="text-[35vw] font-bold tracking-tighter drop-shadow-2xl flex items-baseline leading-[0.8]">{hours}<span className="animate-blink">:</span>{minutes}</span>
+                            <span className="text-[8vw] font-light uppercase opacity-80 self-end mb-[4vw]">{getAmPm(time)}</span>
                         </div>
-                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vh] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
-                           <div className="w-[1vh] h-[1vh] rounded-full bg-green-500 animate-pulse" />
+                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vw] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
+                           <div className="w-[1.5vw] h-[1.5vw] rounded-full bg-green-500 animate-pulse" />
                            {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
                         </div>
                     </div>
