@@ -68,7 +68,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef, Component } = React;
 
-        // --- ERROR BOUNDARY (Fixes Blank Screen by showing error) ---
+        // --- ERROR BOUNDARY ---
         class ErrorBoundary extends Component {
             constructor(props) {
                 super(props);
@@ -82,7 +82,7 @@
                     return (
                         <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-900 text-white p-10 text-center">
                             <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
-                            <p className="mb-4 text-red-200">The dashboard crashed. This is usually due to bad saved settings.</p>
+                            <p className="mb-4 text-red-200">The dashboard crashed.</p>
                             <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">
                                 {this.state.error.toString()}
                             </div>
@@ -99,20 +99,15 @@
             }
         }
 
-        // --- SAFE STATE HOOK ---
         const usePersistedState = (key, defaultValue) => {
             const [state, setState] = useState(() => {
                 try {
                     const item = window.localStorage.getItem(key);
                     if (item === null) return defaultValue;
                     const parsed = JSON.parse(item);
-                    // Extra safety: If we expect an array but get something else, force default
                     if (Array.isArray(defaultValue) && !Array.isArray(parsed)) return defaultValue;
                     return parsed;
-                } catch (error) { 
-                    console.error("Storage Error:", error);
-                    return defaultValue; 
-                }
+                } catch (error) { return defaultValue; }
             });
             useEffect(() => {
                 try { window.localStorage.setItem(key, JSON.stringify(state)); } catch (e) {}
@@ -148,54 +143,21 @@
         const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
         const Football = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" className={props.className} style={props.style} {...props}><g transform="rotate(45 50 50)"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M30 18 Q 50 10 70 18 L 70 24 Q 50 16 30 24 Z" fill="white" /><path d="M30 82 Q 50 90 70 82 L 70 76 Q 50 84 30 76 Z" fill="white" /><path d="M48 35 L 48 65" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 40 L 54 40" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 45 L 54 45" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 50 L 54 50" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 55 L 54 55" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 60 L 54 60" stroke="white" strokeWidth="3" strokeLinecap="round" /></g></svg>);
 
-        // --- TEAM SELECTOR (TV SAFE VERSION) ---
-        const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
-            const sortedTeams = useMemo(() => {
-                return [...teams].sort((a, b) => a.city.localeCompare(b.city));
-            }, [teams]);
-
-            const handleSelect = (e) => {
-                const id = e.target.value;
-                if (id) onAdd(id);
-                // On TV browsers, we do NOT manually reset value to "" here to avoid input glitches.
-                // We rely on React rendering the 'value=""' prop below.
-            };
-
-            return (
-                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <h3 className="font-bold text-white mb-2">{title}</h3>
-                    
-                    <div className="flex flex-wrap gap-2 mb-3">
-                        {selected.map(id => (
-                            <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                                {teams.find(t=>t.id===id)?.city} {teams.find(t=>t.id===id)?.name}
-                                <button onClick={() => onRemove(id)} className="hover:text-red-400"><X size={14} /></button>
-                            </span>
-                        ))}
-                    </div>
-
-                    <div className="relative">
-                        <select 
-                            value="" 
-                            onChange={handleSelect}
-                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
-                        >
-                            {/* NOTE: We removed 'disabled' from this option to fix Android TV bugs */}
-                            <option value="">+ Add a Team...</option>
-                            {sortedTeams.map(t => (
-                                <option key={t.id} value={t.id} disabled={selected.includes(t.id)}>
-                                    {selected.includes(t.id) ? '✓ ' : ''}{t.city} {t.name}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                            <Plus size={16} />
-                        </div>
-                    </div>
-                </div>
-            );
+        const getWeatherIcon = (code, sizeClass, style = {}) => {
+            if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} style={style} />;
+            const color = "text-gray-200";
+            if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} style={style} fill="currentColor" />;
+            if (code <= 3) return <div className="relative" style={style}><Sun className={`${sizeClass} text-yellow-400`} fill="currentColor" /><div className={`absolute bottom-[-10%] right-[-10%] ${sizeClass} scale-75 text-gray-100`}><CloudFilled className="w-full h-full" /></div></div>;
+            if (code <= 48) return <CloudFilled className={`${sizeClass} ${color}`} style={style} />;
+            if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} style={style} fill="currentColor" />;
+            if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} style={style} fill="currentColor" />;
+            if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} style={style} fill="currentColor" />;
+            return <CloudFilled className={`${sizeClass} ${color}`} style={style} />;
         };
 
+        const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
+
+        // 1. YEAR PROGRESS COMPONENT (FIXED TO 1 DECIMAL)
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
             useEffect(() => {
@@ -207,7 +169,7 @@
                     setProgress(pct);
                 };
                 update();
-                const interval = setInterval(update, 600000); 
+                const interval = setInterval(update, 600000); // update every 10 min
                 return () => clearInterval(interval);
             }, []);
 
@@ -228,6 +190,7 @@
             );
         };
 
+        // 2. WELCOME CARD
         const WelcomeCard = ({ message, animation }) => {
             let animClass = "anim-fade"; 
             if (animation === 'drop') animClass = "anim-drop";
@@ -243,6 +206,7 @@
             );
         };
 
+        // 3. CUSTOM IMAGE CARD
         const CustomImageCard = ({ url }) => (
             <div className="h-full w-full relative bg-black flex items-center justify-center">
                 {url ? 
@@ -251,6 +215,44 @@
                 }
             </div>
         );
+
+        // 4. CLOCK CARD (RESTORED)
+        const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
+            const [time, setTime] = useState(new Date());
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    const now = new Date();
+                    if (timezoneOffset !== null && timezoneOffset !== undefined) {
+                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                        const targetTime = new Date(utc + (1000 * timezoneOffset));
+                        setTime(targetTime);
+                    } else { setTime(now); }
+                }, 1000);
+                return () => clearInterval(timer);
+            }, [timezoneOffset]);
+
+            const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
+            const [hours, minutes] = formatTime(time).split(':');
+            const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
+            const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+
+            return (
+                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
+                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full">
+                        <div className={`text-[4vw] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
+                        <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
+                            <span className="text-[35vw] font-bold tracking-tighter drop-shadow-2xl flex items-baseline leading-[0.8]">{hours}<span className="animate-blink">:</span>{minutes}</span>
+                            <span className="text-[8vw] font-light uppercase opacity-80 self-end mb-[4vw]">{getAmPm(time)}</span>
+                        </div>
+                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vw] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
+                           <div className="w-[1.5vw] h-[1.5vw] rounded-full bg-green-500 animate-pulse" />
+                           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
 
         const SportsCardLayout = ({ team, isLive, children }) => (
             <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
@@ -687,6 +689,55 @@
             );
         };
 
+        const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
+            const sortedTeams = useMemo(() => {
+                return [...teams].sort((a, b) => a.city.localeCompare(b.city));
+            }, [teams]);
+
+            const handleSelect = (e) => {
+                const id = e.target.value;
+                if (id) {
+                    onAdd(id);
+                }
+            };
+
+            return (
+                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                    <h3 className="font-bold text-white mb-2">{title}</h3>
+                    
+                    {/* Selected Tags Area */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        {selected.map(id => (
+                            <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                                {teams.find(t=>t.id===id)?.city} {teams.find(t=>t.id===id)?.name}
+                                <button onClick={() => onRemove(id)} className="hover:text-red-400"><X size={14} /></button>
+                            </span>
+                        ))}
+                    </div>
+
+                    {/* The Modified Dropdown (Controlled Component) */}
+                    <div className="relative">
+                        <select 
+                            value="" 
+                            onChange={handleSelect}
+                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                        >
+                            <option value="">+ Add a Team...</option>
+                            {sortedTeams.map(t => (
+                                <option key={t.id} value={t.id} disabled={selected.includes(t.id)}>
+                                    {selected.includes(t.id) ? '✓ ' : ''}{t.city} {t.name}
+                                </option>
+                            ))}
+                        </select>
+                        {/* Visual indicator arrow */}
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <Plus size={16} />
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const ZipSelector = ({ zipList, onAdd, onRemove, onUpdate }) => {
             const [inputZip, setInputZip] = useState('');
             return (
@@ -723,7 +774,6 @@
         };
 
         const App = () => {
-            // --- SAFETY: Force empty array if loaded data is null/undefined to prevent crashes ---
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
             const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
@@ -805,7 +855,7 @@
                 }
             }, [zipConfigs]);
 
-            // --- DATA FETCHING (Truncated for brevity, reusing existing logic) ---
+            // --- DATA FETCHING ---
             const calculateRecord = (events, teamId, league) => {
                 if (!events || !Array.isArray(events)) return "0-0";
                 let w = 0, l = 0, d = 0, otl = 0;
@@ -1033,7 +1083,6 @@
             useEffect(() => {
                 const loadAll = async () => {
                       const promises = [];
-                      // Safety: Check if team lists are arrays before forEach
                       if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
                       if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
                       if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
