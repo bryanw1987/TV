@@ -755,7 +755,7 @@
 
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
                     // --- CHANGED LOGIC: Use 'completed' status instead of time cutoff ---
-                    const isGameFinished = (e) => e.status.type.completed === true || e.status.type.state === 'post' || e.status.type.description === 'Final';
+                    const isGameFinished = (e) => e.status?.type?.completed === true || e.status?.type?.state === 'post' || e.status?.type?.description === 'Final';
                     const pastGames = validEvents.filter(e => isGameFinished(e)).sort((a,b) => b.dateObj - a.dateObj);
                     const futureGames = validEvents.filter(e => !isGameFinished(e)).sort((a,b) => a.dateObj - b.dateObj);
 
