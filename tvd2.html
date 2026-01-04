@@ -28,7 +28,7 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         
-        /* Modal Styles */
+        /* Modal Styles for Android TV */
         .tv-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .tv-modal-content { background-color: #1e293b; padding: 20px; border-radius: 12px; width: 300px; max-height: 80vh; overflow-y: auto; border: 1px solid #475569; display: flex; flex-direction: column; gap: 10px; }
     </style>
@@ -754,8 +754,10 @@
                     else record = calculateRecord(events, teamId, league);
 
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
-                    const pastGames = validEvents.filter(e => e.status?.type?.completed === true || e.status?.type?.state === 'post').sort((a,b) => b.dateObj - a.dateObj);
-                    const futureGames = validEvents.filter(e => e.status?.type?.state === 'pre' || e.status?.type?.state === 'scheduled').sort((a,b) => a.dateObj - b.dateObj);
+                    // --- CHANGED LOGIC: Use 'completed' status instead of time cutoff ---
+                    const isGameFinished = (e) => e.status.type.completed === true || e.status.type.state === 'post' || e.status.type.description === 'Final';
+                    const pastGames = validEvents.filter(e => isGameFinished(e)).sort((a,b) => b.dateObj - a.dateObj);
+                    const futureGames = validEvents.filter(e => !isGameFinished(e)).sort((a,b) => a.dateObj - b.dateObj);
 
                     let prevGame = pastGames.length > 0 ? pastGames[0] : null;
                     let nextGame = futureGames.length > 0 ? futureGames[0] : null;
@@ -784,7 +786,6 @@
 
                     let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null, prevGameData = null;
 
-                    // UPDATED: Robust Score Extraction
                     if (prevGame && prevGame.competitions) {
                         const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
                         const myComp = prevGame.competitions[0].competitors.find(c => isMe(c));
@@ -792,28 +793,15 @@
                             if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href;
                             prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
                             
-                            // Helper to safely get score integer from different possible locations
-                            const getScore = (competitor) => {
-                                if (competitor.score && competitor.score.value) return parseInt(competitor.score.value, 10);
-                                if (competitor.score && !isNaN(parseInt(competitor.score, 10))) return parseInt(competitor.score, 10);
-                                // Try fallback for some sports/structures
-                                if (prevGame.competitions[0].status?.type?.description === "Final") {
-                                     // Just in case it's string only
-                                     return 0;
-                                }
-                                return 0;
-                            };
-
+                            // Safe Score Parsing
+                            const getScore = (c) => parseInt(c.score?.value || c.score || 0, 10);
                             const myScore = getScore(myComp);
                             const oppScore = getScore(prevComp);
                             
-                            // Determine Win/Loss: Use winner boolean if available, otherwise compare scores
                             let isWin = false;
                             if (myComp.winner === true) isWin = true;
                             else if (myComp.winner === false) isWin = false;
-                            else {
-                                isWin = myScore > oppScore;
-                            }
+                            else { isWin = myScore > oppScore; }
 
                             prevGameData = {
                                 opponent: prevComp.team.abbreviation || 'OPP',
