@@ -82,7 +82,7 @@
                     return (
                         <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-900 text-white p-10 text-center">
                             <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
-                            <p className="mb-4 text-red-200">The dashboard crashed.</p>
+                            <p className="mb-4 text-red-200">The dashboard crashed. This is usually due to bad saved settings.</p>
                             <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">
                                 {this.state.error.toString()}
                             </div>
@@ -157,7 +157,9 @@
 
         const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
 
-        // 1. YEAR PROGRESS COMPONENT (FIXED TO 1 DECIMAL)
+        // --- COMPONENTS RESTORED ---
+
+        // 1. YEAR PROGRESS 
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
             useEffect(() => {
@@ -169,7 +171,7 @@
                     setProgress(pct);
                 };
                 update();
-                const interval = setInterval(update, 600000); // update every 10 min
+                const interval = setInterval(update, 600000); 
                 return () => clearInterval(interval);
             }, []);
 
@@ -250,6 +252,164 @@
                            {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
                         </div>
                     </div>
+                </div>
+            );
+        };
+
+        // 5. WEATHER CARD (RESTORED)
+        const WeatherCard = ({ weatherData }) => {
+            if (!weatherData) return null;
+            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
+            
+            const getConditionText = (code) => {
+                if (code === 0) return "Clear Sky";
+                if (code <= 3) return "Partly Cloudy";
+                if (code <= 45) return "Foggy";
+                if (code <= 67) return "Rainy";
+                if (code <= 77) return "Snow";
+                if (code >= 95) return "Thunderstorms";
+                return "Cloudy";
+            };
+
+            const getPrecipText = (amount, code) => {
+                if (amount === 0) return '0"';
+                if (amount < 0.01) return `<.01"`;
+                return `${amount.toFixed(2)}"`;
+            };
+
+            const getAqiColor = (val) => {
+                if (val <= 50) return 'text-green-400';
+                if (val <= 100) return 'text-yellow-400';
+                if (val <= 150) return 'text-orange-400';
+                if (val <= 200) return 'text-red-500';
+                if (val <= 300) return 'text-purple-500';
+                return 'text-rose-900';
+            };
+
+            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
+
+            const high = daily?.temperature_2m_max?.[0];
+            const low = daily?.temperature_2m_min?.[0];
+
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
+                    <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1vmin] opacity-80 z-20">
+                        <MapPin className="w-[4vmin] h-[4vmin]" />
+                        <span className="text-[4vmin] font-bold uppercase tracking-wider">{city}</span>
+                    </div>
+                    <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10">
+                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10">
+                            <div className="drop-shadow-2xl filter">
+                                {getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}
+                            </div>
+                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">
+                                {Math.round(temp)}°
+                            </h1>
+                        </div>
+                        <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[4vmin] gap-[4vmin]">
+                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">
+                                {getConditionText(condition)}
+                            </div>
+                            {high !== undefined && low !== undefined && (
+                                <div className="flex items-center gap-[8vmin]">
+                                    <div className="flex flex-col items-center landscape:items-start">
+                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span>
+                                        <span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span>
+                                    </div>
+                                    <div className="w-[1px] h-[12vmin] bg-white/30 rounded-full"></div>
+                                    <div className="flex flex-col items-center landscape:items-start">
+                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span>
+                                        <span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[3vmin] rounded-3xl backdrop-blur-md w-full max-w-[80vmin] border border-white/10 mt-[1vmin]">
+                                <div className="text-center">
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div>
+                                    <div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div>
+                                </div>
+                                <div className="text-center border-l border-white/20">
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div>
+                                    <div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip, condition)}</div>
+                                </div>
+                                <div className="text-center border-l border-white/20">
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div>
+                                    <div className={`font-black text-[5vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="absolute -bottom-[10%] -right-[10%] w-[50vmin] h-[50vmin] opacity-10 text-white pointer-events-none rotate-12">
+                        <CloudFilled className="w-full h-full" />
+                    </div>
+                </div>
+            );
+        };
+
+        // 6. FORECAST CARD (RESTORED)
+        const ForecastCard = ({ weatherData, days }) => {
+            if (!weatherData) return null;
+            const { daily, loading, error, city } = weatherData;
+            if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
+
+            const limit = Math.min(days, 5);
+            const baseScale = days === 3 ? 1.6 : 1.2; 
+            
+            const forecastItems = [];
+            if (daily && daily.time) {
+                for (let i = 1; i <= limit; i++) {
+                    if (daily.time[i]) {
+                        const parts = daily.time[i].split('-');
+                        const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                        forecastItems.push({
+                            date: localDate,
+                            max: Math.round(daily.temperature_2m_max[i]),
+                            min: Math.round(daily.temperature_2m_min[i]),
+                            precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0,
+                            code: daily.weather_code[i]
+                        });
+                    }
+                }
+            }
+
+            const getPrecipLabel = (amount, code) => {
+                if (!amount || amount < 0.01) return null;
+                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
+                return `${amount.toFixed(2)}" ${type}`;
+            };
+
+            return (
+                <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
+                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none">
+                        <CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" />
+                        <div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
+                    </div>
+                    
+                    <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
+                        {forecastItems.map((day, idx) => (
+                            <div key={idx} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
+                                <div className="text-center mt-[1vmin]">
+                                    <div style={{ fontSize: `clamp(1.5rem, ${4.5 * baseScale}vmin, 5rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                                    <div style={{ fontSize: `clamp(1rem, ${2 * baseScale}vmin, 2rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                </div>
+                                <div className="flex flex-col items-center justify-center flex-1 w-full">
+                                    {getWeatherIcon(day.code, "", { width: `${15 * baseScale}vmin`, height: `${15 * baseScale}vmin` })}
+                                    {day.precip > 0.01 && (
+                                        <div style={{ fontSize: `clamp(0.8rem, ${2 * baseScale}vmin, 1.5rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[2vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">
+                                            {getPrecipLabel(day.precip, day.code)}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="text-center mb-[1vmin]">
+                                    <div style={{ fontSize: `clamp(3rem, ${10 * baseScale}vmin, 12rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div>
+                                    <div style={{ fontSize: `clamp(1.5rem, ${5 * baseScale}vmin, 5rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="absolute -bottom-10 -right-10 w-[40vmin] h-[40vmin] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
                 </div>
             );
         };
@@ -705,7 +865,6 @@
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                     <h3 className="font-bold text-white mb-2">{title}</h3>
                     
-                    {/* Selected Tags Area */}
                     <div className="flex flex-wrap gap-2 mb-3">
                         {selected.map(id => (
                             <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
@@ -715,7 +874,6 @@
                         ))}
                     </div>
 
-                    {/* The Modified Dropdown (Controlled Component) */}
                     <div className="relative">
                         <select 
                             value="" 
@@ -729,7 +887,6 @@
                                 </option>
                             ))}
                         </select>
-                        {/* Visual indicator arrow */}
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                             <Plus size={16} />
                         </div>
@@ -855,7 +1012,6 @@
                 }
             }, [zipConfigs]);
 
-            // --- DATA FETCHING ---
             const calculateRecord = (events, teamId, league) => {
                 if (!events || !Array.isArray(events)) return "0-0";
                 let w = 0, l = 0, d = 0, otl = 0;
@@ -1119,12 +1275,12 @@
 
                 if (liveCards.length > 0) return liveCards; 
 
-                // 1. Add Custom Slides
+                // 1. Custom Slides
                 if (showWelcome) cards.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
                 if (showImage) cards.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
                 if (showYearProgress) cards.push({ id: 'year_progress', component: <YearProgressCard /> });
 
-                // 2. Add Clock
+                // 2. Clock
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
                     const firstZip = zipConfigs[0].id;
                     const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
@@ -1133,7 +1289,7 @@
                     cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); 
                 }
                 
-                // 3. Add Weather
+                // 3. Weather
                 if (Array.isArray(zipConfigs)) {
                     zipConfigs.forEach(config => {
                         const data = weatherDataMap[config.id];
@@ -1144,7 +1300,7 @@
                     });
                 }
                 
-                // 4. Add Sports Cards
+                // 4. Sports Cards
                 if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
                 if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
                 if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
