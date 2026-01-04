@@ -27,6 +27,10 @@
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        
+        /* Modal Styles */
+        .tv-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .tv-modal-content { background-color: #1e293b; padding: 20px; border-radius: 12px; width: 300px; max-height: 80vh; overflow-y: auto; border: 1px solid #475569; display: flex; flex-direction: column; gap: 10px; }
     </style>
 </head>
 <body>
@@ -58,10 +62,8 @@
             const [state, setState] = useState(() => {
                 try {
                     const item = window.localStorage.getItem(key);
-                    if (item === null) return defaultValue;
-                    const parsed = JSON.parse(item);
-                    if (Array.isArray(defaultValue) && !Array.isArray(parsed)) return defaultValue;
-                    return parsed;
+                    const parsed = item ? JSON.parse(item) : defaultValue;
+                    return parsed === null ? defaultValue : parsed;
                 } catch (error) { return defaultValue; }
             });
             useEffect(() => { try { window.localStorage.setItem(key, JSON.stringify(state)); } catch (e) {} }, [key, state]);
@@ -106,6 +108,50 @@
 
         // --- COMPONENTS ---
 
+        // NEW: Popup for Android TV Text Animation Selection
+        const TextAnimationPopup = ({ currentAnimation, onSelectAnimation }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            const firstOptionRef = useRef(null);
+
+            const animations = [
+                { label: 'None', value: 'none' },
+                { label: 'Scroll Left', value: 'scroll' },
+                { label: 'Fade In', value: 'fade' },
+                { label: 'Drop In', value: 'drop' },
+                { label: 'Blink', value: 'blink' },
+            ];
+
+            useEffect(() => {
+                if (isOpen && firstOptionRef.current) {
+                    setTimeout(() => { firstOptionRef.current.focus(); }, 100);
+                }
+            }, [isOpen]);
+
+            const handleSelect = (value) => { onSelectAnimation(value); setIsOpen(false); };
+
+            return (
+                <div className="mb-2">
+                    <button className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex justify-between items-center" onClick={() => setIsOpen(true)}>
+                        <span>Effect: {animations.find(a => a.value === currentAnimation)?.label || currentAnimation}</span>
+                        <span>▼</span>
+                    </button>
+                    {isOpen && (
+                        <div className="tv-modal-overlay" onClick={() => setIsOpen(false)}>
+                            <div className="tv-modal-content" onClick={(e) => e.stopPropagation()}>
+                                <h3 className="text-white font-bold mb-2">Select Effect</h3>
+                                {animations.map((anim, index) => (
+                                    <button key={anim.value} ref={index === 0 ? firstOptionRef : null} className={`w-full text-left p-3 rounded hover:bg-slate-700 text-white ${currentAnimation === anim.value ? 'bg-blue-600' : 'bg-slate-800'}`} onClick={() => handleSelect(anim.value)}>
+                                        {anim.label}
+                                    </button>
+                                ))}
+                                <button className="w-full text-center p-3 mt-2 rounded bg-red-600 text-white font-bold" onClick={() => setIsOpen(false)}>Cancel</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
             useEffect(() => {
@@ -136,6 +182,7 @@
             let animClass = "anim-fade"; 
             if (animation === 'drop') animClass = "anim-drop";
             if (animation === 'scroll') animClass = "anim-scroll";
+            if (animation === 'blink') animClass = "animate-blink";
             return (
                 <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 text-center overflow-hidden">
                     <h1 className={`text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-orange-500 leading-tight uppercase ${animClass}`}>{message || "ENTER YOUR CUSTOM TEXT HERE"}</h1>
@@ -707,7 +754,6 @@
                     else record = calculateRecord(events, teamId, league);
 
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
-                    // Updated logic: Check status to determine past/future
                     const pastGames = validEvents.filter(e => e.status?.type?.completed === true || e.status?.type?.state === 'post').sort((a,b) => b.dateObj - a.dateObj);
                     const futureGames = validEvents.filter(e => e.status?.type?.state === 'pre' || e.status?.type?.state === 'scheduled').sort((a,b) => a.dateObj - b.dateObj);
 
@@ -738,15 +784,37 @@
 
                     let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null, prevGameData = null;
 
+                    // UPDATED: Robust Score Extraction
                     if (prevGame && prevGame.competitions) {
                         const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
                         const myComp = prevGame.competitions[0].competitors.find(c => isMe(c));
                         if (prevComp && myComp) {
                             if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href;
                             prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
-                            const myScore = parseInt(myComp.score?.value || 0, 10);
-                            const oppScore = parseInt(prevComp.score?.value || 0, 10);
-                            const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore);
+                            
+                            // Helper to safely get score integer from different possible locations
+                            const getScore = (competitor) => {
+                                if (competitor.score && competitor.score.value) return parseInt(competitor.score.value, 10);
+                                if (competitor.score && !isNaN(parseInt(competitor.score, 10))) return parseInt(competitor.score, 10);
+                                // Try fallback for some sports/structures
+                                if (prevGame.competitions[0].status?.type?.description === "Final") {
+                                     // Just in case it's string only
+                                     return 0;
+                                }
+                                return 0;
+                            };
+
+                            const myScore = getScore(myComp);
+                            const oppScore = getScore(prevComp);
+                            
+                            // Determine Win/Loss: Use winner boolean if available, otherwise compare scores
+                            let isWin = false;
+                            if (myComp.winner === true) isWin = true;
+                            else if (myComp.winner === false) isWin = false;
+                            else {
+                                isWin = myScore > oppScore;
+                            }
+
                             prevGameData = {
                                 opponent: prevComp.team.abbreviation || 'OPP',
                                 opponentLogo: prevOppLogo,
@@ -962,7 +1030,7 @@
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-3">Custom Slides</h3>
                                         <div className="flex flex-col gap-4">
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><select value={welcomeAnimation} onChange={(e) => setWelcomeAnimation(e.target.value)} className="bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-xs flex-1"><option value="fade">Fade In</option><option value="drop">Drop In</option><option value="scroll">Scrolling</option></select></div></div>)}</div>
+                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400 w-16">Effect:</span><div className="flex-1"><TextAnimationPopup currentAnimation={welcomeAnimation} onSelectAnimation={setWelcomeAnimation} /></div></div></div>)}</div>
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Custom Image</span><button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showImage && (<input type="text" value={customImageUrl} onChange={(e) => setCustomImageUrl(e.target.value)} placeholder="Paste Image URL here..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />)}</div>
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between"><span className="text-slate-200">Year Progress Bar</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
                                         </div>
