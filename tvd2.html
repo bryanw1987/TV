@@ -144,6 +144,7 @@
         const Football = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" className={props.className} style={props.style} {...props}><g transform="rotate(45 50 50)"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M30 18 Q 50 10 70 18 L 70 24 Q 50 16 30 24 Z" fill="white" /><path d="M30 82 Q 50 90 70 82 L 70 76 Q 50 84 30 76 Z" fill="white" /><path d="M48 35 L 48 65" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 40 L 54 40" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 45 L 54 45" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 50 L 54 50" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 55 L 54 55" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 60 L 54 60" stroke="white" strokeWidth="3" strokeLinecap="round" /></g></svg>);
 
         // --- NEW TEAM SELECTOR: POPUP MODAL (NO DROPDOWN) ---
+        // This replaces the dropdown with a clickable button that opens a full-screen menu
         const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
             const [showModal, setShowModal] = useState(false);
             const sortedTeams = useMemo(() => {
