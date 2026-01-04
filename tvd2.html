@@ -20,18 +20,51 @@
             overflow: hidden; 
             height: 100dvh; 
             width: 100vw;
-            margin: 0;
-            padding: 0;
+            margin: 0; 
+            padding: 0; 
             touch-action: none;
         }
         #root { height: 100%; width: 100%; }
+        
+        /* Utility Animations */
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .animate-blink { animation: blink 1s step-end infinite; }
+        
+        /* Scrollbar Hiding */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        /* --- NEW ANIMATIONS FOR WELCOME MESSAGE --- */
+        
+        /* 1. Drop In */
+        @keyframes dropIn {
+            0% { transform: translateY(-50vh) scale(0.5); opacity: 0; }
+            60% { transform: translateY(20px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .anim-drop { animation: dropIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+        /* 2. Scrolling (Marquee) */
+        @keyframes scrollText {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100vw); }
+        }
+        .anim-scroll { 
+            white-space: nowrap;
+            display: inline-block;
+            animation: scrollText 10s linear infinite; 
+            min-width: 100%;
+        }
+
+        /* 3. Fade In Scale (Default) */
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .anim-fade { animation: fadeInScale 2s ease-out forwards; }
     </style>
 </head>
 <body>
@@ -60,13 +93,12 @@
             { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
         ];
 
-        // --- TEAM DATA LISTS (Truncated for brevity, assumes standard lists are here) ---
+        // --- TEAM DATA ---
         const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
         const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
         const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
         const NCAAF_TEAMS = [ { id: '2005', city: 'Air Force', name: 'Falcons', color: '#003087' }, { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '2026', city: 'Appalachian State', name: 'Mountaineers', color: '#FFCC00' }, { id: '8',   city: 'Arkansas', name: 'Razorbacks', color: '#9D2235' }, { id: '2032', city: 'Arkansas State', name: 'Red Wolves', color: '#CC092F' }, { id: '349', city: 'Army', name: 'Black Knights', color: '#D4BF91' }, { id: '2',   city: 'Auburn', name: 'Tigers', color: '#0C2340' }, { id: '239', city: 'Baylor', name: 'Bears', color: '#154734' }, { id: '68', city: 'Boise State', name: 'Broncos', color: '#0033A0' }, { id: '2084', city: 'Buffalo', name: 'Bulls', color: '#005BBB' }, { id: '25',  city: 'California', name: 'Golden Bears', color: '#003262' }, { id: '2429', city: 'Charlotte', name: '49ers', color: '#046A38' }, { id: '228', city: 'Clemson', name: 'Tigers', color: '#F56600' }, { id: '324', city: 'Coastal Carolina', name: 'Chanticleers', color: '#006991' }, { id: '38',  city: 'Colorado', name: 'Buffaloes', color: '#CFB87C' }, { id: '36', city: 'Colorado State', name: 'Rams', color: '#1E4D2B' }, { id: '150', city: 'Duke', name: 'Blue Devils', color: '#003087' }, { id: '151', city: 'East Carolina', name: 'Pirates', color: '#592A8A' }, { id: '143', city: 'FAU', name: 'Owls', color: '#0033A0' }, { id: '2229', city: 'FIU', name: 'Panthers', color: '#B6862C' }, { id: '57',  city: 'Florida', name: 'Gators', color: '#0021A5' }, { id: '52',  city: 'Florida State', name: 'Seminoles', color: '#782F40' }, { id: '278', city: 'Fresno State', name: 'Bulldogs', color: '#DB0032' }, { id: '61',  city: 'Georgia', name: 'Bulldogs', color: '#BA0C2F' }, { id: '290', city: 'Georgia Southern', name: 'Eagles', color: '#011E41' }, { id: '2247', city: 'Georgia State', name: 'Panthers', color: '#0039A6' }, { id: '59',  city: 'Georgia Tech', name: 'Yellow Jackets', color: '#B3A369' }, { id: '62', city: 'Hawaii', name: 'Rainbow Warriors', color: '#024731' }, { id: '356', city: 'Illinois', name: 'Fighting Illini', color: '#E84A27' }, { id: '2294', city: 'Iowa', name: 'Hawkeyes', color: '#FFCD00' }, { id: '66',  city: 'Iowa State', name: 'Cyclones', color: '#C8102E' }, { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' }, { id: '55', city: 'Jacksonville State', name: 'Gamecocks', color: '#CC0000' }, { id: '2305', city: 'Kansas', name: 'Jayhawks', color: '#0051BA' }, { id: '2306', city: 'Kansas State', name: 'Wildcats', color: '#512888' }, { id: '96',  city: 'Kentucky', name: 'Wildcats', color: '#0033A0' }, { id: '2335', city: 'Liberty', name: 'Flames', color: '#002D62' }, { id: '309', city: 'Louisiana', name: 'Ragin\' Cajuns', color: '#CE181D' }, { id: '97',  city: 'Louisville', name: 'Cardinals', color: '#AD0000' }, { id: '99',  city: 'LSU', name: 'Tigers', color: '#461D7C' }, { id: '276', city: 'Marshall', name: 'Thundering Herd', color: '#00B140' }, { id: '235', city: 'Memphis', name: 'Tigers', color: '#003087' }, { id: '2390', city: 'Miami', name: 'Hurricanes', color: '#F47321' }, { id: '193', city: 'Miami (OH)', name: 'RedHawks', color: '#B61E2E' }, { id: '130', city: 'Michigan', name: 'Wolverines', color: '#00274C' }, { id: '127', city: 'Michigan State', name: 'Spartans', color: '#18453B' }, { id: '2393', city: 'Middle Tennessee', name: 'Blue Raiders', color: '#0066CC' }, { id: '135', city: 'Minnesota', name: 'Golden Gophers', color: '#7A0019' }, { id: '344', city: 'Mississippi State', name: 'Bulldogs', color: '#660000' }, { id: '142', city: 'Missouri', name: 'Tigers', color: '#F1B82D' }, { id: '2426', city: 'Navy', name: 'Midshipmen', color: '#00205B' }, { id: '158', city: 'Nebraska', name: 'Cornhuskers', color: '#E41C38' }, { id: '2440', city: 'Nevada', name: 'Wolf Pack', color: '#002E62' }, { id: '166', city: 'New Mexico', name: 'Lobos', color: '#CE0037' }, { id: '164', city: 'New Mexico State', name: 'Aggies', color: '#882345' }, { id: '153', city: 'North Carolina', name: 'Tar Heels', color: '#7BAFD4' }, { id: '152', city: 'NC State', name: 'Wolfpack', color: '#CC0000' }, { id: '249', city: 'North Texas', name: 'Mean Green', color: '#00853E' }, { id: '2459', city: 'Northern Illinois', name: 'Huskies', color: '#BA0C2F' }, { id: '87',  city: 'Notre Dame', name: 'Fighting Irish', color: '#0C2340' }, { id: '195', city: 'Ohio', name: 'Bobcats', color: '#00694E' }, { id: '194', city: 'Ohio State', name: 'Buckeyes', color: '#BB0000' }, { id: '201', city: 'Oklahoma', name: 'Sooners', color: '#841617' }, { id: '197', city: 'Oklahoma State', name: 'Cowboys', color: '#FF7300' }, { id: '295', city: 'Old Dominion', name: 'Monarchs', color: '#003057' }, { id: '145', city: 'Ole Miss', name: 'Rebels', color: '#CE1126' }, { id: '2483', city: 'Oregon', name: 'Ducks', color: '#154733' }, { id: '204', city: 'Oregon State', name: 'Beavers', color: '#DC4405' }, { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' }, { id: '221', city: 'Pittsburgh', name: 'Panthers', color: '#FFB81C' }, { id: '2509', city: 'Purdue', name: 'Boilermakers', color: '#CEB888' }, { id: '242', city: 'Rice', name: 'Owls', color: '#00205B' }, { id: '2534', city: 'Sam Houston', name: 'Bearkats', color: '#F26522' }, { id: '21', city: 'San Diego State', name: 'Aztecs', color: '#A6192E' }, { id: '23', city: 'San Jose State', name: 'Spartans', color: '#0055A2' }, { id: '2567', city: 'SMU', name: 'Mustangs', color: '#354C8C' }, { id: '6', city: 'South Alabama', name: 'Jaguars', color: '#00205B' }, { id: '2579', city: 'South Carolina', name: 'Gamecocks', color: '#73000A' }, { id: '58', city: 'South Florida', name: 'Bulls', color: '#006747' }, { id: '2572', city: 'Southern Miss', name: 'Golden Eagles', color: '#FFC425' }, { id: '252', city: 'TCU', name: 'Horned Frogs', color: '#4d1979' }, { id: '218', city: 'Temple', name: 'Owls', color: '#9D2235' }, { id: '2633', city: 'Tennessee', name: 'Volunteers', color: '#FF8200' }, { id: '251', city: 'Texas', name: 'Longhorns', color: '#BF5700' }, { id: '245', city: 'Texas A&M', name: 'Aggies', color: '#500000' }, { id: '326', city: 'Texas State', name: 'Bobcats', color: '#501214' }, { id: '2641', city: 'Texas Tech', name: 'Red Raiders', color: '#CC0000' }, { id: '2649', city: 'Toledo', name: 'Rockets', color: '#15397F' }, { id: '2653', city: 'Troy', name: 'Trojans', color: '#8A2432' }, { id: '2655', city: 'Tulane', name: 'Green Wave', color: '#006747' }, { id: '202', city: 'Tulsa', name: 'Golden Hurricane', color: '#C5B783' }, { id: '5', city: 'UAB', name: 'Blazers', color: '#1E6B52' }, { id: '26',  city: 'UCLA', name: 'Bruins', color: '#2D68C4' }, { id: '41', city: 'UConn', name: 'Huskies', color: '#000E2F' }, { id: '2433', city: 'UL Monroe', name: 'Warhawks', color: '#840029' }, { id: '113', city: 'UMass', name: 'Minutemen', color: '#881c1c' }, { id: '2439', city: 'UNLV', name: 'Rebels', color: '#CF0A2C' }, { id: '30',  city: 'USC', name: 'Trojans', color: '#990000' }, { id: '254', city: 'Utah', name: 'Utes', color: '#CC0000' }, { id: '328', city: 'Utah State', name: 'Aggies', color: '#00375E' }, { id: '2638', city: 'UTEP', name: 'Miners', color: '#FF7F00' }, { id: '2636', city: 'UTSA', name: 'Roadrunners', color: '#F15A22' }, { id: '259', city: 'Virginia Tech', name: 'Hokies', color: '#630031' }, { id: '265', city: 'Washington', name: 'Huskies', color: '#4B2E83' }, { id: '264', city: 'Washington State', name: 'Cougars', color: '#981E32' }, { id: '277', city: 'West Virginia', name: 'Mountaineers', color: '#002855' }, { id: '98', city: 'Western Kentucky', name: 'Hilltoppers', color: '#C60C30' }, { id: '275', city: 'Wisconsin', name: 'Badgers', color: '#C5050C' }, { id: '2751', city: 'Wyoming', name: 'Cowboys', color: '#FFC425' } ];
 
-        // --- ICONS & HELPERS ---
         const IconBase = ({ children, className, style, size = 24, ...props }) => ( <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style} {...props}>{children}</svg> );
         const Settings = (props) => <IconBase {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
         const X = (props) => <IconBase {...props}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></IconBase>;
@@ -116,9 +148,9 @@
 
             return (
                 <div className="h-full w-full flex flex-col justify-center items-center bg-zinc-900 text-white p-10 font-sans">
-                    <h2 className="text-[14vmin] font-bold text-green-400 mb-[4vmin] tracking-widest uppercase">Year Progress</h2>
+                    <h2 className="text-[4vmin] font-bold text-zinc-400 mb-[4vmin] tracking-widest uppercase">Year Progress</h2>
                     <div className="w-full h-[6vmin] bg-zinc-800 rounded-full overflow-hidden border border-zinc-700 relative">
-                        <div className="h-full bg-gradient-to-r from-red-500 to-green-600 transition-all duration-1000 ease-out flex items-center justify-end px-4" style={{ width: `${progress}%` }}>
+                        <div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 ease-out flex items-center justify-end px-4" style={{ width: `${progress}%` }}>
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center text-[3vmin] font-black z-10 mix-blend-difference text-white">
                             {progress}%
@@ -131,15 +163,23 @@
             );
         };
 
-        const WelcomeCard = ({ message }) => (
-            <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 text-center">
-                <h1 className="text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-600 leading-tight">
-                    {message || "ENTER CUSTOM TEXT HERE"}
-                </h1>
-                <p className="text-[4vmin] text-gray-400 mt-4">Brought to you by www.weekendcustomcreations.com</p>
-            </div>
-        );
+        // 2. WELCOME CARD (With Animations & Caps)
+        const WelcomeCard = ({ message, animation }) => {
+            let animClass = "anim-fade"; 
+            if (animation === 'drop') animClass = "anim-drop";
+            if (animation === 'scroll') animClass = "anim-scroll";
 
+            return (
+                <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 text-center overflow-hidden">
+                    <h1 className={`text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 leading-tight uppercase ${animClass}`}>
+                        {message || "HELLO WORLD"}
+                    </h1>
+                    <p className="text-[4vmin] text-gray-400 mt-4 animate-pulse">Welcome to your dashboard</p>
+                </div>
+            );
+        };
+
+        // 3. CUSTOM IMAGE CARD
         const CustomImageCard = ({ url }) => (
             <div className="h-full w-full relative bg-black">
                 {url ? 
@@ -149,6 +189,78 @@
             </div>
         );
 
+        // 4. NFL STANDINGS CARD (New Feature)
+        const NFLStandingsCard = ({ divisionName }) => {
+            const [standings, setStandings] = useState(null);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                const fetchStandings = async () => {
+                    try {
+                        const res = await fetch('https://site.api.espn.com/apis/v2/sports/football/nfl/standings');
+                        if (!res.ok) throw new Error("Failed to fetch");
+                        const data = await res.json();
+                        
+                        let foundDivision = null;
+                        data.children?.forEach(conf => {
+                            conf.children?.forEach(div => {
+                                if (div.name === divisionName) foundDivision = div;
+                            });
+                        });
+
+                        if (foundDivision && foundDivision.children) {
+                            const teams = foundDivision.children.map(t => {
+                                const record = t.stats?.find(s => s.name === 'overallRecord')?.displayValue || '0-0';
+                                const configTeam = NFL_TEAMS.find(local => local.id === t.abbreviation);
+                                return {
+                                    id: t.id,
+                                    rank: t.standings?.entries?.[0]?.stats?.find(s => s.name === 'rank')?.value || '-',
+                                    name: t.displayName,
+                                    abbrev: t.abbreviation,
+                                    logo: t.logos?.[0]?.href,
+                                    record: record,
+                                    color: configTeam ? configTeam.color : '#333'
+                                };
+                            });
+                            setStandings(teams);
+                        }
+                    } catch (e) { console.error("Standings Error", e); }
+                    setLoading(false);
+                };
+
+                if (divisionName) fetchStandings();
+            }, [divisionName]);
+
+            if (!divisionName) return null;
+            if (loading) return <div className="h-full w-full flex items-center justify-center bg-zinc-900 text-white"><Loader className="animate-spin" /></div>;
+
+            return (
+                <div className="h-full w-full bg-zinc-900 p-6 flex flex-col font-sans relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-20" style={{ background: standings?.[0]?.color ? `linear-gradient(135deg, ${standings[0].color}, transparent)` : '#333' }} />
+                    <div className="relative z-10 flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
+                        <div className="bg-white/10 p-2 rounded-lg"><Check size={24} className="text-white" /></div>
+                        <div>
+                            <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">{divisionName}</h2>
+                            <span className="text-sm font-bold text-zinc-400 tracking-widest uppercase">Live Standings</span>
+                        </div>
+                    </div>
+                    <div className="relative z-10 flex flex-col gap-3 flex-1 justify-center">
+                        {standings ? standings.map((team, index) => (
+                            <div key={team.id} className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5 backdrop-blur-sm">
+                                <div className="flex items-center gap-4">
+                                    <span className="font-mono font-bold text-zinc-500 w-4 text-center">{index + 1}</span>
+                                    <img src={team.logo} className="w-10 h-10 object-contain drop-shadow-md" />
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-lg leading-none">{team.name}</span>
+                                    </div>
+                                </div>
+                                <div className="text-xl font-black tracking-tighter bg-white/10 px-3 py-1 rounded-md">{team.record}</div>
+                            </div>
+                        )) : <div className="text-center text-zinc-500">Standings not available</div>}
+                    </div>
+                </div>
+            );
+        };
         const SportsCardLayout = ({ team, isLive, children }) => (
             <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
                 <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
@@ -862,9 +974,15 @@
             // --- NEW: Customization States ---
             const [showWelcome, setShowWelcome] = usePersistedState('showWelcome', true);
             const [welcomeMessage, setWelcomeMessage] = usePersistedState('welcomeMsg', '');
+            const [welcomeAnimation, setWelcomeAnimation] = usePersistedState('welcomeAnim', 'fade');
+            
             const [showImage, setShowImage] = usePersistedState('showImage', false);
             const [customImageUrl, setCustomImageUrl] = usePersistedState('customImgUrl', '');
+            
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
+            
+            // --- NEW: Division State ---
+            const [selectedNflDivision, setSelectedNflDivision] = usePersistedState('myNflDivision', '');
 
             const [showControls, setShowControls] = useState(false);
             const controlsTimeoutRef = useRef(null);
@@ -950,8 +1068,6 @@
             const fetchSportData = async (sport, league, teamId) => {
                 try {
                     const idStr = String(teamId).toLowerCase(); 
-                    
-                    // 1. Fetch Global Scoreboard
                     let liveScoreboardGame = null;
                     try {
                         const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
@@ -964,7 +1080,6 @@
                         }
                     } catch(e) {}
 
-                    // 2. Fetch Team Info
                     let teamInfoData = null;
                     try {
                         const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
@@ -973,7 +1088,6 @@
 
                     if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
 
-                    // 3. Fetch Schedule
                     let events = [];
                     try {
                         const scheduleRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`);
@@ -1000,7 +1114,6 @@
                         nextGame = teamInfoData.team.nextEvent[0];
                     }
 
-                    // Helpers
                     const fetchOpponentRecord = async (oppId) => {
                         if (!oppId) return null;
                         try {
@@ -1187,7 +1300,7 @@
                 if (liveCards.length > 0) return liveCards; 
 
                 // 1. Add Custom Slides
-                if (showWelcome) cards.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} /> });
+                if (showWelcome) cards.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
                 if (showImage) cards.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
                 if (showYearProgress) cards.push({ id: 'year_progress', component: <YearProgressCard /> });
 
@@ -1210,15 +1323,23 @@
                         }
                     });
                 }
+
+                // 4. Add Division Standings (NEW)
+                if (selectedNflDivision) {
+                    cards.push({ 
+                        id: 'nfl-standings', 
+                        component: <NFLStandingsCard divisionName={selectedNflDivision} /> 
+                    });
+                }
                 
-                // 4. Add Sports Cards
+                // 5. Add Sports Cards
                 nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
                 nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
                 mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
                 ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
                 
                 return cards;
-            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, customImageUrl]);
+            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl, selectedNflDivision]);
 
             useEffect(() => {
                 if (allCards.length === 0) return;
@@ -1254,10 +1375,24 @@
                                 </div>
                                 <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
                                     
+                                    {/* --- DIVISION SELECTOR --- */}
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                        <h3 className="font-bold text-white mb-2">My Division</h3>
+                                        <select 
+                                            value={selectedNflDivision} 
+                                            onChange={(e) => setSelectedNflDivision(e.target.value)} 
+                                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white font-bold"
+                                        >
+                                            <option value="">-- No Division Selected --</option>
+                                            {["AFC East", "AFC North", "AFC South", "AFC West", "NFC East", "NFC North", "NFC South", "NFC West"].map(div => <option key={div} value={div}>{div}</option>)}
+                                        </select>
+                                    </div>
+
                                     {/* --- CUSTOM SLIDES CONFIG --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-3">Custom Slides</h3>
                                         <div className="flex flex-col gap-4">
+                                            
                                             {/* Welcome Slide */}
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
                                                 <div className="flex items-center justify-between">
@@ -1267,7 +1402,17 @@
                                                     </button>
                                                 </div>
                                                 {showWelcome && (
-                                                    <input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+                                                    <div className="flex flex-col gap-2">
+                                                        <input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs text-slate-400">Effect:</span>
+                                                            <select value={welcomeAnimation} onChange={(e) => setWelcomeAnimation(e.target.value)} className="bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-xs flex-1">
+                                                                <option value="fade">Fade In</option>
+                                                                <option value="drop">Drop In</option>
+                                                                <option value="scroll">Scrolling</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                 )}
                                             </div>
 
