@@ -190,132 +190,6 @@
             </div>
         );
 
-        // 4. NFL STANDINGS CARD (New Feature)
-        const NFLStandingsCard = ({ divisionName }) => {
-            const [standings, setStandings] = useState(null);
-            const [loading, setLoading] = useState(true);
-
-            useEffect(() => {
-                const fetchStandings = async () => {
-                    try {
-                        const res = await fetch('https://site.api.espn.com/apis/v2/sports/football/nfl/standings');
-                        if (!res.ok) throw new Error("Failed to fetch");
-                        const data = await res.json();
-                        
-                        let foundDivision = null;
-                        data.children?.forEach(conf => {
-                            conf.children?.forEach(div => {
-                                if (div.name === divisionName) foundDivision = div;
-                            });
-                        });
-
-                        if (foundDivision && foundDivision.children) {
-                            const teams = foundDivision.children.map(t => {
-                                const record = t.stats?.find(s => s.name === 'overallRecord')?.displayValue || '0-0';
-                                const configTeam = NFL_TEAMS.find(local => local.id === t.abbreviation);
-                                return {
-                                    id: t.id,
-                                    rank: t.standings?.entries?.[0]?.stats?.find(s => s.name === 'rank')?.value || '-',
-                                    name: t.displayName,
-                                    abbrev: t.abbreviation,
-                                    logo: t.logos?.[0]?.href,
-                                    record: record,
-                                    color: configTeam ? configTeam.color : '#333'
-                                };
-                            });
-                            setStandings(teams);
-                        }
-                    } catch (e) { console.error("Standings Error", e); }
-                    setLoading(false);
-                };
-
-                if (divisionName) fetchStandings();
-            }, [divisionName]);
-
-            if (!divisionName) return null;
-            if (loading) return <div className="h-full w-full flex items-center justify-center bg-zinc-900 text-white"><Loader className="animate-spin" /></div>;
-
-            return (
-                <div className="h-full w-full bg-zinc-900 p-6 flex flex-col font-sans relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-20" style={{ background: standings?.[0]?.color ? `linear-gradient(135deg, ${standings[0].color}, transparent)` : '#333' }} />
-                    <div className="relative z-10 flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
-                        <div className="bg-white/10 p-2 rounded-lg"><Check size={24} className="text-white" /></div>
-                        <div>
-                            <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">{divisionName}</h2>
-                            <span className="text-sm font-bold text-zinc-400 tracking-widest uppercase">Live Standings</span>
-                        </div>
-                    </div>
-                    <div className="relative z-10 flex flex-col gap-3 flex-1 justify-center">
-                        {standings ? standings.map((team, index) => (
-                            <div key={team.id} className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5 backdrop-blur-sm">
-                                <div className="flex items-center gap-4">
-                                    <span className="font-mono font-bold text-zinc-500 w-4 text-center">{index + 1}</span>
-                                    <img src={team.logo} className="w-10 h-10 object-contain drop-shadow-md" />
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-lg leading-none">{team.name}</span>
-                                    </div>
-                                </div>
-                                <div className="text-xl font-black tracking-tighter bg-white/10 px-3 py-1 rounded-md">{team.record}</div>
-                            </div>
-                        )) : <div className="text-center text-zinc-500">Standings not available</div>}
-                    </div>
-                </div>
-            );
-        };
-
-                        if (foundDivision && foundDivision.children) {
-                            const teams = foundDivision.children.map(t => {
-                                const record = t.stats?.find(s => s.name === 'overallRecord')?.displayValue || '0-0';
-                                const configTeam = NFL_TEAMS.find(local => local.id === t.abbreviation);
-                                return {
-                                    id: t.id,
-                                    rank: t.standings?.entries?.[0]?.stats?.find(s => s.name === 'rank')?.value || '-',
-                                    name: t.displayName,
-                                    abbrev: t.abbreviation,
-                                    logo: t.logos?.[0]?.href,
-                                    record: record,
-                                    color: configTeam ? configTeam.color : '#333'
-                                };
-                            });
-                            setStandings(teams);
-                        }
-                    } catch (e) { console.error("Standings Error", e); }
-                    setLoading(false);
-                };
-
-                if (divisionName) fetchStandings();
-            }, [divisionName]);
-
-            if (!divisionName) return null;
-            if (loading) return <div className="h-full w-full flex items-center justify-center bg-zinc-900 text-white"><Loader className="animate-spin" /></div>;
-
-            return (
-                <div className="h-full w-full bg-zinc-900 p-6 flex flex-col font-sans relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-20" style={{ background: standings?.[0]?.color ? `linear-gradient(135deg, ${standings[0].color}, transparent)` : '#333' }} />
-                    <div className="relative z-10 flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
-                        <div className="bg-white/10 p-2 rounded-lg"><Check size={24} className="text-white" /></div>
-                        <div>
-                            <h2 className="text-3xl font-black uppercase italic tracking-tighter text-white">{divisionName}</h2>
-                            <span className="text-sm font-bold text-zinc-400 tracking-widest uppercase">Live Standings</span>
-                        </div>
-                    </div>
-                    <div className="relative z-10 flex flex-col gap-3 flex-1 justify-center">
-                        {standings ? standings.map((team, index) => (
-                            <div key={team.id} className="flex items-center justify-between bg-black/40 p-3 rounded-xl border border-white/5 backdrop-blur-sm">
-                                <div className="flex items-center gap-4">
-                                    <span className="font-mono font-bold text-zinc-500 w-4 text-center">{index + 1}</span>
-                                    <img src={team.logo} className="w-10 h-10 object-contain drop-shadow-md" />
-                                    <div className="flex flex-col">
-                                        <span className="font-bold text-lg leading-none">{team.name}</span>
-                                    </div>
-                                </div>
-                                <div className="text-xl font-black tracking-tighter bg-white/10 px-3 py-1 rounded-md">{team.record}</div>
-                            </div>
-                        )) : <div className="text-center text-zinc-500">Standings not available</div>}
-                    </div>
-                </div>
-            );
-        };
         const SportsCardLayout = ({ team, isLive, children }) => (
             <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
                 <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
@@ -1036,9 +910,6 @@
             
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
             
-            // --- NEW: Division State ---
-            const [selectedNflDivision, setSelectedNflDivision] = usePersistedState('myNflDivision', '');
-
             const [showControls, setShowControls] = useState(false);
             const controlsTimeoutRef = useRef(null);
 
@@ -1378,23 +1249,15 @@
                         }
                     });
                 }
-
-                // 4. Add Division Standings (NEW)
-                if (selectedNflDivision) {
-                    cards.push({ 
-                        id: 'nfl-standings', 
-                        component: <NFLStandingsCard divisionName={selectedNflDivision} /> 
-                    });
-                }
                 
-                // 5. Add Sports Cards
+                // 4. Add Sports Cards
                 nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
                 nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
                 mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
                 ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
                 
                 return cards;
-            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl, selectedNflDivision]);
+            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl]);
 
             useEffect(() => {
                 if (allCards.length === 0) return;
@@ -1430,19 +1293,6 @@
                                 </div>
                                 <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
                                     
-                                    {/* --- DIVISION SELECTOR --- */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-2">My Division</h3>
-                                        <select 
-                                            value={selectedNflDivision} 
-                                            onChange={(e) => setSelectedNflDivision(e.target.value)} 
-                                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white font-bold"
-                                        >
-                                            <option value="">-- No Division Selected --</option>
-                                            {["AFC East", "AFC North", "AFC South", "AFC West", "NFC East", "NFC North", "NFC South", "NFC West"].map(div => <option key={div} value={div}>{div}</option>)}
-                                        </select>
-                                    </div>
-
                                     {/* --- CUSTOM SLIDES CONFIG --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-3">Custom Slides</h3>
