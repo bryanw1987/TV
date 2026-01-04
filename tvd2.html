@@ -64,6 +64,52 @@
             return [state, setState];
         };
 
+        const CLOCK_COLORS = [
+            { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' },
+            { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' },
+            { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' },
+            { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
+        ];
+
+        const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
+        const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
+        const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
+        const NCAAF_TEAMS = [ { id: '2005', city: 'Air Force', name: 'Falcons', color: '#003087' }, { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '2026', city: 'Appalachian State', name: 'Mountaineers', color: '#FFCC00' }, { id: '8',   city: 'Arkansas', name: 'Razorbacks', color: '#9D2235' }, { id: '2032', city: 'Arkansas State', name: 'Red Wolves', color: '#CC092F' }, { id: '349', city: 'Army', name: 'Black Knights', color: '#D4BF91' }, { id: '2',   city: 'Auburn', name: 'Tigers', color: '#0C2340' }, { id: '239', city: 'Baylor', name: 'Bears', color: '#154734' }, { id: '68', city: 'Boise State', name: 'Broncos', color: '#0033A0' }, { id: '2084', city: 'Buffalo', name: 'Bulls', color: '#005BBB' }, { id: '25',  city: 'California', name: 'Golden Bears', color: '#003262' }, { id: '2429', city: 'Charlotte', name: '49ers', color: '#046A38' }, { id: '228', city: 'Clemson', name: 'Tigers', color: '#F56600' }, { id: '324', city: 'Coastal Carolina', name: 'Chanticleers', color: '#006991' }, { id: '38',  city: 'Colorado', name: 'Buffaloes', color: '#CFB87C' }, { id: '36', city: 'Colorado State', name: 'Rams', color: '#1E4D2B' }, { id: '150', city: 'Duke', name: 'Blue Devils', color: '#003087' }, { id: '151', city: 'East Carolina', name: 'Pirates', color: '#592A8A' }, { id: '143', city: 'FAU', name: 'Owls', color: '#0033A0' }, { id: '2229', city: 'FIU', name: 'Panthers', color: '#B6862C' }, { id: '57',  city: 'Florida', name: 'Gators', color: '#0021A5' }, { id: '52',  city: 'Florida State', name: 'Seminoles', color: '#782F40' }, { id: '278', city: 'Fresno State', name: 'Bulldogs', color: '#DB0032' }, { id: '61',  city: 'Georgia', name: 'Bulldogs', color: '#BA0C2F' }, { id: '290', city: 'Georgia Southern', name: 'Eagles', color: '#011E41' }, { id: '2247', city: 'Georgia State', name: 'Panthers', color: '#0039A6' }, { id: '59',  city: 'Georgia Tech', name: 'Yellow Jackets', color: '#B3A369' }, { id: '62', city: 'Hawaii', name: 'Rainbow Warriors', color: '#024731' }, { id: '356', city: 'Illinois', name: 'Fighting Illini', color: '#E84A27' }, { id: '2294', city: 'Iowa', name: 'Hawkeyes', color: '#FFCD00' }, { id: '66',  city: 'Iowa State', name: 'Cyclones', color: '#C8102E' }, { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' }, { id: '55', city: 'Jacksonville State', name: 'Gamecocks', color: '#CC0000' }, { id: '2305', city: 'Kansas', name: 'Jayhawks', color: '#0051BA' }, { id: '2306', city: 'Kansas State', name: 'Wildcats', color: '#512888' }, { id: '96',  city: 'Kentucky', name: 'Wildcats', color: '#0033A0' }, { id: '2335', city: 'Liberty', name: 'Flames', color: '#002D62' }, { id: '309', city: 'Louisiana', name: 'Ragin\' Cajuns', color: '#CE181D' }, { id: '97',  city: 'Louisville', name: 'Cardinals', color: '#AD0000' }, { id: '99',  city: 'LSU', name: 'Tigers', color: '#461D7C' }, { id: '276', city: 'Marshall', name: 'Thundering Herd', color: '#00B140' }, { id: '235', city: 'Memphis', name: 'Tigers', color: '#003087' }, { id: '2390', city: 'Miami', name: 'Hurricanes', color: '#F47321' }, { id: '193', city: 'Miami (OH)', name: 'RedHawks', color: '#B61E2E' }, { id: '130', city: 'Michigan', name: 'Wolverines', color: '#00274C' }, { id: '127', city: 'Michigan State', name: 'Spartans', color: '#18453B' }, { id: '2393', city: 'Middle Tennessee', name: 'Blue Raiders', color: '#0066CC' }, { id: '135', city: 'Minnesota', name: 'Golden Gophers', color: '#7A0019' }, { id: '344', city: 'Mississippi State', name: 'Bulldogs', color: '#660000' }, { id: '142', city: 'Missouri', name: 'Tigers', color: '#F1B82D' }, { id: '2426', city: 'Navy', name: 'Midshipmen', color: '#00205B' }, { id: '158', city: 'Nebraska', name: 'Cornhuskers', color: '#E41C38' }, { id: '2440', city: 'Nevada', name: 'Wolf Pack', color: '#002E62' }, { id: '166', city: 'New Mexico', name: 'Lobos', color: '#CE0037' }, { id: '164', city: 'New Mexico State', name: 'Aggies', color: '#882345' }, { id: '153', city: 'North Carolina', name: 'Tar Heels', color: '#7BAFD4' }, { id: '152', city: 'NC State', name: 'Wolfpack', color: '#CC0000' }, { id: '249', city: 'North Texas', name: 'Mean Green', color: '#00853E' }, { id: '2459', city: 'Northern Illinois', name: 'Huskies', color: '#BA0C2F' }, { id: '87',  city: 'Notre Dame', name: 'Fighting Irish', color: '#0C2340' }, { id: '195', city: 'Ohio', name: 'Bobcats', color: '#00694E' }, { id: '194', city: 'Ohio State', name: 'Buckeyes', color: '#BB0000' }, { id: '201', city: 'Oklahoma', name: 'Sooners', color: '#841617' }, { id: '197', city: 'Oklahoma State', name: 'Cowboys', color: '#FF7300' }, { id: '295', city: 'Old Dominion', name: 'Monarchs', color: '#003057' }, { id: '145', city: 'Ole Miss', name: 'Rebels', color: '#CE1126' }, { id: '2483', city: 'Oregon', name: 'Ducks', color: '#154733' }, { id: '204', city: 'Oregon State', name: 'Beavers', color: '#DC4405' }, { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' }, { id: '221', city: 'Pittsburgh', name: 'Panthers', color: '#FFB81C' }, { id: '2509', city: 'Purdue', name: 'Boilermakers', color: '#CEB888' }, { id: '242', city: 'Rice', name: 'Owls', color: '#00205B' }, { id: '2534', city: 'Sam Houston', name: 'Bearkats', color: '#F26522' }, { id: '21', city: 'San Diego State', name: 'Aztecs', color: '#A6192E' }, { id: '23', city: 'San Jose State', name: 'Spartans', color: '#0055A2' }, { id: '2567', city: 'SMU', name: 'Mustangs', color: '#354C8C' }, { id: '6', city: 'South Alabama', name: 'Jaguars', color: '#00205B' }, { id: '2579', city: 'South Carolina', name: 'Gamecocks', color: '#73000A' }, { id: '58', city: 'South Florida', name: 'Bulls', color: '#006747' }, { id: '2572', city: 'Southern Miss', name: 'Golden Eagles', color: '#FFC425' }, { id: '252', city: 'TCU', name: 'Horned Frogs', color: '#4d1979' }, { id: '218', city: 'Temple', name: 'Owls', color: '#9D2235' }, { id: '2633', city: 'Tennessee', name: 'Volunteers', color: '#FF8200' }, { id: '251', city: 'Texas', name: 'Longhorns', color: '#BF5700' }, { id: '245', city: 'Texas A&M', name: 'Aggies', color: '#500000' }, { id: '326', city: 'Texas State', name: 'Bobcats', color: '#501214' }, { id: '2641', city: 'Texas Tech', name: 'Red Raiders', color: '#CC0000' }, { id: '2649', city: 'Toledo', name: 'Rockets', color: '#15397F' }, { id: '2653', city: 'Troy', name: 'Trojans', color: '#8A2432' }, { id: '2655', city: 'Tulane', name: 'Green Wave', color: '#006747' }, { id: '202', city: 'Tulsa', name: 'Golden Hurricane', color: '#C5B783' }, { id: '5', city: 'UAB', name: 'Blazers', color: '#1E6B52' }, { id: '26',  city: 'UCLA', name: 'Bruins', color: '#2D68C4' }, { id: '41', city: 'UConn', name: 'Huskies', color: '#000E2F' }, { id: '2433', city: 'UL Monroe', name: 'Warhawks', color: '#840029' }, { id: '113', city: 'UMass', name: 'Minutemen', color: '#881c1c' }, { id: '2439', city: 'UNLV', name: 'Rebels', color: '#CF0A2C' }, { id: '30',  city: 'USC', name: 'Trojans', color: '#990000' }, { id: '254', city: 'Utah', name: 'Utes', color: '#CC0000' }, { id: '328', city: 'Utah State', name: 'Aggies', color: '#00375E' }, { id: '2638', city: 'UTEP', name: 'Miners', color: '#FF7F00' }, { id: '2636', city: 'UTSA', name: 'Roadrunners', color: '#F15A22' }, { id: '259', city: 'Virginia Tech', name: 'Hokies', color: '#630031' }, { id: '265', city: 'Washington', name: 'Huskies', color: '#4B2E83' }, { id: '264', city: 'Washington State', name: 'Cougars', color: '#981E32' }, { id: '277', city: 'West Virginia', name: 'Mountaineers', color: '#002855' }, { id: '98', city: 'Western Kentucky', name: 'Hilltoppers', color: '#C60C30' }, { id: '275', city: 'Wisconsin', name: 'Badgers', color: '#C5050C' }, { id: '2751', city: 'Wyoming', name: 'Cowboys', color: '#FFC425' } ];
+        // ---------------------------------------------
+        // --- CUSTOM CARD / SLIDE REGISTRY ------------
+        // ---------------------------------------------
+        const CUSTOM_SLIDE_REGISTRY = [
+            {
+                id: 'custom_welcome',
+                label: 'Welcome Message',
+                defaultEnabled: true,
+                component: (
+                    <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 text-center">
+                        <h1 className="text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+                            HELLO WORLD
+                        </h1>
+                        <p className="text-[4vmin] text-gray-400 mt-4">Welcome to your dashboard</p>
+                    </div>
+                )
+            },
+            {
+                id: 'custom_image',
+                label: 'Sample Image',
+                defaultEnabled: false,
+                component: (
+                    <div className="h-full w-full relative">
+                        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2874&auto=format&fit=crop" 
+                             className="w-full h-full object-cover opacity-80" />
+                        <div className="absolute bottom-[5vmin] left-[5vmin] text-[5vmin] font-bold text-white drop-shadow-md">
+                            Nature View
+                        </div>
+                    </div>
+                )
+            }
+            // ADD MORE SLIDES HERE AS NEEDED
+        ];
+        // ---------------------------------------------
+
         const IconBase = ({ children, className, style, size = 24, ...props }) => (
             <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style} {...props}>{children}</svg>
         );
@@ -79,8 +125,7 @@
         const CloudLightning = (props) => <IconBase {...props}><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/></IconBase>;
         const Loader = (props) => <IconBase {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></IconBase>;
         const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
-        const TimerReset = (props) => <IconBase {...props}><path d="M10 2h4"/><path d="M12 14v-4"/><path d="M4 13a8 8 0 0 1 8-7 8 8 0 1 1-5.3 14L4 17.6"/><path d="M9 17H4v5"/></IconBase>;
-
+        
         const Football = (props) => (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" className={props.className} style={props.style} {...props}>
                 <g transform="rotate(45 50 50)">
@@ -111,18 +156,6 @@
 
         const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
 
-        const CLOCK_COLORS = [
-            { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' },
-            { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' },
-            { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' },
-            { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
-        ];
-
-        const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
-        const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
-        const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
-        const NCAAF_TEAMS = [ { id: '2005', city: 'Air Force', name: 'Falcons', color: '#003087' }, { id: '333', city: 'Alabama', name: 'Crimson Tide', color: '#9E1B32' }, { id: '2026', city: 'Appalachian State', name: 'Mountaineers', color: '#FFCC00' }, { id: '8',   city: 'Arkansas', name: 'Razorbacks', color: '#9D2235' }, { id: '2032', city: 'Arkansas State', name: 'Red Wolves', color: '#CC092F' }, { id: '349', city: 'Army', name: 'Black Knights', color: '#D4BF91' }, { id: '2',   city: 'Auburn', name: 'Tigers', color: '#0C2340' }, { id: '239', city: 'Baylor', name: 'Bears', color: '#154734' }, { id: '68', city: 'Boise State', name: 'Broncos', color: '#0033A0' }, { id: '2084', city: 'Buffalo', name: 'Bulls', color: '#005BBB' }, { id: '25',  city: 'California', name: 'Golden Bears', color: '#003262' }, { id: '2429', city: 'Charlotte', name: '49ers', color: '#046A38' }, { id: '228', city: 'Clemson', name: 'Tigers', color: '#F56600' }, { id: '324', city: 'Coastal Carolina', name: 'Chanticleers', color: '#006991' }, { id: '38',  city: 'Colorado', name: 'Buffaloes', color: '#CFB87C' }, { id: '36', city: 'Colorado State', name: 'Rams', color: '#1E4D2B' }, { id: '150', city: 'Duke', name: 'Blue Devils', color: '#003087' }, { id: '151', city: 'East Carolina', name: 'Pirates', color: '#592A8A' }, { id: '143', city: 'FAU', name: 'Owls', color: '#0033A0' }, { id: '2229', city: 'FIU', name: 'Panthers', color: '#B6862C' }, { id: '57',  city: 'Florida', name: 'Gators', color: '#0021A5' }, { id: '52',  city: 'Florida State', name: 'Seminoles', color: '#782F40' }, { id: '278', city: 'Fresno State', name: 'Bulldogs', color: '#DB0032' }, { id: '61',  city: 'Georgia', name: 'Bulldogs', color: '#BA0C2F' }, { id: '290', city: 'Georgia Southern', name: 'Eagles', color: '#011E41' }, { id: '2247', city: 'Georgia State', name: 'Panthers', color: '#0039A6' }, { id: '59',  city: 'Georgia Tech', name: 'Yellow Jackets', color: '#B3A369' }, { id: '62', city: 'Hawaii', name: 'Rainbow Warriors', color: '#024731' }, { id: '356', city: 'Illinois', name: 'Fighting Illini', color: '#E84A27' }, { id: '2294', city: 'Iowa', name: 'Hawkeyes', color: '#FFCD00' }, { id: '66',  city: 'Iowa State', name: 'Cyclones', color: '#C8102E' }, { id: '256', city: 'James Madison', name: 'Dukes', color: '#450084' }, { id: '55', city: 'Jacksonville State', name: 'Gamecocks', color: '#CC0000' }, { id: '2305', city: 'Kansas', name: 'Jayhawks', color: '#0051BA' }, { id: '2306', city: 'Kansas State', name: 'Wildcats', color: '#512888' }, { id: '96',  city: 'Kentucky', name: 'Wildcats', color: '#0033A0' }, { id: '2335', city: 'Liberty', name: 'Flames', color: '#002D62' }, { id: '309', city: 'Louisiana', name: 'Ragin\' Cajuns', color: '#CE181D' }, { id: '97',  city: 'Louisville', name: 'Cardinals', color: '#AD0000' }, { id: '99',  city: 'LSU', name: 'Tigers', color: '#461D7C' }, { id: '276', city: 'Marshall', name: 'Thundering Herd', color: '#00B140' }, { id: '235', city: 'Memphis', name: 'Tigers', color: '#003087' }, { id: '2390', city: 'Miami', name: 'Hurricanes', color: '#F47321' }, { id: '193', city: 'Miami (OH)', name: 'RedHawks', color: '#B61E2E' }, { id: '130', city: 'Michigan', name: 'Wolverines', color: '#00274C' }, { id: '127', city: 'Michigan State', name: 'Spartans', color: '#18453B' }, { id: '2393', city: 'Middle Tennessee', name: 'Blue Raiders', color: '#0066CC' }, { id: '135', city: 'Minnesota', name: 'Golden Gophers', color: '#7A0019' }, { id: '344', city: 'Mississippi State', name: 'Bulldogs', color: '#660000' }, { id: '142', city: 'Missouri', name: 'Tigers', color: '#F1B82D' }, { id: '2426', city: 'Navy', name: 'Midshipmen', color: '#00205B' }, { id: '158', city: 'Nebraska', name: 'Cornhuskers', color: '#E41C38' }, { id: '2440', city: 'Nevada', name: 'Wolf Pack', color: '#002E62' }, { id: '166', city: 'New Mexico', name: 'Lobos', color: '#CE0037' }, { id: '164', city: 'New Mexico State', name: 'Aggies', color: '#882345' }, { id: '153', city: 'North Carolina', name: 'Tar Heels', color: '#7BAFD4' }, { id: '152', city: 'NC State', name: 'Wolfpack', color: '#CC0000' }, { id: '249', city: 'North Texas', name: 'Mean Green', color: '#00853E' }, { id: '2459', city: 'Northern Illinois', name: 'Huskies', color: '#BA0C2F' }, { id: '87',  city: 'Notre Dame', name: 'Fighting Irish', color: '#0C2340' }, { id: '195', city: 'Ohio', name: 'Bobcats', color: '#00694E' }, { id: '194', city: 'Ohio State', name: 'Buckeyes', color: '#BB0000' }, { id: '201', city: 'Oklahoma', name: 'Sooners', color: '#841617' }, { id: '197', city: 'Oklahoma State', name: 'Cowboys', color: '#FF7300' }, { id: '295', city: 'Old Dominion', name: 'Monarchs', color: '#003057' }, { id: '145', city: 'Ole Miss', name: 'Rebels', color: '#CE1126' }, { id: '2483', city: 'Oregon', name: 'Ducks', color: '#154733' }, { id: '204', city: 'Oregon State', name: 'Beavers', color: '#DC4405' }, { id: '213', city: 'Penn State', name: 'Nittany Lions', color: '#041E42' }, { id: '221', city: 'Pittsburgh', name: 'Panthers', color: '#FFB81C' }, { id: '2509', city: 'Purdue', name: 'Boilermakers', color: '#CEB888' }, { id: '242', city: 'Rice', name: 'Owls', color: '#00205B' }, { id: '2534', city: 'Sam Houston', name: 'Bearkats', color: '#F26522' }, { id: '21', city: 'San Diego State', name: 'Aztecs', color: '#A6192E' }, { id: '23', city: 'San Jose State', name: 'Spartans', color: '#0055A2' }, { id: '2567', city: 'SMU', name: 'Mustangs', color: '#354C8C' }, { id: '6', city: 'South Alabama', name: 'Jaguars', color: '#00205B' }, { id: '2579', city: 'South Carolina', name: 'Gamecocks', color: '#73000A' }, { id: '58', city: 'South Florida', name: 'Bulls', color: '#006747' }, { id: '2572', city: 'Southern Miss', name: 'Golden Eagles', color: '#FFC425' }, { id: '252', city: 'TCU', name: 'Horned Frogs', color: '#4d1979' }, { id: '218', city: 'Temple', name: 'Owls', color: '#9D2235' }, { id: '2633', city: 'Tennessee', name: 'Volunteers', color: '#FF8200' }, { id: '251', city: 'Texas', name: 'Longhorns', color: '#BF5700' }, { id: '245', city: 'Texas A&M', name: 'Aggies', color: '#500000' }, { id: '326', city: 'Texas State', name: 'Bobcats', color: '#501214' }, { id: '2641', city: 'Texas Tech', name: 'Red Raiders', color: '#CC0000' }, { id: '2649', city: 'Toledo', name: 'Rockets', color: '#15397F' }, { id: '2653', city: 'Troy', name: 'Trojans', color: '#8A2432' }, { id: '2655', city: 'Tulane', name: 'Green Wave', color: '#006747' }, { id: '202', city: 'Tulsa', name: 'Golden Hurricane', color: '#C5B783' }, { id: '5', city: 'UAB', name: 'Blazers', color: '#1E6B52' }, { id: '26',  city: 'UCLA', name: 'Bruins', color: '#2D68C4' }, { id: '41', city: 'UConn', name: 'Huskies', color: '#000E2F' }, { id: '2433', city: 'UL Monroe', name: 'Warhawks', color: '#840029' }, { id: '113', city: 'UMass', name: 'Minutemen', color: '#881c1c' }, { id: '2439', city: 'UNLV', name: 'Rebels', color: '#CF0A2C' }, { id: '30',  city: 'USC', name: 'Trojans', color: '#990000' }, { id: '254', city: 'Utah', name: 'Utes', color: '#CC0000' }, { id: '328', city: 'Utah State', name: 'Aggies', color: '#00375E' }, { id: '2638', city: 'UTEP', name: 'Miners', color: '#FF7F00' }, { id: '2636', city: 'UTSA', name: 'Roadrunners', color: '#F15A22' }, { id: '259', city: 'Virginia Tech', name: 'Hokies', color: '#630031' }, { id: '265', city: 'Washington', name: 'Huskies', color: '#4B2E83' }, { id: '264', city: 'Washington State', name: 'Cougars', color: '#981E32' }, { id: '277', city: 'West Virginia', name: 'Mountaineers', color: '#002855' }, { id: '98', city: 'Western Kentucky', name: 'Hilltoppers', color: '#C60C30' }, { id: '275', city: 'Wisconsin', name: 'Badgers', color: '#C5050C' }, { id: '2751', city: 'Wyoming', name: 'Cowboys', color: '#FFC425' } ];
-
         const SportsCardLayout = ({ team, isLive, children }) => (
             <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
                 <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
@@ -141,52 +174,46 @@
             </div>
         );
 
+        // UPDATED FOOTBALL FIELD 
         const FootballField = ({ yardLine, possession, homeTeam, awayTeam }) => {
             const isHome = String(possession) === String(homeTeam.id);
             const activeTeam = isHome ? homeTeam : awayTeam;
             const activeColor = activeTeam.color || '#555';
-            
             const activeLogo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/${activeTeam.abbrev ? activeTeam.abbrev.toLowerCase() : 'scoreboard'}.png`;
             const teamAbbrev = activeTeam.abbrev || (activeTeam.name ? activeTeam.name.substring(0,3).toUpperCase() : '');
-
             let displayWidth = yardLine;
             if (!isHome) { displayWidth = 100 - yardLine; }
             const widthPct = Math.min(Math.max(displayWidth, 0), 100);
             const gridLines = [];
             for (let i = 5; i < 100; i += 5) { gridLines.push(i); }
             const [logoError, setLogoError] = useState(false);
-
             return (
                 <div className="w-[90%] h-[15vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
                     <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}>
-                        {homeTeam.logo ? ( <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80" /> ) : ( <span className="-rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span> )}
+                        {homeTeam.logo ? <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80" /> : <span className="-rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>}
                     </div>
                     <div className="w-[83.334%] h-full relative z-0">
                         {gridLines.map((num) => {
                             const isTen = num % 10 === 0;
                             return (
                                 <div key={num} className={`absolute top-0 bottom-0 border-l flex flex-col justify-between py-[0.5vmin] ${isTen ? 'border-white/40' : 'border-white/10'}`} style={{ left: `${num}%` }}>
-                                    {isTen && (
-                                        <>
-                                            <span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span>
-                                            <span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span>
-                                        </>
-                                    )}
+                                    {isTen && (<><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span></>)}
                                 </div>
                             );
                         })}
                         <div className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out z-20 flex items-center overflow-visible" style={{ left: isHome ? '0%' : 'auto', right: isHome ? 'auto' : '0%', width: `${widthPct}%`, backgroundColor: activeColor, opacity: 0.9, boxShadow: '0 0 10px rgba(0,0,0,0.5)', justifyContent: isHome ? 'flex-end' : 'flex-start' }}>
                              <div className={`w-[8vmin] h-[8vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}>
-                                {!logoError ? ( <img src={activeLogo} className="w-full h-full object-contain" onError={() => setLogoError(true)} /> ) : ( <span className="text-black font-bold text-[1.5vmin]">{teamAbbrev}</span> )}
+                                {!logoError ? <img src={activeLogo} className="w-full h-full object-contain" onError={() => setLogoError(true)} /> : <span className="text-black font-bold text-[1.5vmin]">{teamAbbrev}</span>}
                              </div>
                         </div>
                     </div>
                     <div className="w-[8.333%] h-full border-l-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: awayTeam.color }}>
-                        {awayTeam.logo ? ( <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80" /> ) : ( <span className="rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span> )}
+                        {awayTeam.logo ? <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80" /> : <span className="rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>}
                     </div>
                 </div>
             );
         };
+
         const NFLCard = ({ teamId, realData }) => {
             const teamConfig = NFL_TEAMS.find(t => t.id === teamId);
             const team = useMemo(() => {
@@ -202,18 +229,14 @@
 
             if (!team) return null;
             const isLive = team.status === 'LIVE' || team.status === 'IN';
-            
             const possessionId = String(team.live?.possession || '');
             const homeId = String(team.live?.homeTeam?.id || '');
             const awayId = String(team.live?.awayTeam?.id || '');
-            
             const isHomePossession = possessionId === homeId;
             const isAwayPossession = possessionId === awayId;
-            
             const myAbbrev = String(team.id);
             const isHomeTeamMe = String(team.live?.homeTeam?.abbrev) === myAbbrev;
             const isAwayTeamMe = String(team.live?.awayTeam?.abbrev) === myAbbrev;
-            
             const isMyPossession = (isHomeTeamMe && isHomePossession) || (isAwayTeamMe && isAwayPossession);
             const isOppPossession = (isHomeTeamMe && isAwayPossession) || (isAwayTeamMe && isHomePossession);
             
@@ -222,13 +245,8 @@
                 const yl = team.live.yardLine;
                 if (yl === 50) ballOnText = "50";
                 else {
-                    if (isHomePossession) {
-                         if (yl < 50) ballOnText = `OWN ${yl}`;
-                         else ballOnText = `OPP ${100 - yl}`;
-                    } else {
-                         if (yl > 50) ballOnText = `OWN ${100 - yl}`;
-                         else ballOnText = `OPP ${yl}`;
-                    }
+                    if (isHomePossession) { if (yl < 50) ballOnText = `OWN ${yl}`; else ballOnText = `OPP ${100 - yl}`; } 
+                    else { if (yl > 50) ballOnText = `OWN ${100 - yl}`; else ballOnText = `OPP ${yl}`; }
                 }
             }
 
@@ -256,16 +274,9 @@
                                 </div>
                                 <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
                             </div>
-                            
                             <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
-                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">
-                                    {team.live.lastPlay || "Coverage starting..."}
-                                </div>
-                                
-                                {team.live.homeTeam && team.live.awayTeam && (
-                                    <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} />
-                                )}
-
+                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay || "Coverage starting..."}</div>
+                                {team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}
                                 <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]">
                                     <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
                                         <div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Down & Dist</div>
@@ -273,9 +284,7 @@
                                     </div>
                                     <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
                                         <div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div>
-                                        <div className="text-[4vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>
-                                            {ballOnText}
-                                        </div>
+                                        <div className="text-[4vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>{ballOnText}</div>
                                     </div>
                                 </div>
                             </div>
@@ -285,10 +294,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? 
-                                        <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : 
-                                        <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
-                                    }
+                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
                                 </div>
                                 <div>
                                     <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
@@ -299,9 +305,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>
-                                        {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
-                                    </div>
+                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
                                 </div>
                                 <div className="flex items-center gap-[4vmin] mt-[2vmin]">
                                     <div className="flex flex-col items-center">
@@ -310,10 +314,7 @@
                                     </div>
                                     <div className="text-[10vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> :
-                                            <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>
-                                        }
+                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
                                         <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
@@ -340,13 +341,10 @@
 
             if (!team) return null;
             const isLive = team.status === 'LIVE' || team.status === 'IN';
-            
             const possessionId = String(team.live?.possession || '');
             const homeId = String(team.live?.homeTeam?.id || '');
             const awayId = String(team.live?.awayTeam?.id || '');
-            
             const isHomePossession = possessionId === homeId;
-            const isAwayPossession = possessionId === awayId;
             const myAbbrev = String(team.id);
             const isMyPossession = possessionId === myAbbrev;
             const isOppPossession = !isMyPossession && possessionId !== 'null' && possessionId !== '';
@@ -356,13 +354,8 @@
                 const yl = team.live.yardLine;
                 if (yl === 50) ballOnText = "50";
                 else {
-                    if (isHomePossession) {
-                         if (yl < 50) ballOnText = `OWN ${yl}`;
-                         else ballOnText = `OPP ${100 - yl}`;
-                    } else {
-                         if (yl > 50) ballOnText = `OWN ${100 - yl}`;
-                         else ballOnText = `OPP ${yl}`;
-                    }
+                    if (isHomePossession) { if (yl < 50) ballOnText = `OWN ${yl}`; else ballOnText = `OPP ${100 - yl}`; } 
+                    else { if (yl > 50) ballOnText = `OWN ${100 - yl}`; else ballOnText = `OPP ${yl}`; }
                 }
             }
 
@@ -390,14 +383,9 @@
                                 </div>
                                 <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
                             </div>
-                            
                             <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
-                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">
-                                    {team.live.lastPlay}
-                                </div>
-                                {team.live.homeTeam && team.live.awayTeam && (
-                                    <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} />
-                                )}
+                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay}</div>
+                                {team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}
                                 <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]">
                                     <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md">
                                         <div className="text-[2vmin] text-gray-400 uppercase font-bold">Down & Dist</div>
@@ -415,10 +403,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? 
-                                        <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : 
-                                        <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
-                                    }
+                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
                                 </div>
                                 <div>
                                     <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
@@ -429,9 +414,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>
-                                        {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
-                                    </div>
+                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
                                 </div>
                                 <div className="flex items-center gap-[4vmin] mt-[2vmin]">
                                     <div className="flex flex-col items-center">
@@ -440,10 +423,7 @@
                                     </div>
                                     <div className="text-[10vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> :
-                                            <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>
-                                        }
+                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
                                         <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
@@ -494,10 +474,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? 
-                                        <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : 
-                                        <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
-                                    }
+                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
                                 </div>
                                 <div>
                                     <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
@@ -508,9 +485,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>
-                                        {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
-                                    </div>
+                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
                                 </div>
                                 <div className="flex items-center gap-[4vmin] mt-[2vmin]">
                                     <div className="flex flex-col items-center">
@@ -519,10 +494,7 @@
                                     </div>
                                     <div className="text-[10vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> :
-                                            <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>
-                                        }
+                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
                                         <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
@@ -588,10 +560,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? 
-                                        <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : 
-                                        <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>
-                                    }
+                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
                                 </div>
                                 <div>
                                     <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
@@ -602,9 +571,7 @@
                             <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
                                 <div>
                                     <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>
-                                        {team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}
-                                    </div>
+                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
                                 </div>
                                 <div className="flex items-center gap-[4vmin] mt-[2vmin]">
                                     <div className="flex flex-col items-center">
@@ -613,10 +580,7 @@
                                     </div>
                                     <div className="text-[10vmin] font-bold text-gray-600">-</div>
                                     <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? 
-                                            <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> :
-                                            <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>
-                                        }
+                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
                                         <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
                                     </div>
                                 </div>
@@ -718,6 +682,7 @@
                 </div>
             );
         };
+
         const ForecastCard = ({ weatherData, days }) => {
             if (!weatherData) return null;
             const { daily, loading, error, city } = weatherData;
@@ -756,6 +721,7 @@
                         <CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" />
                         <div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
                     </div>
+                    
                     <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
                         {forecastItems.map((day, idx) => (
                             <div key={idx} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
@@ -779,63 +745,6 @@
                         ))}
                     </div>
                     <div className="absolute -bottom-10 -right-10 w-[40vmin] h-[40vmin] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
-                </div>
-            );
-        };
-
-        const YearProgressCard = () => {
-            const [progress, setProgress] = useState(0);
-            const [year, setYear] = useState(new Date().getFullYear());
-            const [daysLeft, setDaysLeft] = useState(0);
-
-            useEffect(() => {
-                const calculateProgress = () => {
-                    const now = new Date();
-                    const currentYear = now.getFullYear();
-                    const start = new Date(currentYear, 0, 1);
-                    const end = new Date(currentYear + 1, 0, 1);
-                    const total = end - start;
-                    const elapsed = now - start;
-                    const pct = (elapsed / total) * 100;
-                    
-                    // Reset check is implicit because new Date() will roll over
-                    setYear(currentYear);
-                    setProgress(pct);
-                    setDaysLeft(Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
-                };
-                
-                calculateProgress();
-                const interval = setInterval(calculateProgress, 100); // Update frequently for smooth decimals
-                return () => clearInterval(interval);
-            }, []);
-
-            return (
-                <div className="h-full w-full flex flex-col justify-center items-center p-[4vmin] bg-black text-white relative overflow-hidden font-sans">
-                     <div className="absolute inset-0 bg-gradient-to-b from-slate-900 to-black pointer-events-none" />
-                     
-                     <div className="relative z-10 w-full max-w-[90vw] flex flex-col items-center gap-[4vmin]">
-                        <div className="flex items-center gap-[2vmin] opacity-80">
-                            <TimerReset className="w-[6vmin] h-[6vmin] text-green-400" />
-                            <h2 className="text-[5vmin] font-bold uppercase tracking-[0.2em] text-gray-300">Year Progress</h2>
-                        </div>
-
-                        <div className="text-[20vmin] font-black leading-none tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600 drop-shadow-2xl">
-                            {progress.toFixed(4)}%
-                        </div>
-
-                        <div className="w-full h-[6vmin] bg-gray-800 rounded-full overflow-hidden border-4 border-gray-700 shadow-inner relative">
-                            <div 
-                                className="h-full bg-gradient-to-r from-green-500 to-emerald-400 shadow-[0_0_30px_rgba(34,197,94,0.6)] transition-all duration-300 ease-linear"
-                                style={{ width: `${progress}%` }}
-                            />
-                        </div>
-
-                        <div className="flex justify-between w-full text-[3vmin] font-mono text-gray-400 mt-[2vmin] px-[2vmin]">
-                            <span>Jan 1, {year}</span>
-                            <span className="text-white font-bold">{daysLeft} Days Remaining</span>
-                            <span>Jan 1, {year + 1}</span>
-                        </div>
-                     </div>
                 </div>
             );
         };
@@ -939,13 +848,11 @@
                 </div>
             );
         };
-
         const App = () => {
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
             const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
             const [ncaafTeamsSelected, setNcaafTeamsSelected] = usePersistedState('ncaafTeams', []);
-            const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
             
             const [nflData, setNflData] = useState({});
             const [nhlData, setNhlData] = useState({});
@@ -959,6 +866,9 @@
             const [isSettingsOpen, setIsSettingsOpen] = useState(false);
             const [isPaused, setIsPaused] = useState(false);
             const [clockColor, setClockColor] = usePersistedState('clockColor', 'text-white');
+            
+            // --- NEW: Custom Slide State ---
+            const [enabledCustomSlides, setEnabledCustomSlides] = usePersistedState('customSlides', {});
 
             const [showControls, setShowControls] = useState(false);
             const controlsTimeoutRef = useRef(null);
@@ -1044,6 +954,7 @@
                 try {
                     const idStr = String(teamId).toLowerCase(); 
                     
+                    // --- 1. Fetch Global Scoreboard (Live Source) ---
                     let liveScoreboardGame = null;
                     try {
                         const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
@@ -1056,6 +967,7 @@
                         }
                     } catch(e) { console.error("Scoreboard fetch failed", e); }
 
+                    // --- 2. Fetch Team Info ---
                     let teamInfoData = null;
                     try {
                         const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
@@ -1064,6 +976,7 @@
 
                     if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
 
+                    // --- 3. Fetch Schedule ---
                     let events = [];
                     try {
                         const scheduleRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`);
@@ -1077,6 +990,7 @@
                     if (teamInfoData.team.record?.items?.[0]?.summary) record = teamInfoData.team.record.items[0].summary;
                     else record = calculateRecord(events, teamId, league);
 
+                    // --- 4. Organize Schedule (Past/Future) ---
                     const now = new Date();
                     const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); 
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
@@ -1280,11 +1194,15 @@
 
                 if (liveCards.length > 0) return liveCards; 
 
-                // --- Year Progress (Toggleable) ---
-                if (showYearProgress) {
-                    cards.push({ id: 'year-progress', component: <YearProgressCard /> });
-                }
+                // 1. Add Custom Slides (Based on Enabled State)
+                CUSTOM_SLIDE_REGISTRY.forEach(slide => {
+                    const isEnabled = enabledCustomSlides[slide.id] !== undefined ? enabledCustomSlides[slide.id] : slide.defaultEnabled;
+                    if (isEnabled) {
+                        cards.push({ id: slide.id, component: slide.component });
+                    }
+                });
 
+                // 2. Add Clock
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
                     const firstZip = zipConfigs[0].id;
                     const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
@@ -1293,6 +1211,7 @@
                     cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); 
                 }
                 
+                // 3. Add Weather
                 if (Array.isArray(zipConfigs)) {
                     zipConfigs.forEach(config => {
                         const data = weatherDataMap[config.id];
@@ -1303,12 +1222,13 @@
                     });
                 }
                 
+                // 4. Add Sports Cards
                 nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
                 nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
                 mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
                 ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
                 return cards;
-            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showYearProgress]);
+            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, enabledCustomSlides]);
 
             useEffect(() => {
                 if (allCards.length === 0) return;
@@ -1343,17 +1263,30 @@
                                     <button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button>
                                 </div>
                                 <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
+                                    {/* --- CUSTOM SLIDES TOGGLE SECTION --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <h3 className="font-bold text-white">Year Progress</h3>
-                                                <p className="text-sm text-slate-400">Show completion bar slide</p>
-                                            </div>
-                                            <button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-14 h-8 rounded-full relative transition-colors ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}>
-                                                <div className={`absolute top-1 left-1 bg-white w-6 h-6 rounded-full transition-transform ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} />
-                                            </button>
+                                        <h3 className="font-bold text-white mb-3">Custom Slides</h3>
+                                        <div className="flex flex-col gap-3">
+                                            {CUSTOM_SLIDE_REGISTRY.map(slide => {
+                                                const isOn = enabledCustomSlides[slide.id] !== undefined 
+                                                    ? enabledCustomSlides[slide.id] 
+                                                    : slide.defaultEnabled;
+                                                
+                                                return (
+                                                    <div key={slide.id} className="flex items-center justify-between bg-slate-900 p-3 rounded-lg border border-slate-700">
+                                                        <span className="text-slate-200">{slide.label}</span>
+                                                        <button 
+                                                            onClick={() => setEnabledCustomSlides(prev => ({...prev, [slide.id]: !isOn}))}
+                                                            className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${isOn ? 'bg-green-500' : 'bg-slate-700'}`}
+                                                        >
+                                                            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${isOn ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
+
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <label className="block text-sm text-slate-400 mb-2">Clock Color</label>
                                         <select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">
