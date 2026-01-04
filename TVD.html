@@ -26,20 +26,10 @@
         }
         #root { height: 100%; width: 100%; }
         
-        /* Utility Animations */
+        /* Animations */
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .animate-blink { animation: blink 1s step-end infinite; }
         
-        /* Scrollbar Hiding */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-
-        /* --- NEW ANIMATIONS FOR WELCOME MESSAGE --- */
-        
-        /* 1. Drop In */
         @keyframes dropIn {
             0% { transform: translateY(-50vh) scale(0.5); opacity: 0; }
             60% { transform: translateY(20px) scale(1.1); opacity: 1; }
@@ -47,7 +37,6 @@
         }
         .anim-drop { animation: dropIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
-        /* 2. Scrolling (Marquee) */
         @keyframes scrollText {
             0% { transform: translateX(100vw); }
             100% { transform: translateX(-100vw); }
@@ -59,25 +48,65 @@
             min-width: 100%;
         }
 
-        /* 3. Fade In Scale (Default) */
         @keyframes fadeInScale {
             0% { opacity: 0; transform: scale(0.9); }
             100% { opacity: 1; transform: scale(1); }
         }
         .anim-fade { animation: fadeInScale 2s ease-out forwards; }
+
+        /* Scrollbar Hiding */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef } = React;
+        const { useState, useEffect, useMemo, useRef, Component } = React;
+
+        // --- ERROR BOUNDARY ---
+        class ErrorBoundary extends Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false, error: null };
+            }
+            static getDerivedStateFromError(error) {
+                return { hasError: true, error };
+            }
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-900 text-white p-10 text-center">
+                            <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
+                            <p className="mb-4 text-red-200">The dashboard crashed. This is usually due to bad saved settings.</p>
+                            <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">
+                                {this.state.error.toString()}
+                            </div>
+                            <button 
+                                onClick={() => { localStorage.clear(); window.location.reload(); }}
+                                className="bg-white text-red-900 font-bold py-3 px-8 rounded-lg text-xl hover:bg-gray-200"
+                            >
+                                FACTORY RESET & RELOAD
+                            </button>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
 
         const usePersistedState = (key, defaultValue) => {
             const [state, setState] = useState(() => {
                 try {
                     const item = window.localStorage.getItem(key);
-                    return item ? JSON.parse(item) : defaultValue;
+                    if (item === null) return defaultValue;
+                    const parsed = JSON.parse(item);
+                    if (Array.isArray(defaultValue) && !Array.isArray(parsed)) return defaultValue;
+                    return parsed;
                 } catch (error) { return defaultValue; }
             });
             useEffect(() => {
@@ -93,7 +122,7 @@
             { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
         ];
 
-        // --- TEAM DATA ---
+        // --- TEAMS DATA ---
         const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
         const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
         const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
@@ -127,9 +156,10 @@
         };
 
         const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
-      // --- COMPONENTS ---
 
-        // 1. YEAR PROGRESS COMPONENT (FIXED TO 1 DECIMAL)
+        // --- COMPONENTS RESTORED ---
+
+        // 1. YEAR PROGRESS 
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
             useEffect(() => {
@@ -137,12 +167,11 @@
                     const now = new Date();
                     const start = new Date(now.getFullYear(), 0, 1);
                     const end = new Date(now.getFullYear() + 1, 0, 1);
-                    // Fixed to 1 decimal place here
                     const pct = ((now - start) / (end - start) * 100).toFixed(1);
                     setProgress(pct);
                 };
                 update();
-                const interval = setInterval(update, 600000); // update every 10 min
+                const interval = setInterval(update, 600000); 
                 return () => clearInterval(interval);
             }, []);
 
@@ -163,7 +192,7 @@
             );
         };
 
-        // 2. WELCOME CARD (With Animations & Caps)
+        // 2. WELCOME CARD
         const WelcomeCard = ({ message, animation }) => {
             let animClass = "anim-fade"; 
             if (animation === 'drop') animClass = "anim-drop";
@@ -179,16 +208,211 @@
             );
         };
 
-        // 3. CUSTOM IMAGE CARD (FIXED SIZING)
+        // 3. CUSTOM IMAGE CARD
         const CustomImageCard = ({ url }) => (
             <div className="h-full w-full relative bg-black flex items-center justify-center">
                 {url ? 
-                    // Changed object-cover to object-contain so the whole image fits
                     <img src={url} className="max-w-full max-h-full object-contain" alt="Custom Slide" /> : 
                     <div className="flex items-center justify-center h-full text-gray-500">No Image URL Set</div>
                 }
             </div>
         );
+
+        // 4. CLOCK CARD (RESTORED)
+        const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
+            const [time, setTime] = useState(new Date());
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    const now = new Date();
+                    if (timezoneOffset !== null && timezoneOffset !== undefined) {
+                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                        const targetTime = new Date(utc + (1000 * timezoneOffset));
+                        setTime(targetTime);
+                    } else { setTime(now); }
+                }, 1000);
+                return () => clearInterval(timer);
+            }, [timezoneOffset]);
+
+            const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
+            const [hours, minutes] = formatTime(time).split(':');
+            const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
+            const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+
+            return (
+                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
+                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full">
+                        <div className={`text-[4vw] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
+                        <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
+                            <span className="text-[35vw] font-bold tracking-tighter drop-shadow-2xl flex items-baseline leading-[0.8]">{hours}<span className="animate-blink">:</span>{minutes}</span>
+                            <span className="text-[8vw] font-light uppercase opacity-80 self-end mb-[4vw]">{getAmPm(time)}</span>
+                        </div>
+                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vw] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
+                           <div className="w-[1.5vw] h-[1.5vw] rounded-full bg-green-500 animate-pulse" />
+                           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 5. WEATHER CARD (RESTORED)
+        const WeatherCard = ({ weatherData }) => {
+            if (!weatherData) return null;
+            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
+            
+            const getConditionText = (code) => {
+                if (code === 0) return "Clear Sky";
+                if (code <= 3) return "Partly Cloudy";
+                if (code <= 45) return "Foggy";
+                if (code <= 67) return "Rainy";
+                if (code <= 77) return "Snow";
+                if (code >= 95) return "Thunderstorms";
+                return "Cloudy";
+            };
+
+            const getPrecipText = (amount, code) => {
+                if (amount === 0) return '0"';
+                if (amount < 0.01) return `<.01"`;
+                return `${amount.toFixed(2)}"`;
+            };
+
+            const getAqiColor = (val) => {
+                if (val <= 50) return 'text-green-400';
+                if (val <= 100) return 'text-yellow-400';
+                if (val <= 150) return 'text-orange-400';
+                if (val <= 200) return 'text-red-500';
+                if (val <= 300) return 'text-purple-500';
+                return 'text-rose-900';
+            };
+
+            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
+
+            const high = daily?.temperature_2m_max?.[0];
+            const low = daily?.temperature_2m_min?.[0];
+
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
+                    <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1vmin] opacity-80 z-20">
+                        <MapPin className="w-[4vmin] h-[4vmin]" />
+                        <span className="text-[4vmin] font-bold uppercase tracking-wider">{city}</span>
+                    </div>
+                    <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10">
+                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10">
+                            <div className="drop-shadow-2xl filter">
+                                {getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}
+                            </div>
+                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">
+                                {Math.round(temp)}°
+                            </h1>
+                        </div>
+                        <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[4vmin] gap-[4vmin]">
+                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">
+                                {getConditionText(condition)}
+                            </div>
+                            {high !== undefined && low !== undefined && (
+                                <div className="flex items-center gap-[8vmin]">
+                                    <div className="flex flex-col items-center landscape:items-start">
+                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span>
+                                        <span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span>
+                                    </div>
+                                    <div className="w-[1px] h-[12vmin] bg-white/30 rounded-full"></div>
+                                    <div className="flex flex-col items-center landscape:items-start">
+                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span>
+                                        <span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span>
+                                    </div>
+                                </div>
+                            )}
+                            <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[3vmin] rounded-3xl backdrop-blur-md w-full max-w-[80vmin] border border-white/10 mt-[1vmin]">
+                                <div className="text-center">
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div>
+                                    <div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div>
+                                </div>
+                                <div className="text-center border-l border-white/20">
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div>
+                                    <div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip, condition)}</div>
+                                </div>
+                                <div className="text-center border-l border-white/20">
+                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div>
+                                    <div className={`font-black text-[5vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="absolute -bottom-[10%] -right-[10%] w-[50vmin] h-[50vmin] opacity-10 text-white pointer-events-none rotate-12">
+                        <CloudFilled className="w-full h-full" />
+                    </div>
+                </div>
+            );
+        };
+
+        // 6. FORECAST CARD (RESTORED)
+        const ForecastCard = ({ weatherData, days }) => {
+            if (!weatherData) return null;
+            const { daily, loading, error, city } = weatherData;
+            if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
+            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
+
+            const limit = Math.min(days, 5);
+            const baseScale = days === 3 ? 1.6 : 1.2; 
+            
+            const forecastItems = [];
+            if (daily && daily.time) {
+                for (let i = 1; i <= limit; i++) {
+                    if (daily.time[i]) {
+                        const parts = daily.time[i].split('-');
+                        const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                        forecastItems.push({
+                            date: localDate,
+                            max: Math.round(daily.temperature_2m_max[i]),
+                            min: Math.round(daily.temperature_2m_min[i]),
+                            precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0,
+                            code: daily.weather_code[i]
+                        });
+                    }
+                }
+            }
+
+            const getPrecipLabel = (amount, code) => {
+                if (!amount || amount < 0.01) return null;
+                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
+                return `${amount.toFixed(2)}" ${type}`;
+            };
+
+            return (
+                <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
+                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none">
+                        <CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" />
+                        <div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
+                    </div>
+                    
+                    <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
+                        {forecastItems.map((day, idx) => (
+                            <div key={idx} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
+                                <div className="text-center mt-[1vmin]">
+                                    <div style={{ fontSize: `clamp(1.5rem, ${4.5 * baseScale}vmin, 5rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                                    <div style={{ fontSize: `clamp(1rem, ${2 * baseScale}vmin, 2rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                </div>
+                                <div className="flex flex-col items-center justify-center flex-1 w-full">
+                                    {getWeatherIcon(day.code, "", { width: `${15 * baseScale}vmin`, height: `${15 * baseScale}vmin` })}
+                                    {day.precip > 0.01 && (
+                                        <div style={{ fontSize: `clamp(0.8rem, ${2 * baseScale}vmin, 1.5rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[2vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">
+                                            {getPrecipLabel(day.precip, day.code)}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="text-center mb-[1vmin]">
+                                    <div style={{ fontSize: `clamp(3rem, ${10 * baseScale}vmin, 12rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div>
+                                    <div style={{ fontSize: `clamp(1.5rem, ${5 * baseScale}vmin, 5rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="absolute -bottom-10 -right-10 w-[40vmin] h-[40vmin] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
+                </div>
+            );
+        };
 
         const SportsCardLayout = ({ team, isLive, children }) => (
             <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
@@ -625,208 +849,22 @@
             );
         };
 
-        const WeatherCard = ({ weatherData }) => {
-            if (!weatherData) return null;
-            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
-            
-            const getConditionText = (code) => {
-                if (code === 0) return "Clear Sky";
-                if (code <= 3) return "Partly Cloudy";
-                if (code <= 45) return "Foggy";
-                if (code <= 67) return "Rainy";
-                if (code <= 77) return "Snow";
-                if (code >= 95) return "Thunderstorms";
-                return "Cloudy";
-            };
-
-            const getPrecipText = (amount, code) => {
-                if (amount === 0) return '0"';
-                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
-                if (amount < 0.01) return `<.01"`;
-                return `${amount.toFixed(2)}"`;
-            };
-
-            const getAqiColor = (val) => {
-                if (val <= 50) return 'text-green-400';
-                if (val <= 100) return 'text-yellow-400';
-                if (val <= 150) return 'text-orange-400';
-                if (val <= 200) return 'text-red-500';
-                if (val <= 300) return 'text-purple-500';
-                return 'text-rose-900';
-            };
-
-            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
-            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
-
-            const high = daily?.temperature_2m_max?.[0];
-            const low = daily?.temperature_2m_min?.[0];
-
-            return (
-                <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
-                    <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1vmin] opacity-80 z-20">
-                        <MapPin className="w-[4vmin] h-[4vmin]" />
-                        <span className="text-[4vmin] font-bold uppercase tracking-wider">{city}</span>
-                    </div>
-                    <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10">
-                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10">
-                            <div className="drop-shadow-2xl filter">
-                                {getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}
-                            </div>
-                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">
-                                {Math.round(temp)}°
-                            </h1>
-                        </div>
-                        <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[4vmin] gap-[4vmin]">
-                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">
-                                {getConditionText(condition)}
-                            </div>
-                            {high !== undefined && low !== undefined && (
-                                <div className="flex items-center gap-[8vmin]">
-                                    <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span>
-                                        <span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span>
-                                    </div>
-                                    <div className="w-[1px] h-[12vmin] bg-white/30 rounded-full"></div>
-                                    <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span>
-                                        <span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span>
-                                    </div>
-                                </div>
-                            )}
-                            <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[3vmin] rounded-3xl backdrop-blur-md w-full max-w-[80vmin] border border-white/10 mt-[1vmin]">
-                                <div className="text-center">
-                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div>
-                                    <div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div>
-                                </div>
-                                <div className="text-center border-l border-white/20">
-                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div>
-                                    <div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip, condition)}</div>
-                                </div>
-                                <div className="text-center border-l border-white/20">
-                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div>
-                                    <div className={`font-black text-[5vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="absolute -bottom-[10%] -right-[10%] w-[50vmin] h-[50vmin] opacity-10 text-white pointer-events-none rotate-12">
-                        <CloudFilled className="w-full h-full" />
-                    </div>
-                </div>
-            );
-        };
-
-        const ForecastCard = ({ weatherData, days }) => {
-            if (!weatherData) return null;
-            const { daily, loading, error, city } = weatherData;
-            if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
-            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
-
-            const limit = Math.min(days, 5);
-            const baseScale = days === 3 ? 1.6 : 1.2; 
-            
-            const forecastItems = [];
-            if (daily && daily.time) {
-                for (let i = 1; i <= limit; i++) {
-                    if (daily.time[i]) {
-                        const parts = daily.time[i].split('-');
-                        const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                        forecastItems.push({
-                            date: localDate,
-                            max: Math.round(daily.temperature_2m_max[i]),
-                            min: Math.round(daily.temperature_2m_min[i]),
-                            precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0,
-                            code: daily.weather_code[i]
-                        });
-                    }
-                }
-            }
-
-            const getPrecipLabel = (amount, code) => {
-                if (!amount || amount < 0.01) return null;
-                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
-                return `${amount.toFixed(2)}" ${type}`;
-            };
-
-            return (
-                <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
-                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none">
-                        <CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" />
-                        <div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
-                    </div>
-                    
-                    <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
-                        {forecastItems.map((day, idx) => (
-                            <div key={idx} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
-                                <div className="text-center mt-[1vmin]">
-                                    <div style={{ fontSize: `clamp(1.5rem, ${4.5 * baseScale}vmin, 5rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                                    <div style={{ fontSize: `clamp(1rem, ${2 * baseScale}vmin, 2rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                                </div>
-                                <div className="flex flex-col items-center justify-center flex-1 w-full">
-                                    {getWeatherIcon(day.code, "", { width: `${15 * baseScale}vmin`, height: `${15 * baseScale}vmin` })}
-                                    {day.precip > 0.01 && (
-                                        <div style={{ fontSize: `clamp(0.8rem, ${2 * baseScale}vmin, 1.5rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[2vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">
-                                            {getPrecipLabel(day.precip, day.code)}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="text-center mb-[1vmin]">
-                                    <div style={{ fontSize: `clamp(3rem, ${10 * baseScale}vmin, 12rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div>
-                                    <div style={{ fontSize: `clamp(1.5rem, ${5 * baseScale}vmin, 5rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="absolute -bottom-10 -right-10 w-[40vmin] h-[40vmin] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
-                </div>
-            );
-        };
-
-        const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
-            const [time, setTime] = useState(new Date());
-            useEffect(() => {
-                const timer = setInterval(() => {
-                    const now = new Date();
-                    if (timezoneOffset !== null && timezoneOffset !== undefined) {
-                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                        const targetTime = new Date(utc + (1000 * timezoneOffset));
-                        setTime(targetTime);
-                    } else { setTime(now); }
-                }, 1000);
-                return () => clearInterval(timer);
-            }, [timezoneOffset]);
-
-            const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
-            const [hours, minutes] = formatTime(time).split(':');
-            const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
-            const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-
-            return (
-                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
-                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full">
-                        <div className={`text-[4vw] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
-                        <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
-                            <span className="text-[35vw] font-bold tracking-tighter drop-shadow-2xl flex items-baseline leading-[0.8]">{hours}<span className="animate-blink">:</span>{minutes}</span>
-                            <span className="text-[8vw] font-light uppercase opacity-80 self-end mb-[4vw]">{getAmPm(time)}</span>
-                        </div>
-                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vw] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
-                           <div className="w-[1.5vw] h-[1.5vw] rounded-full bg-green-500 animate-pulse" />
-                           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
         const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
-            const [selectedTeam, setSelectedTeam] = useState('');
             const sortedTeams = useMemo(() => {
                 return [...teams].sort((a, b) => a.city.localeCompare(b.city));
             }, [teams]);
 
+            const handleSelect = (e) => {
+                const id = e.target.value;
+                if (id) {
+                    onAdd(id);
+                }
+            };
+
             return (
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                     <h3 className="font-bold text-white mb-2">{title}</h3>
+                    
                     <div className="flex flex-wrap gap-2 mb-3">
                         {selected.map(id => (
                             <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
@@ -835,12 +873,23 @@
                             </span>
                         ))}
                     </div>
-                    <div className="flex gap-2">
-                        <select value={selectedTeam} onChange={(e) => setSelectedTeam(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">
-                            <option value="">Select Team</option>
-                            {sortedTeams.map(t => <option key={t.id} value={t.id}>{t.city} {t.name}</option>)}
+
+                    <div className="relative">
+                        <select 
+                            value="" 
+                            onChange={handleSelect}
+                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                        >
+                            <option value="">+ Add a Team...</option>
+                            {sortedTeams.map(t => (
+                                <option key={t.id} value={t.id} disabled={selected.includes(t.id)}>
+                                    {selected.includes(t.id) ? '✓ ' : ''}{t.city} {t.name}
+                                </option>
+                            ))}
                         </select>
-                        <button onClick={() => { if(selectedTeam && !selected.includes(selectedTeam)) { onAdd(selectedTeam); setSelectedTeam(''); } }} className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <Plus size={16} />
+                        </div>
                     </div>
                 </div>
             );
@@ -900,7 +949,6 @@
             const [isPaused, setIsPaused] = useState(false);
             const [clockColor, setClockColor] = usePersistedState('clockColor', 'text-white');
             
-            // --- NEW: Customization States ---
             const [showWelcome, setShowWelcome] = usePersistedState('showWelcome', true);
             const [welcomeMessage, setWelcomeMessage] = usePersistedState('welcomeMsg', '');
             const [welcomeAnimation, setWelcomeAnimation] = usePersistedState('welcomeAnim', 'fade');
@@ -959,10 +1007,11 @@
                         }));
                     } catch (err) { console.error("Weather Error:", err); }
                 };
-                zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
+                if(Array.isArray(zipConfigs)) {
+                    zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
+                }
             }, [zipConfigs]);
 
-            // --- DATA FETCHING (Truncated for brevity, reusing existing logic) ---
             const calculateRecord = (events, teamId, league) => {
                 if (!events || !Array.isArray(events)) return "0-0";
                 let w = 0, l = 0, d = 0, otl = 0;
@@ -1190,10 +1239,10 @@
             useEffect(() => {
                 const loadAll = async () => {
                       const promises = [];
-                      nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
-                      nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
-                      mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
-                      ncaafTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'college-football', id).then(d => setNcaafData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(ncaafTeamsSelected)) ncaafTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'college-football', id).then(d => setNcaafData(prev => ({...prev, ...d})))));
                       await Promise.all(promises);
                 };
                 loadAll();
@@ -1207,6 +1256,7 @@
                 const processedGameIds = new Set(); 
                 
                 const collectLiveGames = (teamsSelected, dataMap, CardComponent) => {
+                    if (!Array.isArray(teamsSelected)) return;
                     const liveTeams = teamsSelected.filter(id => dataMap[id]?.status === 'LIVE');
                     liveTeams.forEach(id => {
                         const gameData = dataMap[id];
@@ -1225,12 +1275,12 @@
 
                 if (liveCards.length > 0) return liveCards; 
 
-                // 1. Add Custom Slides
+                // 1. Custom Slides
                 if (showWelcome) cards.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
                 if (showImage) cards.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
                 if (showYearProgress) cards.push({ id: 'year_progress', component: <YearProgressCard /> });
 
-                // 2. Add Clock
+                // 2. Clock
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
                     const firstZip = zipConfigs[0].id;
                     const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
@@ -1239,7 +1289,7 @@
                     cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); 
                 }
                 
-                // 3. Add Weather
+                // 3. Weather
                 if (Array.isArray(zipConfigs)) {
                     zipConfigs.forEach(config => {
                         const data = weatherDataMap[config.id];
@@ -1250,11 +1300,11 @@
                     });
                 }
                 
-                // 4. Add Sports Cards
-                nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
-                nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
-                mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
-                ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
+                // 4. Sports Cards
+                if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
+                if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
+                if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
+                if(Array.isArray(ncaafTeamsSelected)) ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
                 
                 return cards;
             }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl]);
@@ -1379,7 +1429,11 @@
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(
+            <ErrorBoundary>
+                <App />
+            </ErrorBoundary>
+        );
     </script>
 </body>
 </html>
