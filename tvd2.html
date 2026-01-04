@@ -848,43 +848,82 @@
                 return () => clearInterval(interval);
             }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
 
+            // --- ALL CARDS WITH LIVE PRIORITY LOGIC ---
             const allCards = useMemo(() => {
-                const cards = [];
-                // 1. Custom
-                if (showWelcome) cards.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
-                if (showImage) cards.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
-                if (showYearProgress) cards.push({ id: 'year_progress', component: <YearProgressCard /> });
+                const liveCards = [];
+                const standardCards = [];
+
+                // Helper to process sport cards
+                const processSport = (list, dataMap, Component) => {
+                    if (Array.isArray(list)) {
+                        list.forEach(id => {
+                            const data = dataMap[id];
+                            if (data) {
+                                const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> };
+                                // Always add to standard set for later use if needed
+                                standardCards.push(card);
+                                // Check for LIVE status
+                                if (data.status === 'LIVE' || data.status === 'IN') {
+                                    liveCards.push(card);
+                                }
+                            }
+                        });
+                    }
+                };
+
+                processSport(nflTeamsSelected, nflData, NFLCard);
+                processSport(nhlTeamsSelected, nhlData, NHLCard);
+                processSport(mlbTeamsSelected, mlbData, MLBCard);
+                processSport(ncaafTeamsSelected, ncaafData, NCAAFCard);
+
+                // PRIORITY RULE: If ANY game is live, return ONLY live games.
+                // This pauses the slideshow on the live game (or cycles between multiple live games).
+                if (liveCards.length > 0) {
+                    return liveCards;
+                }
+
+                // OTHERWISE: Build standard slideshow
+                const rotation = [];
+
+                // 1. Custom/Welcome
+                if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
+                if (showImage) rotation.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
+                if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
+
                 // 2. Clock
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
                     const firstZip = zipConfigs[0].id;
                     const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
-                    cards.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
-                } else { cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); }
+                    rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
+                } else {
+                    rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> });
+                }
+
                 // 3. Weather
                 if (Array.isArray(zipConfigs)) {
                     zipConfigs.forEach(config => {
                         const data = weatherDataMap[config.id];
                         if (data) {
-                            cards.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
-                            if (config.showForecast) { cards.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); }
+                            rotation.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
+                            if (config.showForecast) { rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); }
                         }
                     });
                 }
-                // 4. Live & Scheduled Sports
-                const collect = (list, dataMap, Component) => {
-                     if(Array.isArray(list)) list.forEach(id => { if(dataMap[id]) cards.push({ id: `${id}`, component: <Component teamId={id} realData={dataMap[id]} /> }); });
-                }
-                collect(nflTeamsSelected, nflData, NFLCard);
-                collect(nhlTeamsSelected, nhlData, NHLCard);
-                collect(mlbTeamsSelected, mlbData, MLBCard);
-                collect(ncaafTeamsSelected, ncaafData, NCAAFCard);
-                return cards;
+
+                // 4. Sports (which we already collected in standardCards)
+                rotation.push(...standardCards);
+
+                return rotation;
             }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl]);
 
             useEffect(() => {
                 if (allCards.length === 0) return;
+                // Safety check if index is out of bounds after list update
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
+                
+                // If only 1 card (e.g., 1 live game), no need to rotate.
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
+                
                 const interval = setInterval(() => { setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); }, 6000); 
                 return () => clearInterval(interval);
             }, [allCards.length, isPaused, isSettingsOpen, currentSlideIndex]);
