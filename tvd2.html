@@ -106,6 +106,28 @@
 
         // --- COMPONENTS ---
 
+        const SelectionModal = ({ title, options, selectedValue, onSelect, onClose }) => (
+            <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4">
+                <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md overflow-hidden flex flex-col shadow-2xl">
+                    <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900">
+                        <h3 className="text-xl font-bold text-white">{title}</h3>
+                        <button onClick={onClose} className="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded font-bold">X</button>
+                    </div>
+                    <div className="flex flex-col p-2 gap-2 overflow-y-auto max-h-[60vh]">
+                        {options.map(opt => (
+                            <button 
+                                key={opt.value} 
+                                onClick={() => { onSelect(opt.value); onClose(); }} 
+                                className={`p-4 rounded-xl font-bold text-lg text-left transition-colors ${selectedValue === opt.value ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
+                            >
+                                {opt.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
             useEffect(() => {
@@ -586,6 +608,7 @@
             const [showWelcome, setShowWelcome] = usePersistedState('showWelcome', true);
             const [welcomeMessage, setWelcomeMessage] = usePersistedState('welcomeMsg', '');
             const [welcomeAnimation, setWelcomeAnimation] = usePersistedState('welcomeAnim', 'fade');
+            const [showAnimModal, setShowAnimModal] = useState(false);
             
             const [showImage, setShowImage] = usePersistedState('showImage', false);
             const [customImageUrl, setCustomImageUrl] = usePersistedState('customImgUrl', '');
@@ -707,7 +730,8 @@
                     else record = calculateRecord(events, teamId, league);
 
                     const now = new Date();
-                    const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); 
+                    // UPDATED: Changed buffer from 4 hours to 30 minutes to show past games faster
+                    const cutoff = new Date(now.getTime() - (30 * 60 * 1000)); 
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
                     const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
                     const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
@@ -963,7 +987,7 @@
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-3">Custom Slides</h3>
                                         <div className="flex flex-col gap-4">
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><select value={welcomeAnimation} onChange={(e) => setWelcomeAnimation(e.target.value)} className="bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-xs flex-1"><option value="fade">Fade In</option><option value="drop">Drop In</option><option value="scroll">Scrolling</option></select></div></div>)}</div>
+                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Custom Image</span><button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showImage && (<input type="text" value={customImageUrl} onChange={(e) => setCustomImageUrl(e.target.value)} placeholder="Paste Image URL here..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />)}</div>
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between"><span className="text-slate-200">Year Progress Bar</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
                                         </div>
@@ -980,6 +1004,15 @@
                                 <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end"><button onClick={closeSettings} className="w-fit bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 transition-colors shadow-lg"><Check size={20} /> Done</button></div>
                             </div>
                         </div>
+                    )}
+                    {showAnimModal && (
+                        <SelectionModal 
+                            title="Select Animation" 
+                            options={[{ label: 'Fade In', value: 'fade' }, { label: 'Drop In', value: 'drop' }, { label: 'Scrolling', value: 'scroll' }]}
+                            selectedValue={welcomeAnimation}
+                            onSelect={setWelcomeAnimation}
+                            onClose={() => setShowAnimModal(false)}
+                        />
                     )}
                 </div>
             );
