@@ -630,14 +630,11 @@
                 return [...teams].sort((a, b) => a.city.localeCompare(b.city));
             }, [teams]);
 
-            // Function handles adding immediately when an option is clicked
-            const handleChange = (e) => {
+            const handleSelect = (e) => {
                 const id = e.target.value;
-                if (id && !selected.includes(id)) {
+                if (id) {
                     onAdd(id);
                 }
-                // Reset the dropdown to the default "Select" state immediately
-                e.target.value = "";
             };
 
             return (
@@ -654,11 +651,11 @@
                         ))}
                     </div>
 
-                    {/* The Modified Dropdown */}
+                    {/* The Modified Dropdown (Controlled Component) */}
                     <div className="relative">
                         <select 
-                            onChange={handleChange} 
-                            defaultValue=""
+                            value="" 
+                            onChange={handleSelect}
                             className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
                         >
                             <option value="" disabled>+ Add a Team...</option>
@@ -668,7 +665,7 @@
                                 </option>
                             ))}
                         </select>
-                        {/* Visual indicator arrow (pointer-events-none ensures clicks pass through to select) */}
+                        {/* Visual indicator arrow */}
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                             <Plus size={16} />
                         </div>
