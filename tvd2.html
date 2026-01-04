@@ -26,20 +26,10 @@
         }
         #root { height: 100%; width: 100%; }
         
-        /* Utility Animations */
+        /* Animations */
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .animate-blink { animation: blink 1s step-end infinite; }
         
-        /* Scrollbar Hiding */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-
-        /* --- NEW ANIMATIONS FOR WELCOME MESSAGE --- */
-        
-        /* 1. Drop In */
         @keyframes dropIn {
             0% { transform: translateY(-50vh) scale(0.5); opacity: 0; }
             60% { transform: translateY(20px) scale(1.1); opacity: 1; }
@@ -47,7 +37,6 @@
         }
         .anim-drop { animation: dropIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
-        /* 2. Scrolling (Marquee) */
         @keyframes scrollText {
             0% { transform: translateX(100vw); }
             100% { transform: translateX(-100vw); }
@@ -59,26 +48,71 @@
             min-width: 100%;
         }
 
-        /* 3. Fade In Scale (Default) */
         @keyframes fadeInScale {
             0% { opacity: 0; transform: scale(0.9); }
             100% { opacity: 1; transform: scale(1); }
         }
         .anim-fade { animation: fadeInScale 2s ease-out forwards; }
+
+        /* Scrollbar Hiding */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo, useRef } = React;
+        const { useState, useEffect, useMemo, useRef, Component } = React;
 
+        // --- ERROR BOUNDARY (Fixes Blank Screen by showing error) ---
+        class ErrorBoundary extends Component {
+            constructor(props) {
+                super(props);
+                this.state = { hasError: false, error: null };
+            }
+            static getDerivedStateFromError(error) {
+                return { hasError: true, error };
+            }
+            render() {
+                if (this.state.hasError) {
+                    return (
+                        <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-900 text-white p-10 text-center">
+                            <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
+                            <p className="mb-4 text-red-200">The dashboard crashed. This is usually due to bad saved settings.</p>
+                            <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">
+                                {this.state.error.toString()}
+                            </div>
+                            <button 
+                                onClick={() => { localStorage.clear(); window.location.reload(); }}
+                                className="bg-white text-red-900 font-bold py-3 px-8 rounded-lg text-xl hover:bg-gray-200"
+                            >
+                                FACTORY RESET & RELOAD
+                            </button>
+                        </div>
+                    );
+                }
+                return this.props.children;
+            }
+        }
+
+        // --- SAFE STATE HOOK ---
         const usePersistedState = (key, defaultValue) => {
             const [state, setState] = useState(() => {
                 try {
                     const item = window.localStorage.getItem(key);
-                    return item ? JSON.parse(item) : defaultValue;
-                } catch (error) { return defaultValue; }
+                    if (item === null) return defaultValue;
+                    const parsed = JSON.parse(item);
+                    // Extra safety: If we expect an array but get something else, force default
+                    if (Array.isArray(defaultValue) && !Array.isArray(parsed)) return defaultValue;
+                    return parsed;
+                } catch (error) { 
+                    console.error("Storage Error:", error);
+                    return defaultValue; 
+                }
             });
             useEffect(() => {
                 try { window.localStorage.setItem(key, JSON.stringify(state)); } catch (e) {}
@@ -93,7 +127,7 @@
             { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
         ];
 
-        // --- TEAM DATA ---
+        // --- TEAMS DATA ---
         const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
         const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
         const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
@@ -114,22 +148,54 @@
         const CloudFilled = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={props.className} style={props.style} {...props}><path d="M18.5 19H5.5C2.46 19 0 16.54 0 13.5C0 10.46 2.46 8 5.5 8C5.67 8 5.84 8.01 6 8.03C6.73 4.62 9.77 2 13.5 2C18.2 2 22 5.8 22 10.5C22 10.6 22 10.7 21.99 10.8C23.16 11.68 24 13 24 14.5C24 16.99 21.99 19 19.5 19H18.5Z"/></svg>);
         const Football = (props) => (<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" className={props.className} style={props.style} {...props}><g transform="rotate(45 50 50)"><ellipse cx="50" cy="50" rx="30" ry="48" fill="#8B4513" /><path d="M30 18 Q 50 10 70 18 L 70 24 Q 50 16 30 24 Z" fill="white" /><path d="M30 82 Q 50 90 70 82 L 70 76 Q 50 84 30 76 Z" fill="white" /><path d="M48 35 L 48 65" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 40 L 54 40" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 45 L 54 45" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 50 L 54 50" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 55 L 54 55" stroke="white" strokeWidth="3" strokeLinecap="round" /><path d="M42 60 L 54 60" stroke="white" strokeWidth="3" strokeLinecap="round" /></g></svg>);
 
-        const getWeatherIcon = (code, sizeClass, style = {}) => {
-            if (code === undefined) return <Loader className={`animate-spin text-white ${sizeClass}`} style={style} />;
-            const color = "text-gray-200";
-            if (code === 0) return <Sun className={`${sizeClass} text-yellow-400 animate-pulse`} style={style} fill="currentColor" />;
-            if (code <= 3) return <div className="relative" style={style}><Sun className={`${sizeClass} text-yellow-400`} fill="currentColor" /><div className={`absolute bottom-[-10%] right-[-10%] ${sizeClass} scale-75 text-gray-100`}><CloudFilled className="w-full h-full" /></div></div>;
-            if (code <= 48) return <CloudFilled className={`${sizeClass} ${color}`} style={style} />;
-            if (code <= 67) return <CloudRain className={`${sizeClass} text-blue-400`} style={style} fill="currentColor" />;
-            if (code <= 77) return <CloudSnow className={`${sizeClass} text-white`} style={style} fill="currentColor" />;
-            if (code >= 95) return <CloudLightning className={`${sizeClass} text-purple-400`} style={style} fill="currentColor" />;
-            return <CloudFilled className={`${sizeClass} ${color}`} style={style} />;
+        // --- TEAM SELECTOR (TV SAFE VERSION) ---
+        const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
+            const sortedTeams = useMemo(() => {
+                return [...teams].sort((a, b) => a.city.localeCompare(b.city));
+            }, [teams]);
+
+            const handleSelect = (e) => {
+                const id = e.target.value;
+                if (id) onAdd(id);
+                // On TV browsers, we do NOT manually reset value to "" here to avoid input glitches.
+                // We rely on React rendering the 'value=""' prop below.
+            };
+
+            return (
+                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                    <h3 className="font-bold text-white mb-2">{title}</h3>
+                    
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        {selected.map(id => (
+                            <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                                {teams.find(t=>t.id===id)?.city} {teams.find(t=>t.id===id)?.name}
+                                <button onClick={() => onRemove(id)} className="hover:text-red-400"><X size={14} /></button>
+                            </span>
+                        ))}
+                    </div>
+
+                    <div className="relative">
+                        <select 
+                            value="" 
+                            onChange={handleSelect}
+                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                        >
+                            {/* NOTE: We removed 'disabled' from this option to fix Android TV bugs */}
+                            <option value="">+ Add a Team...</option>
+                            {sortedTeams.map(t => (
+                                <option key={t.id} value={t.id} disabled={selected.includes(t.id)}>
+                                    {selected.includes(t.id) ? '✓ ' : ''}{t.city} {t.name}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                            <Plus size={16} />
+                        </div>
+                    </div>
+                </div>
+            );
         };
 
-        const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
-      // --- COMPONENTS ---
-
-        // 1. YEAR PROGRESS COMPONENT (FIXED TO 1 DECIMAL)
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
             useEffect(() => {
@@ -137,12 +203,11 @@
                     const now = new Date();
                     const start = new Date(now.getFullYear(), 0, 1);
                     const end = new Date(now.getFullYear() + 1, 0, 1);
-                    // Fixed to 1 decimal place here
                     const pct = ((now - start) / (end - start) * 100).toFixed(1);
                     setProgress(pct);
                 };
                 update();
-                const interval = setInterval(update, 600000); // update every 10 min
+                const interval = setInterval(update, 600000); 
                 return () => clearInterval(interval);
             }, []);
 
@@ -163,7 +228,6 @@
             );
         };
 
-        // 2. WELCOME CARD (With Animations & Caps)
         const WelcomeCard = ({ message, animation }) => {
             let animClass = "anim-fade"; 
             if (animation === 'drop') animClass = "anim-drop";
@@ -179,11 +243,9 @@
             );
         };
 
-        // 3. CUSTOM IMAGE CARD (FIXED SIZING)
         const CustomImageCard = ({ url }) => (
             <div className="h-full w-full relative bg-black flex items-center justify-center">
                 {url ? 
-                    // Changed object-cover to object-contain so the whole image fits
                     <img src={url} className="max-w-full max-h-full object-contain" alt="Custom Slide" /> : 
                     <div className="flex items-center justify-center h-full text-gray-500">No Image URL Set</div>
                 }
@@ -625,55 +687,6 @@
             );
         };
 
-        const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
-            const sortedTeams = useMemo(() => {
-                return [...teams].sort((a, b) => a.city.localeCompare(b.city));
-            }, [teams]);
-
-            const handleSelect = (e) => {
-                const id = e.target.value;
-                if (id) {
-                    onAdd(id);
-                }
-            };
-
-            return (
-                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <h3 className="font-bold text-white mb-2">{title}</h3>
-                    
-                    {/* Selected Tags Area */}
-                    <div className="flex flex-wrap gap-2 mb-3">
-                        {selected.map(id => (
-                            <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                                {teams.find(t=>t.id===id)?.city} {teams.find(t=>t.id===id)?.name}
-                                <button onClick={() => onRemove(id)} className="hover:text-red-400"><X size={14} /></button>
-                            </span>
-                        ))}
-                    </div>
-
-                    {/* The Modified Dropdown (Controlled Component) */}
-                    <div className="relative">
-                        <select 
-                            value="" 
-                            onChange={handleSelect}
-                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
-                        >
-                            <option value="" disabled>+ Add a Team...</option>
-                            {sortedTeams.map(t => (
-                                <option key={t.id} value={t.id} disabled={selected.includes(t.id)}>
-                                    {selected.includes(t.id) ? '✓ ' : ''}{t.city} {t.name}
-                                </option>
-                            ))}
-                        </select>
-                        {/* Visual indicator arrow */}
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                            <Plus size={16} />
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
         const ZipSelector = ({ zipList, onAdd, onRemove, onUpdate }) => {
             const [inputZip, setInputZip] = useState('');
             return (
@@ -710,6 +723,7 @@
         };
 
         const App = () => {
+            // --- SAFETY: Force empty array if loaded data is null/undefined to prevent crashes ---
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
             const [mlbTeamsSelected, setMlbTeamsSelected] = usePersistedState('mlbTeams', []);
@@ -728,7 +742,6 @@
             const [isPaused, setIsPaused] = useState(false);
             const [clockColor, setClockColor] = usePersistedState('clockColor', 'text-white');
             
-            // --- NEW: Customization States ---
             const [showWelcome, setShowWelcome] = usePersistedState('showWelcome', true);
             const [welcomeMessage, setWelcomeMessage] = usePersistedState('welcomeMsg', '');
             const [welcomeAnimation, setWelcomeAnimation] = usePersistedState('welcomeAnim', 'fade');
@@ -787,7 +800,9 @@
                         }));
                     } catch (err) { console.error("Weather Error:", err); }
                 };
-                zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
+                if(Array.isArray(zipConfigs)) {
+                    zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
+                }
             }, [zipConfigs]);
 
             // --- DATA FETCHING (Truncated for brevity, reusing existing logic) ---
@@ -1018,10 +1033,11 @@
             useEffect(() => {
                 const loadAll = async () => {
                       const promises = [];
-                      nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
-                      nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
-                      mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
-                      ncaafTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'college-football', id).then(d => setNcaafData(prev => ({...prev, ...d})))));
+                      // Safety: Check if team lists are arrays before forEach
+                      if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(ncaafTeamsSelected)) ncaafTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'college-football', id).then(d => setNcaafData(prev => ({...prev, ...d})))));
                       await Promise.all(promises);
                 };
                 loadAll();
@@ -1035,6 +1051,7 @@
                 const processedGameIds = new Set(); 
                 
                 const collectLiveGames = (teamsSelected, dataMap, CardComponent) => {
+                    if (!Array.isArray(teamsSelected)) return;
                     const liveTeams = teamsSelected.filter(id => dataMap[id]?.status === 'LIVE');
                     liveTeams.forEach(id => {
                         const gameData = dataMap[id];
@@ -1079,10 +1096,10 @@
                 }
                 
                 // 4. Add Sports Cards
-                nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
-                nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
-                mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
-                ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
+                if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
+                if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
+                if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
+                if(Array.isArray(ncaafTeamsSelected)) ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
                 
                 return cards;
             }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl]);
@@ -1207,7 +1224,11 @@
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(
+            <ErrorBoundary>
+                <App />
+            </ErrorBoundary>
+        );
     </script>
 </body>
 </html>
