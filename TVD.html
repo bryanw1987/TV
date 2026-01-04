@@ -116,9 +116,9 @@
 
             return (
                 <div className="h-full w-full flex flex-col justify-center items-center bg-zinc-900 text-white p-10 font-sans">
-                    <h2 className="text-[4vmin] font-bold text-green-400 mb-[4vmin] tracking-widest uppercase">Year Progress</h2>
+                    <h2 className="text-[14vmin] font-bold text-green-400 mb-[4vmin] tracking-widest uppercase">Year Progress</h2>
                     <div className="w-full h-[6vmin] bg-zinc-800 rounded-full overflow-hidden border border-zinc-700 relative">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-1000 ease-out flex items-center justify-end px-4" style={{ width: `${progress}%` }}>
+                        <div className="h-full bg-gradient-to-r from-red-500 to-green-600 transition-all duration-1000 ease-out flex items-center justify-end px-4" style={{ width: `${progress}%` }}>
                         </div>
                         <div className="absolute inset-0 flex items-center justify-center text-[3vmin] font-black z-10 mix-blend-difference text-white">
                             {progress}%
@@ -133,10 +133,10 @@
 
         const WelcomeCard = ({ message }) => (
             <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 text-center">
-                <h1 className="text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 leading-tight">
-                    {message || "HELLO WORLD"}
+                <h1 className="text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-600 leading-tight">
+                    {message || "ENTER CUSTOM TEXT HERE"}
                 </h1>
-                <p className="text-[4vmin] text-gray-400 mt-4">Welcome to your dashboard</p>
+                <p className="text-[4vmin] text-gray-400 mt-4">Brought to you by www.weekendcustomcreations.com</p>
             </div>
         );
 
@@ -1333,4 +1333,3 @@
     </script>
 </body>
 </html>
-
