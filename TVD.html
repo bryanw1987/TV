@@ -12,49 +12,16 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #000; 
-            color: white; 
-            overflow: hidden; 
-            height: 100dvh; 
-            width: 100vw;
-            margin: 0; 
-            padding: 0; 
-            touch-action: none;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: white; overflow: hidden; height: 100dvh; width: 100vw; margin: 0; padding: 0; touch-action: none; }
         #root { height: 100%; width: 100%; }
-        
-        /* Animations */
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .animate-blink { animation: blink 1s step-end infinite; }
-        
-        @keyframes dropIn {
-            0% { transform: translateY(-50vh) scale(0.5); opacity: 0; }
-            60% { transform: translateY(20px) scale(1.1); opacity: 1; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
-        }
+        @keyframes dropIn { 0% { transform: translateY(-50vh) scale(0.5); opacity: 0; } 60% { transform: translateY(20px) scale(1.1); opacity: 1; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
         .anim-drop { animation: dropIn 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-
-        @keyframes scrollText {
-            0% { transform: translateX(100vw); }
-            100% { transform: translateX(-100vw); }
-        }
-        .anim-scroll { 
-            white-space: nowrap;
-            display: inline-block;
-            animation: scrollText 10s linear infinite; 
-            min-width: 100%;
-        }
-
-        @keyframes fadeInScale {
-            0% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
-        }
+        @keyframes scrollText { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100vw); } }
+        .anim-scroll { white-space: nowrap; display: inline-block; animation: scrollText 10s linear infinite; min-width: 100%; }
+        @keyframes fadeInScale { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
         .anim-fade { animation: fadeInScale 2s ease-out forwards; }
-
-        /* Scrollbar Hiding */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
@@ -70,28 +37,16 @@
 
         // --- ERROR BOUNDARY ---
         class ErrorBoundary extends Component {
-            constructor(props) {
-                super(props);
-                this.state = { hasError: false, error: null };
-            }
-            static getDerivedStateFromError(error) {
-                return { hasError: true, error };
-            }
+            constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+            static getDerivedStateFromError(error) { return { hasError: true, error }; }
             render() {
                 if (this.state.hasError) {
                     return (
                         <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-900 text-white p-10 text-center">
                             <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
-                            <p className="mb-4 text-red-200">The dashboard crashed. This is usually due to bad saved settings.</p>
-                            <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">
-                                {this.state.error.toString()}
-                            </div>
-                            <button 
-                                onClick={() => { localStorage.clear(); window.location.reload(); }}
-                                className="bg-white text-red-900 font-bold py-3 px-8 rounded-lg text-xl hover:bg-gray-200"
-                            >
-                                FACTORY RESET & RELOAD
-                            </button>
+                            <p className="mb-4 text-red-200">The dashboard crashed. Please try the reset button.</p>
+                            <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">{this.state.error.toString()}</div>
+                            <button onClick={() => { localStorage.clear(); window.location.reload(); }} className="bg-white text-red-900 font-bold py-3 px-8 rounded-lg text-xl hover:bg-gray-200">FACTORY RESET & RELOAD</button>
                         </div>
                     );
                 }
@@ -109,20 +64,12 @@
                     return parsed;
                 } catch (error) { return defaultValue; }
             });
-            useEffect(() => {
-                try { window.localStorage.setItem(key, JSON.stringify(state)); } catch (e) {}
-            }, [key, state]);
+            useEffect(() => { try { window.localStorage.setItem(key, JSON.stringify(state)); } catch (e) {} }, [key, state]);
             return [state, setState];
         };
 
-        const CLOCK_COLORS = [
-            { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' },
-            { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' },
-            { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' },
-            { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' },
-        ];
+        const CLOCK_COLORS = [ { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' }, { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' }, { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' }, { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' } ];
 
-        // --- TEAMS DATA ---
         const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
         const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
         const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
@@ -157,9 +104,8 @@
 
         const getOrdinal = (n) => { const s = ["th", "st", "nd", "rd"]; const v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; };
 
-        // --- COMPONENTS RESTORED ---
+        // --- COMPONENTS ---
 
-        // 1. YEAR PROGRESS 
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
             useEffect(() => {
@@ -174,51 +120,36 @@
                 const interval = setInterval(update, 600000); 
                 return () => clearInterval(interval);
             }, []);
-
             return (
                 <div className="h-full w-full flex flex-col justify-center items-center bg-zinc-900 text-white p-10 font-sans">
                     <h2 className="text-[14vmin] font-bold text-green-400 mb-[4vmin] tracking-widest uppercase">Year Progress</h2>
                     <div className="w-full h-[6vmin] bg-zinc-800 rounded-full overflow-hidden border border-zinc-700 relative">
-                        <div className="h-full bg-gradient-to-r from-red-500 to-green-600 transition-all duration-1000 ease-out flex items-center justify-end px-4" style={{ width: `${progress}%` }}>
-                        </div>
-                        <div className="absolute inset-0 flex items-center justify-center text-[3vmin] font-black z-10 mix-blend-difference text-white">
-                            {progress}%
-                        </div>
+                        <div className="h-full bg-gradient-to-r from-red-500 to-green-600 transition-all duration-1000 ease-out flex items-center justify-end px-4" style={{ width: `${progress}%` }}></div>
+                        <div className="absolute inset-0 flex items-center justify-center text-[3vmin] font-black z-10 mix-blend-difference text-white">{progress}%</div>
                     </div>
-                    <div className="mt-[4vmin] text-[2vmin] text-zinc-500 font-mono">
-                        {new Date().getFullYear()} IS {progress}% COMPLETE
-                    </div>
+                    <div className="mt-[4vmin] text-[2vmin] text-zinc-500 font-mono">{new Date().getFullYear()} IS {progress}% COMPLETE</div>
                 </div>
             );
         };
 
-        // 2. WELCOME CARD
         const WelcomeCard = ({ message, animation }) => {
             let animClass = "anim-fade"; 
             if (animation === 'drop') animClass = "anim-drop";
             if (animation === 'scroll') animClass = "anim-scroll";
-
             return (
                 <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 text-center overflow-hidden">
-                    <h1 className={`text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-orange-500 leading-tight uppercase ${animClass}`}>
-                        {message || "ENTER YOUR CUSTOM TEXT HERE - CLICK SETTINGS ICON TO START"}
-                    </h1>
+                    <h1 className={`text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-orange-500 leading-tight uppercase ${animClass}`}>{message || "ENTER YOUR CUSTOM TEXT HERE"}</h1>
                     <p className="text-[4vmin] text-gray-400 mt-4 animate-pulse">BROUGHT TO YOU BY WWW.WEEKENDCUSTOMCREATIONS.COM</p>
                 </div>
             );
         };
 
-        // 3. CUSTOM IMAGE CARD
         const CustomImageCard = ({ url }) => (
             <div className="h-full w-full relative bg-black flex items-center justify-center">
-                {url ? 
-                    <img src={url} className="max-w-full max-h-full object-contain" alt="Custom Slide" /> : 
-                    <div className="flex items-center justify-center h-full text-gray-500">No Image URL Set</div>
-                }
+                {url ? <img src={url} className="max-w-full max-h-full object-contain" alt="Custom Slide" /> : <div className="flex items-center justify-center h-full text-gray-500">No Image URL Set</div>}
             </div>
         );
 
-        // 4. CLOCK CARD (RESTORED)
         const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
             const [time, setTime] = useState(new Date());
             useEffect(() => {
@@ -232,12 +163,10 @@
                 }, 1000);
                 return () => clearInterval(timer);
             }, [timezoneOffset]);
-
             const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
             const [hours, minutes] = formatTime(time).split(':');
             const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
             const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-
             return (
                 <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
                     <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
@@ -256,11 +185,9 @@
             );
         };
 
-        // 5. WEATHER CARD (RESTORED)
         const WeatherCard = ({ weatherData }) => {
             if (!weatherData) return null;
             const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
-            
             const getConditionText = (code) => {
                 if (code === 0) return "Clear Sky";
                 if (code <= 3) return "Partly Cloudy";
@@ -270,13 +197,11 @@
                 if (code >= 95) return "Thunderstorms";
                 return "Cloudy";
             };
-
             const getPrecipText = (amount, code) => {
                 if (amount === 0) return '0"';
                 if (amount < 0.01) return `<.01"`;
                 return `${amount.toFixed(2)}"`;
             };
-
             const getAqiColor = (val) => {
                 if (val <= 50) return 'text-green-400';
                 if (val <= 100) return 'text-yellow-400';
@@ -285,13 +210,10 @@
                 if (val <= 300) return 'text-purple-500';
                 return 'text-rose-900';
             };
-
             if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
             if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
-
             const high = daily?.temperature_2m_max?.[0];
             const low = daily?.temperature_2m_min?.[0];
-
             return (
                 <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
                     <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1vmin] opacity-80 z-20">
@@ -300,93 +222,55 @@
                     </div>
                     <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10">
                         <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10">
-                            <div className="drop-shadow-2xl filter">
-                                {getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}
-                            </div>
-                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">
-                                {Math.round(temp)}°
-                            </h1>
+                            <div className="drop-shadow-2xl filter">{getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}</div>
+                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">{Math.round(temp)}°</h1>
                         </div>
                         <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[4vmin] gap-[4vmin]">
-                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">
-                                {getConditionText(condition)}
-                            </div>
+                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">{getConditionText(condition)}</div>
                             {high !== undefined && low !== undefined && (
                                 <div className="flex items-center gap-[8vmin]">
-                                    <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span>
-                                        <span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span>
-                                    </div>
+                                    <div className="flex flex-col items-center landscape:items-start"><span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span><span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span></div>
                                     <div className="w-[1px] h-[12vmin] bg-white/30 rounded-full"></div>
-                                    <div className="flex flex-col items-center landscape:items-start">
-                                        <span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span>
-                                        <span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span>
-                                    </div>
+                                    <div className="flex flex-col items-center landscape:items-start"><span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span><span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span></div>
                                 </div>
                             )}
                             <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[3vmin] rounded-3xl backdrop-blur-md w-full max-w-[80vmin] border border-white/10 mt-[1vmin]">
-                                <div className="text-center">
-                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div>
-                                    <div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div>
-                                </div>
-                                <div className="text-center border-l border-white/20">
-                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div>
-                                    <div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip, condition)}</div>
-                                </div>
-                                <div className="text-center border-l border-white/20">
-                                    <div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div>
-                                    <div className={`font-black text-[5vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div>
-                                </div>
+                                <div className="text-center"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div><div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div></div>
+                                <div className="text-center border-l border-white/20"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div><div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip, condition)}</div></div>
+                                <div className="text-center border-l border-white/20"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div><div className={`font-black text-[5vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div></div>
                             </div>
                         </div>
                     </div>
-                    <div className="absolute -bottom-[10%] -right-[10%] w-[50vmin] h-[50vmin] opacity-10 text-white pointer-events-none rotate-12">
-                        <CloudFilled className="w-full h-full" />
-                    </div>
+                    <div className="absolute -bottom-[10%] -right-[10%] w-[50vmin] h-[50vmin] opacity-10 text-white pointer-events-none rotate-12"><CloudFilled className="w-full h-full" /></div>
                 </div>
             );
         };
 
-        // 6. FORECAST CARD (RESTORED)
         const ForecastCard = ({ weatherData, days }) => {
             if (!weatherData) return null;
             const { daily, loading, error, city } = weatherData;
             if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
             if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
-
             const limit = Math.min(days, 5);
             const baseScale = days === 3 ? 1.6 : 1.2; 
-            
             const forecastItems = [];
             if (daily && daily.time) {
                 for (let i = 1; i <= limit; i++) {
                     if (daily.time[i]) {
                         const parts = daily.time[i].split('-');
                         const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                        forecastItems.push({
-                            date: localDate,
-                            max: Math.round(daily.temperature_2m_max[i]),
-                            min: Math.round(daily.temperature_2m_min[i]),
-                            precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0,
-                            code: daily.weather_code[i]
-                        });
+                        forecastItems.push({ date: localDate, max: Math.round(daily.temperature_2m_max[i]), min: Math.round(daily.temperature_2m_min[i]), precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0, code: daily.weather_code[i] });
                     }
                 }
             }
-
             const getPrecipLabel = (amount, code) => {
                 if (!amount || amount < 0.01) return null;
                 const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
                 return `${amount.toFixed(2)}" ${type}`;
             };
-
             return (
                 <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
-                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none">
-                        <CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" />
-                        <div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div>
-                    </div>
-                    
+                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none"><CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" /><div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div></div>
                     <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
                         {forecastItems.map((day, idx) => (
                             <div key={idx} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
@@ -394,18 +278,8 @@
                                     <div style={{ fontSize: `clamp(1.5rem, ${4.5 * baseScale}vmin, 5rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
                                     <div style={{ fontSize: `clamp(1rem, ${2 * baseScale}vmin, 2rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
                                 </div>
-                                <div className="flex flex-col items-center justify-center flex-1 w-full">
-                                    {getWeatherIcon(day.code, "", { width: `${15 * baseScale}vmin`, height: `${15 * baseScale}vmin` })}
-                                    {day.precip > 0.01 && (
-                                        <div style={{ fontSize: `clamp(0.8rem, ${2 * baseScale}vmin, 1.5rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[2vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">
-                                            {getPrecipLabel(day.precip, day.code)}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="text-center mb-[1vmin]">
-                                    <div style={{ fontSize: `clamp(3rem, ${10 * baseScale}vmin, 12rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div>
-                                    <div style={{ fontSize: `clamp(1.5rem, ${5 * baseScale}vmin, 5rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div>
-                                </div>
+                                <div className="flex flex-col items-center justify-center flex-1 w-full">{getWeatherIcon(day.code, "", { width: `${15 * baseScale}vmin`, height: `${15 * baseScale}vmin` })}{day.precip > 0.01 && (<div style={{ fontSize: `clamp(0.8rem, ${2 * baseScale}vmin, 1.5rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[2vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">{getPrecipLabel(day.precip, day.code)}</div>)}</div>
+                                <div className="text-center mb-[1vmin]"><div style={{ fontSize: `clamp(3rem, ${10 * baseScale}vmin, 12rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div><div style={{ fontSize: `clamp(1.5rem, ${5 * baseScale}vmin, 5rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div></div>
                             </div>
                         ))}
                     </div>
@@ -416,19 +290,8 @@
 
         const SportsCardLayout = ({ team, isLive, children }) => (
             <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
-                <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90">
-                    <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md" />
-                    <div>
-                        <h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2>
-                        <div className="flex items-center gap-[1vmin]">
-                            <span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>
-                            {isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}
-                        </div>
-                    </div>
-                </div>
-                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[8vmin]">
-                    {children}
-                </div>
+                <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20 opacity-90"><img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md" /><div><h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2><div className="flex items-center gap-[1vmin]"><span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>{isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}</div></div></div>
+                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[8vmin]">{children}</div>
             </div>
         );
 
@@ -446,27 +309,12 @@
             const [logoError, setLogoError] = useState(false);
             return (
                 <div className="w-[90%] h-[15vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
-                    <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}>
-                        {homeTeam.logo ? <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80" /> : <span className="-rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>}
-                    </div>
+                    <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}>{homeTeam.logo ? <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80" /> : <span className="-rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>}</div>
                     <div className="w-[83.334%] h-full relative z-0">
-                        {gridLines.map((num) => {
-                            const isTen = num % 10 === 0;
-                            return (
-                                <div key={num} className={`absolute top-0 bottom-0 border-l flex flex-col justify-between py-[0.5vmin] ${isTen ? 'border-white/40' : 'border-white/10'}`} style={{ left: `${num}%` }}>
-                                    {isTen && (<><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span></>)}
-                                </div>
-                            );
-                        })}
-                        <div className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out z-20 flex items-center overflow-visible" style={{ left: isHome ? '0%' : 'auto', right: isHome ? 'auto' : '0%', width: `${widthPct}%`, backgroundColor: activeColor, opacity: 0.9, boxShadow: '0 0 10px rgba(0,0,0,0.5)', justifyContent: isHome ? 'flex-end' : 'flex-start' }}>
-                             <div className={`w-[8vmin] h-[8vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}>
-                                {!logoError ? <img src={activeLogo} className="w-full h-full object-contain" onError={() => setLogoError(true)} /> : <span className="text-black font-bold text-[1.5vmin]">{teamAbbrev}</span>}
-                             </div>
-                        </div>
+                        {gridLines.map((num) => { const isTen = num % 10 === 0; return (<div key={num} className={`absolute top-0 bottom-0 border-l flex flex-col justify-between py-[0.5vmin] ${isTen ? 'border-white/40' : 'border-white/10'}`} style={{ left: `${num}%` }}>{isTen && (<><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span></>)}</div>); })}
+                        <div className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out z-20 flex items-center overflow-visible" style={{ left: isHome ? '0%' : 'auto', right: isHome ? 'auto' : '0%', width: `${widthPct}%`, backgroundColor: activeColor, opacity: 0.9, boxShadow: '0 0 10px rgba(0,0,0,0.5)', justifyContent: isHome ? 'flex-end' : 'flex-start' }}><div className={`w-[8vmin] h-[8vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}>{!logoError ? <img src={activeLogo} className="w-full h-full object-contain" onError={() => setLogoError(true)} /> : <span className="text-black font-bold text-[1.5vmin]">{teamAbbrev}</span>}</div></div>
                     </div>
-                    <div className="w-[8.333%] h-full border-l-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: awayTeam.color }}>
-                        {awayTeam.logo ? <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80" /> : <span className="rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>}
-                    </div>
+                    <div className="w-[8.333%] h-full border-l-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: awayTeam.color }}>{awayTeam.logo ? <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80" /> : <span className="rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>}</div>
                 </div>
             );
         };
@@ -490,12 +338,8 @@
             const homeId = String(team.live?.homeTeam?.id || '');
             const awayId = String(team.live?.awayTeam?.id || '');
             const isHomePossession = possessionId === homeId;
-            const isAwayPossession = possessionId === awayId;
-            const myAbbrev = String(team.id);
-            const isHomeTeamMe = String(team.live?.homeTeam?.abbrev) === myAbbrev;
-            const isAwayTeamMe = String(team.live?.awayTeam?.abbrev) === myAbbrev;
-            const isMyPossession = (isHomeTeamMe && isHomePossession) || (isAwayTeamMe && isAwayPossession);
-            const isOppPossession = (isHomeTeamMe && isAwayPossession) || (isAwayTeamMe && isHomePossession);
+            const isMyPossession = (String(team.live?.homeTeam?.abbrev) === String(team.id) && isHomePossession) || (String(team.live?.awayTeam?.abbrev) === String(team.id) && possessionId === awayId);
+            const isOppPossession = (String(team.live?.homeTeam?.abbrev) === String(team.id) && possessionId === awayId) || (String(team.live?.awayTeam?.abbrev) === String(team.id) && isHomePossession);
             
             let ballOnText = "50";
             if (isLive && team.live) {
@@ -512,71 +356,14 @@
                     {isLive ? (
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            {isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
-                                            <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain" />
-                                        </div>
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
-                                    </div>
-                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[10vmin] h-[10vmin] object-contain" />
-                                            {isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
-                                        </div>
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
-                                    </div>
-                                </div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
+                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">{isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}<img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain" /></div><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[10vmin] h-[10vmin] object-contain" />{isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}</div><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div><div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
                             </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
-                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay || "Coverage starting..."}</div>
-                                {team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}
-                                <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]">
-                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
-                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Down & Dist</div>
-                                        <div className="text-[4vmin] font-black">{team.live.down > 0 ? `${team.live.down}${getOrdinal(team.live.down)} & ${team.live.distance}` : "1st & 10"}</div>
-                                    </div>
-                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5">
-                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div>
-                                        <div className="text-[4vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>{ballOnText}</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]"><div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay || "Coverage starting..."}</div>{team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}<div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]"><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5"><div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Down & Dist</div><div className="text-[4vmin] font-black">{team.live.down > 0 ? `${team.live.down}${getOrdinal(team.live.down)} & ${team.live.distance}` : "1st & 10"}</div></div><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5"><div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div><div className="text-[4vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>{ballOnText}</div></div></div></div>
                         </>
                     ) : (
                         <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
-                                </div>
-                                <div>
-                                    <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
-                                    <div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
-                                    <div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
-                                </div>
-                                <div className="flex items-center gap-[4vmin] mt-[2vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" />
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
-                                    </div>
-                                    <div className="text-[10vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
-                                    </div>
-                                </div>
-                                <div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div>
-                            </div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]"><div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -584,7 +371,7 @@
         };
 
         const NCAAFCard = ({ teamId, realData }) => {
-            const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
+             const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
             const team = useMemo(() => {
                 if (!teamConfig) return null;
                 const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId}.png` };
@@ -621,71 +408,14 @@
                     {isLive ? (
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            {isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
-                                            <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain" />
-                                        </div>
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
-                                    </div>
-                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        <div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">
-                                            <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[10vmin] h-[10vmin] object-contain" />
-                                            {isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}
-                                        </div>
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
-                                    </div>
-                                </div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
+                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">{isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}<img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain" /></div><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[10vmin] h-[10vmin] object-contain" />{isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}</div><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div><div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
                             </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
-                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay}</div>
-                                {team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}
-                                <div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]">
-                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md">
-                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold">Down & Dist</div>
-                                        <div className="text-[4vmin] font-black">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div>
-                                    </div>
-                                    <div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md">
-                                        <div className="text-[2vmin] text-gray-400 uppercase font-bold">Ball On</div>
-                                        <div className="text-[4vmin] font-black" style={{ color: '#fff' }}>{ballOnText}</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]"><div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay}</div>{team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}<div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]"><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md"><div className="text-[2vmin] text-gray-400 uppercase font-bold">Down & Dist</div><div className="text-[4vmin] font-black">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div></div><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md"><div className="text-[2vmin] text-gray-400 uppercase font-bold">Ball On</div><div className="text-[4vmin] font-black" style={{ color: '#fff' }}>{ballOnText}</div></div></div></div>
                         </>
                     ) : (
                          <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
-                                </div>
-                                <div>
-                                    <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
-                                    <div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
-                                    <div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
-                                </div>
-                                <div className="flex items-center gap-[4vmin] mt-[2vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" />
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
-                                    </div>
-                                    <div className="text-[10vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
-                                    </div>
-                                </div>
-                                <div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div>
-                            </div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]"><div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -710,53 +440,21 @@
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full">
                                 <div className="flex items-center gap-[3vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
-                                    </div>
+                                    <div className="flex flex-col items-center"><img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" /><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div>
                                     <div className="text-[6vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nhl/500/nhl.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
-                                    </div>
+                                    <div className="flex flex-col items-center"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nhl/500/nhl.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" /><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div>
                                 </div>
                                 <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.time} | P{team.live.period}</div>
                             </div>
                             <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]">
                                 <div className="text-[6vmin] font-bold text-white">vs {team.live.opponent}</div>
+                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90">{team.live.lastPlay}</div>
                             </div>
                         </>
                     ) : (
                         <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
-                                </div>
-                                <div>
-                                    <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
-                                    <div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
-                                    <div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
-                                </div>
-                                <div className="flex items-center gap-[4vmin] mt-[2vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" />
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
-                                    </div>
-                                    <div className="text-[10vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
-                                    </div>
-                                </div>
-                                <div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div>
-                            </div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]"><div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -790,59 +488,14 @@
                     {isLive ? (
                         <>
                             <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div>
-                                    </div>
-                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/mlb/500/mlb.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" />
-                                        <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div>
-                                    </div>
-                                </div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.inningState}</div>
+                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" /><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/mlb/500/mlb.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin]" /><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div><div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.inningState}</div>
                             </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]">
-                                <Diamond runners={team.live.runners} />
-                                <div className="flex gap-[2vmin] mt-[2vmin]">
-                                    <div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">B: {team.live.balls}</div>
-                                    <div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">S: {team.live.strikes}</div>
-                                    <div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full text-red-400">O: {team.live.outs}</div>
-                                </div>
-                            </div>
+                            <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]"><Diamond runners={team.live.runners} /><div className="flex gap-[2vmin] mt-[2vmin]"><div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">B: {team.live.balls}</div><div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">S: {team.live.strikes}</div><div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full text-red-400">O: {team.live.outs}</div></div></div>
                         </>
                     ) : (
                         <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>
-                                    {team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}
-                                </div>
-                                <div>
-                                    <div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div>
-                                    <div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div>
-                                    <div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]">
-                                <div>
-                                    <div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div>
-                                    <div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div>
-                                </div>
-                                <div className="flex items-center gap-[4vmin] mt-[2vmin]">
-                                    <div className="flex flex-col items-center">
-                                        <img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" />
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span>
-                                    </div>
-                                    <div className="text-[10vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center">
-                                        {team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}
-                                        <span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span>
-                                    </div>
-                                </div>
-                                <div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div>
-                            </div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]"><div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin]" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -850,21 +503,12 @@
         };
 
         const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
-            const sortedTeams = useMemo(() => {
-                return [...teams].sort((a, b) => a.city.localeCompare(b.city));
-            }, [teams]);
-
-            const handleSelect = (e) => {
-                const id = e.target.value;
-                if (id) {
-                    onAdd(id);
-                }
-            };
+            const [showModal, setShowModal] = useState(false);
+            const sortedTeams = useMemo(() => [...teams].sort((a, b) => a.city.localeCompare(b.city)), [teams]);
 
             return (
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                     <h3 className="font-bold text-white mb-2">{title}</h3>
-                    
                     <div className="flex flex-wrap gap-2 mb-3">
                         {selected.map(id => (
                             <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
@@ -873,24 +517,30 @@
                             </span>
                         ))}
                     </div>
-
-                    <div className="relative">
-                        <select 
-                            value="" 
-                            onChange={handleSelect}
-                            className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-3 text-white appearance-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
-                        >
-                            <option value="">+ Add a Team...</option>
-                            {sortedTeams.map(t => (
-                                <option key={t.id} value={t.id} disabled={selected.includes(t.id)}>
-                                    {selected.includes(t.id) ? '✓ ' : ''}{t.city} {t.name}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                            <Plus size={16} />
+                    <button onClick={() => setShowModal(true)} className="w-full bg-slate-950 hover:bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-left text-white flex justify-between items-center transition-colors">
+                        <span className="text-slate-400">+ Add a Team...</span><Plus size={20} className="text-blue-500" />
+                    </button>
+                    {showModal && (
+                        <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4">
+                            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-5xl h-[80vh] flex flex-col shadow-2xl">
+                                <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 rounded-t-2xl">
+                                    <h3 className="text-xl font-bold text-white">Select {title}</h3>
+                                    <button onClick={() => setShowModal(false)} className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-bold">Close X</button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 custom-scrollbar">
+                                    {sortedTeams.map(t => {
+                                        const isSelected = selected.includes(t.id);
+                                        return (
+                                            <button key={t.id} onClick={() => { if (!isSelected) { onAdd(t.id); setShowModal(false); } }} disabled={isSelected} className={`text-left p-3 rounded-xl border flex flex-col transition-all active:scale-95 ${isSelected ? 'bg-slate-800 border-slate-700 opacity-50 cursor-not-allowed' : 'bg-slate-800 hover:bg-blue-900 border-slate-600 hover:border-blue-500 cursor-pointer'}`}>
+                                                <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">{t.city}</span>
+                                                <span className="text-lg font-black text-white leading-tight">{t.name}</span>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             );
         };
@@ -903,29 +553,13 @@
                     <div className="flex flex-col gap-3 mb-4">
                         {zipList.map(item => (
                             <div key={item.id} className="bg-slate-900 border border-slate-700 p-3 rounded-lg flex flex-col gap-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="font-bold font-mono text-lg">{item.id}</span>
-                                    <button onClick={() => onRemove(item.id)} className="text-slate-500 hover:text-red-400"><X size={18} /></button>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm text-slate-400">Show Forecast</span>
-                                    <button onClick={() => onUpdate(item.id, { showForecast: !item.showForecast })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}>
-                                        <div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showForecast ? 'translate-x-5' : 'translate-x-0'}`} />
-                                    </button>
-                                </div>
-                                {item.showForecast && (
-                                    <div className="flex gap-2">
-                                        <button onClick={() => onUpdate(item.id, { days: 3 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 3 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>3 Day</button>
-                                        <button onClick={() => onUpdate(item.id, { days: 5 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 5 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>5 Day</button>
-                                    </div>
-                                )}
+                                <div className="flex justify-between items-center"><span className="font-bold font-mono text-lg">{item.id}</span><button onClick={() => onRemove(item.id)} className="text-slate-500 hover:text-red-400"><X size={18} /></button></div>
+                                <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Forecast</span><button onClick={() => onUpdate(item.id, { showForecast: !item.showForecast })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showForecast ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
+                                {item.showForecast && (<div className="flex gap-2"><button onClick={() => onUpdate(item.id, { days: 3 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 3 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>3 Day</button><button onClick={() => onUpdate(item.id, { days: 5 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 5 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>5 Day</button></div>)}
                             </div>
                         ))}
                     </div>
-                    <div className="flex gap-2">
-                        <input type="text" value={inputZip} onChange={(e) => setInputZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="Enter ZIP" maxLength={5} />
-                        <button onClick={() => { if(inputZip.length === 5 && !zipList.find(z => z.id === inputZip)) { onAdd(inputZip); setInputZip(''); } }} className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button>
-                    </div>
+                    <div className="flex gap-2"><input type="text" value={inputZip} onChange={(e) => setInputZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="Enter ZIP" maxLength={5} /><button onClick={() => { if(inputZip.length === 5 && !zipList.find(z => z.id === inputZip)) { onAdd(inputZip); setInputZip(''); } }} className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button></div>
                 </div>
             );
         };
@@ -957,7 +591,6 @@
             const [customImageUrl, setCustomImageUrl] = usePersistedState('customImgUrl', '');
             
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
-            
             const [showControls, setShowControls] = useState(false);
             const controlsTimeoutRef = useRef(null);
 
@@ -972,44 +605,42 @@
             useEffect(() => {
                 const fetchWeatherForZip = async (zip) => {
                     try {
-                        let lat, lon, city, state;
+                        let lat = 40.71, lon = -74.00, city = "New York", state = "NY";
                         try {
                             const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
-                            if (!zipRes.ok) throw new Error("ZIP API Failed");
-                            const zipData = await zipRes.json();
-                            lat = zipData.places[0].latitude;
-                            lon = zipData.places[0].longitude;
-                            city = zipData.places[0]["place name"];
-                            state = zipData.places[0].state;
-                        } catch (e) { lat = 40.71; lon = -74.00; city = "New York"; state = "NY"; }
+                            if (zipRes.ok) {
+                                const zipData = await zipRes.json();
+                                lat = zipData.places[0].latitude;
+                                lon = zipData.places[0].longitude;
+                                city = zipData.places[0]["place name"];
+                                state = zipData.places[0].state;
+                            }
+                        } catch (e) {}
 
                         const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
                         const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`);
 
-                        if (!weatherRes.ok) throw new Error("Weather API Failed");
-                        const wData = await weatherRes.json();
-                        const aqiData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }};
-
-                        setWeatherDataMap(prev => ({
-                            ...prev,
-                            [zip]: {
-                                temp: wData.current.temperature_2m,
-                                condition: wData.current.weather_code,
-                                wind: wData.current.wind_speed_10m,
-                                precip: wData.current.precipitation, 
-                                aqi: aqiData.current?.us_aqi || 0,
-                                city: `${city}, ${state}`,
-                                timezoneOffset: wData.utc_offset_seconds || -14400,
-                                daily: wData.daily,
-                                loading: false,
-                                error: false
-                            }
-                        }));
-                    } catch (err) { console.error("Weather Error:", err); }
+                        if (weatherRes.ok) {
+                            const wData = await weatherRes.json();
+                            const aqiData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }};
+                            setWeatherDataMap(prev => ({
+                                ...prev,
+                                [zip]: {
+                                    temp: wData.current.temperature_2m,
+                                    condition: wData.current.weather_code,
+                                    wind: wData.current.wind_speed_10m,
+                                    precip: wData.current.precipitation, 
+                                    aqi: aqiData.current?.us_aqi || 0,
+                                    city: `${city}, ${state}`,
+                                    timezoneOffset: wData.utc_offset_seconds || -14400,
+                                    daily: wData.daily,
+                                    loading: false, error: false
+                                }
+                            }));
+                        }
+                    } catch (err) {}
                 };
-                if(Array.isArray(zipConfigs)) {
-                    zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
-                }
+                if(Array.isArray(zipConfigs)) zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
             }, [zipConfigs]);
 
             const calculateRecord = (events, teamId, league) => {
@@ -1054,7 +685,6 @@
                             });
                         }
                     } catch(e) {}
-
                     let teamInfoData = null;
                     try {
                         const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
@@ -1107,8 +737,7 @@
                         return compId === target || compAbbrev === target;
                     };
 
-                    let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null;
-                    let prevGameData = null;
+                    let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null, prevGameData = null;
 
                     if (prevGame && prevGame.competitions) {
                         const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
@@ -1119,7 +748,6 @@
                             const myScore = parseInt(myComp.score?.value || 0, 10);
                             const oppScore = parseInt(prevComp.score?.value || 0, 10);
                             const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore);
-
                             prevGameData = {
                                 opponent: prevComp.team.abbreviation || 'OPP',
                                 opponentLogo: prevOppLogo,
@@ -1154,7 +782,6 @@
                     }
 
                     let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
-                    
                     mapped.schedule = {
                         prev: prevGameData || { opponent: 'None', result: '-', date: '-' },
                         next: nextGame ? {
@@ -1174,29 +801,17 @@
                         if (comp) {
                             const myTeam = comp.competitors.find(c => isMe(c));
                             const oppTeam = comp.competitors.find(c => !isMe(c));
-                            
                             const homeComp = comp.competitors.find(c => c.homeAway === 'home');
                             const awayComp = comp.competitors.find(c => c.homeAway === 'away');
-
                             let oppLogo = null;
-                            if (oppTeam.team.logos?.length > 0) {
-                                oppLogo = oppTeam.team.logos[0].href;
-                            } else {
+                            if (oppTeam.team.logos?.length > 0) { oppLogo = oppTeam.team.logos[0].href; } else {
                                 const abbrev = oppTeam.team.abbreviation ? oppTeam.team.abbreviation.toLowerCase() : '';
-                                if (league === 'nfl') {
-                                    const t = NFL_TEAMS.find(x => x.id.toLowerCase() === abbrev);
-                                    if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`;
-                                } else if (league === 'nhl') {
-                                    oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${abbrev}.png`;
-                                } else if (league === 'mlb') {
-                                    oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${abbrev}.png`;
-                                } else if (league === 'college-football') {
-                                    oppLogo = `https://a.espncdn.com/i/teamlogos/ncaa/500/${oppTeam.team.id}.png`;
-                                }
+                                if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id.toLowerCase() === abbrev); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
+                                else if (league === 'nhl') { oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${abbrev}.png`; } 
+                                else if (league === 'mlb') { oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${abbrev}.png`; } 
+                                else if (league === 'college-football') { oppLogo = `https://a.espncdn.com/i/teamlogos/ncaa/500/${oppTeam.team.id}.png`; }
                             }
-
                             const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
-                            
                             const liveBase = {
                                 id: liveGame.id || (liveGame.header ? liveGame.header.id : 'unknown'),
                                 opponent: oppTeam.team.abbreviation,
@@ -1207,28 +822,18 @@
                                 homeTeam: { id: homeComp.team.id, abbrev: homeComp.team.abbreviation, name: homeComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===homeComp.team.abbreviation)?.color : '#333') || '#333', logo: homeComp.team.logos?.[0]?.href },
                                 awayTeam: { id: awayComp.team.id, abbrev: awayComp.team.abbreviation, name: awayComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===awayComp.team.abbreviation)?.color : '#fff') || '#fff', logo: awayComp.team.logos?.[0]?.href }
                             };
-
                             if (league === 'nfl' || league === 'college-football') {
                                 const situation = comp.situation || (liveGame.situation) || {};
                                 const lastPlayText = situation.lastPlay?.text || (liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress");
-                                mapped.live = { ...liveBase, 
-                                    quarter: comp.status.period,
-                                    down: situation.down || 0,
-                                    distance: situation.distance || 0,
-                                    yardLine: situation.yardLine || 50,
-                                    possession: situation.possession || null, 
-                                    lastPlay: lastPlayText,
-                                    opponentColor: '#333' 
-                                };
-                            } else if (league === 'nhl') { mapped.live = { ...liveBase, period: comp.status.period }; } 
+                                mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: lastPlayText, opponentColor: '#333' };
+                            } else if (league === 'nhl') { 
+                                const situation = comp.situation || (liveGame.situation) || {};
+                                const lastPlayText = situation.lastPlay?.text || "Update in progress...";
+                                mapped.live = { ...liveBase, period: comp.status.period, lastPlay: lastPlayText };
+                            } 
                             else if (league === 'mlb') {
                                 const sit = liveGame.situation || {};
-                                mapped.live = { ...liveBase, 
-                                    inning: comp.status.period,
-                                    inningState: comp.status.type.detail || `Inn ${comp.status.period}`,
-                                    balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, 
-                                    runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird }
-                                };
+                                mapped.live = { ...liveBase, inning: comp.status.period, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } };
                             }
                         }
                     }
@@ -1250,69 +855,82 @@
                 return () => clearInterval(interval);
             }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
 
+            // --- ALL CARDS WITH LIVE PRIORITY LOGIC ---
             const allCards = useMemo(() => {
-                const cards = [];
-                const liveCards = []; 
-                const processedGameIds = new Set(); 
-                
-                const collectLiveGames = (teamsSelected, dataMap, CardComponent) => {
-                    if (!Array.isArray(teamsSelected)) return;
-                    const liveTeams = teamsSelected.filter(id => dataMap[id]?.status === 'LIVE');
-                    liveTeams.forEach(id => {
-                        const gameData = dataMap[id];
-                        if (gameData && gameData.live && gameData.live.id) {
-                            if (processedGameIds.has(gameData.live.id)) return;
-                            processedGameIds.add(gameData.live.id);
-                        }
-                        liveCards.push({ id: `live-${id}`, component: <CardComponent teamId={id} realData={gameData} /> });
-                    });
+                const liveCards = [];
+                const standardCards = [];
+
+                // Helper to process sport cards
+                const processSport = (list, dataMap, Component) => {
+                    if (Array.isArray(list)) {
+                        list.forEach(id => {
+                            const data = dataMap[id];
+                            if (data) {
+                                const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> };
+                                // Always add to standard set for later use if needed
+                                standardCards.push(card);
+                                // Check for LIVE status
+                                if (data.status === 'LIVE' || data.status === 'IN') {
+                                    liveCards.push(card);
+                                }
+                            }
+                        });
+                    }
                 };
 
-                collectLiveGames(nflTeamsSelected, nflData, NFLCard);
-                collectLiveGames(nhlTeamsSelected, nhlData, NHLCard);
-                collectLiveGames(mlbTeamsSelected, mlbData, MLBCard);
-                collectLiveGames(ncaafTeamsSelected, ncaafData, NCAAFCard);
+                processSport(nflTeamsSelected, nflData, NFLCard);
+                processSport(nhlTeamsSelected, nhlData, NHLCard);
+                processSport(mlbTeamsSelected, mlbData, MLBCard);
+                processSport(ncaafTeamsSelected, ncaafData, NCAAFCard);
 
-                if (liveCards.length > 0) return liveCards; 
+                // PRIORITY RULE: If ANY game is live, return ONLY live games.
+                // This pauses the slideshow on the live game (or cycles between multiple live games).
+                if (liveCards.length > 0) {
+                    return liveCards;
+                }
 
-                // 1. Custom Slides
-                if (showWelcome) cards.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
-                if (showImage) cards.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
-                if (showYearProgress) cards.push({ id: 'year_progress', component: <YearProgressCard /> });
+                // OTHERWISE: Build standard slideshow
+                const rotation = [];
+
+                // 1. Custom/Welcome
+                if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
+                if (showImage) rotation.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
+                if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
 
                 // 2. Clock
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
                     const firstZip = zipConfigs[0].id;
                     const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
-                    cards.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
-                } else { 
-                    cards.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); 
+                    rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
+                } else {
+                    rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> });
                 }
-                
+
                 // 3. Weather
                 if (Array.isArray(zipConfigs)) {
                     zipConfigs.forEach(config => {
                         const data = weatherDataMap[config.id];
                         if (data) {
-                            cards.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
-                            if (config.showForecast) { cards.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); }
+                            rotation.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
+                            if (config.showForecast) { rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); }
                         }
                     });
                 }
-                
-                // 4. Sports Cards
-                if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => { if(nflData[id]) cards.push({ id: `nfl-${id}`, component: <NFLCard teamId={id} realData={nflData[id]} /> }); });
-                if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => { if(nhlData[id]) cards.push({ id: `nhl-${id}`, component: <NHLCard teamId={id} realData={nhlData[id]} /> }); });
-                if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => { if(mlbData[id]) cards.push({ id: `mlb-${id}`, component: <MLBCard teamId={id} realData={mlbData[id]} /> }); });
-                if(Array.isArray(ncaafTeamsSelected)) ncaafTeamsSelected.forEach(id => { if(ncaafData[id]) cards.push({ id: `ncaaf-${id}`, component: <NCAAFCard teamId={id} realData={ncaafData[id]} /> }); });
-                
-                return cards;
+
+                // 4. Sports (which we already collected in standardCards)
+                rotation.push(...standardCards);
+
+                return rotation;
             }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl]);
 
             useEffect(() => {
                 if (allCards.length === 0) return;
+                // Safety check if index is out of bounds after list update
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
+                
+                // If only 1 card (e.g., 1 live game), no need to rotate.
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
+                
                 const interval = setInterval(() => { setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); }, 6000); 
                 return () => clearInterval(interval);
             }, [allCards.length, isPaused, isSettingsOpen, currentSlideIndex]);
@@ -1342,70 +960,16 @@
                                     <button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button>
                                 </div>
                                 <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
-                                    
-                                    {/* --- CUSTOM SLIDES CONFIG --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-3">Custom Slides</h3>
                                         <div className="flex flex-col gap-4">
-                                            
-                                            {/* Welcome Slide */}
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-slate-200">Welcome Message</span>
-                                                    <button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}>
-                                                        <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} />
-                                                    </button>
-                                                </div>
-                                                {showWelcome && (
-                                                    <div className="flex flex-col gap-2">
-                                                        <input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-xs text-slate-400">Effect:</span>
-                                                            <select value={welcomeAnimation} onChange={(e) => setWelcomeAnimation(e.target.value)} className="bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-xs flex-1">
-                                                                <option value="fade">Fade In</option>
-                                                                <option value="drop">Drop In</option>
-                                                                <option value="scroll">Scrolling</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Image Slide */}
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-slate-200">Custom Image</span>
-                                                    <button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}>
-                                                        <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} />
-                                                    </button>
-                                                </div>
-                                                {showImage && (
-                                                    <input type="text" value={customImageUrl} onChange={(e) => setCustomImageUrl(e.target.value)} placeholder="Paste Image URL here..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
-                                                )}
-                                            </div>
-
-                                            {/* Year Progress */}
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between">
-                                                <span className="text-slate-200">Year Progress Bar</span>
-                                                <button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}>
-                                                    <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} />
-                                                </button>
-                                            </div>
+                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><select value={welcomeAnimation} onChange={(e) => setWelcomeAnimation(e.target.value)} className="bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-xs flex-1"><option value="fade">Fade In</option><option value="drop">Drop In</option><option value="scroll">Scrolling</option></select></div></div>)}</div>
+                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Custom Image</span><button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showImage && (<input type="text" value={customImageUrl} onChange={(e) => setCustomImageUrl(e.target.value)} placeholder="Paste Image URL here..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />)}</div>
+                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between"><span className="text-slate-200">Year Progress Bar</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
                                         </div>
                                     </div>
-
-                                    {/* Clock Color */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <label className="block text-sm text-slate-400 mb-2">Clock Color</label>
-                                        <select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">
-                                            {CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                                        </select>
-                                    </div>
-
-                                    {/* Weather Zips */}
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><label className="block text-sm text-slate-400 mb-2">Clock Color</label><select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">{CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
                                     <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
-                                    
-                                    {/* Sports Teams */}
                                     <div className="mt-4 space-y-8">
                                         <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
                                         <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
@@ -1413,27 +977,15 @@
                                         <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
                                     </div>
                                 </div>
-                                <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end">
-                                    <button 
-                                        onClick={closeSettings} 
-                                        className="w-fit bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 transition-colors shadow-lg"
-                                    >
-                                        <Check size={20} /> Done
-                                    </button>
-                                </div>
+                                <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end"><button onClick={closeSettings} className="w-fit bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 transition-colors shadow-lg"><Check size={20} /> Done</button></div>
                             </div>
                         </div>
                     )}
                 </div>
             );
         };
-
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(
-            <ErrorBoundary>
-                <App />
-            </ErrorBoundary>
-        );
+        root.render(<ErrorBoundary><App /></ErrorBoundary>);
     </script>
 </body>
 </html>
