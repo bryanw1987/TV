@@ -446,7 +446,10 @@
                                 </div>
                                 <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.time} | P{team.live.period}</div>
                             </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]"><div className="text-[6vmin] font-bold text-white">vs {team.live.opponent}</div></div>
+                            <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]">
+                                <div className="text-[6vmin] font-bold text-white">vs {team.live.opponent}</div>
+                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90">{team.live.lastPlay}</div>
+                            </div>
                         </>
                     ) : (
                         <>
@@ -823,7 +826,11 @@
                                 const situation = comp.situation || (liveGame.situation) || {};
                                 const lastPlayText = situation.lastPlay?.text || (liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress");
                                 mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: lastPlayText, opponentColor: '#333' };
-                            } else if (league === 'nhl') { mapped.live = { ...liveBase, period: comp.status.period }; } 
+                            } else if (league === 'nhl') { 
+                                const situation = comp.situation || (liveGame.situation) || {};
+                                const lastPlayText = situation.lastPlay?.text || "Update in progress...";
+                                mapped.live = { ...liveBase, period: comp.status.period, lastPlay: lastPlayText };
+                            } 
                             else if (league === 'mlb') {
                                 const sit = liveGame.situation || {};
                                 mapped.live = { ...liveBase, inning: comp.status.period, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } };
