@@ -794,14 +794,22 @@
                     const cutoff = new Date(now.getTime() - (30 * 60 * 1000)); 
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
                     const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
-                    const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
-
-                    let prevGame = pastGames.length > 0 ? pastGames[0] : null;
-                    let nextGame = futureGames.length > 0 ? futureGames[0] : null;
-
-                    if (!nextGame && teamInfoData.team.nextEvent && teamInfoData.team.nextEvent.length > 0) {
+                    
+                    // --- CHANGED LOGIC HERE ---
+                    // 1. Prioritize the explicit 'nextEvent' from ESPN (Handles Playoffs correctly)
+                    let nextGame = null;
+                    if (teamInfoData.team.nextEvent && teamInfoData.team.nextEvent.length > 0) {
                         nextGame = teamInfoData.team.nextEvent[0];
                     }
+
+                    // 2. If no official nextEvent, try to calculate from the schedule array
+                    if (!nextGame) {
+                        const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
+                        if (futureGames.length > 0) nextGame = futureGames[0];
+                    }
+                    
+                    let prevGame = pastGames.length > 0 ? pastGames[0] : null;
+                    // --------------------------
 
                     const fetchOpponentRecord = async (oppId) => {
                         if (!oppId) return null;
