@@ -577,7 +577,301 @@
             );
         };
         // end sect 1
-        drop-shadow-xl filter">{data.question}</h2>
+        const PlayoffCard = ({ game }) => {
+            const comp = game.competitions[0];
+            const home = comp.competitors.find(c => c.homeAway === 'home');
+            const away = comp.competitors.find(c => c.homeAway === 'away');
+            const isLive = game.status.type.state === 'in';
+            const isFinal = game.status.type.state === 'post';
+
+            const homeColor = NFL_TEAMS.find(t => t.id === home.team.abbreviation)?.color || '#002244';
+            const awayColor = NFL_TEAMS.find(t => t.id === away.team.abbreviation)?.color || '#c60c30';
+
+            const teamData = {
+                color: homeColor, 
+                name: "NFL Playoffs",
+                logo: "https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png",
+                record: "Playoffs",
+            };
+
+            if (isLive) {
+                const liveData = {
+                    ...teamData,
+                    status: 'LIVE',
+                    live: {
+                        score: { myScore: home.score, oppScore: away.score },
+                        quarter: game.status.period,
+                        time: game.status.displayClock,
+                        down: game.situation?.down || 0,
+                        distance: game.situation?.distance || 0,
+                        yardLine: game.situation?.yardLine || 50,
+                        possession: game.situation?.possession || null,
+                        lastPlay: game.situation?.lastPlay?.text || "Playoff Action",
+                        opponent: away.team.shortDisplayName,
+                        opponentLogo: away.team.logo,
+                        homeTeam: { id: home.team.id, logo: home.team.logo, color: homeColor },
+                        awayTeam: { id: away.team.id, logo: away.team.logo, color: awayColor }
+                    }
+                };
+                return (
+                    <SportsCardLayout team={liveData} isLive={true}>
+                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
+                            <div className="flex items-center gap-[3vmin]">
+                                <div className="flex flex-col items-center">
+                                    <img src={home.team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />
+                                    <div className="text-[14vmin] font-black leading-none tracking-tighter">{home.score}</div>
+                                </div>
+                                <div className="text-[6vmin] font-bold text-gray-600">-</div>
+                                <div className="flex flex-col items-center">
+                                    <img src={away.team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />
+                                    <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{away.score}</div>
+                                </div>
+                            </div>
+                            <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{game.status.type.shortDetail}</div>
+                        </div>
+                        <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
+                             <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{game.situation?.lastPlay?.text || "Game in progress..."}</div>
+                             <FootballField yardLine={game.situation?.yardLine || 50} possession={game.situation?.possession} homeTeam={{...home.team, color: homeColor}} awayTeam={{...away.team, color: awayColor}} />
+                        </div>
+                    </SportsCardLayout>
+                );
+            }
+
+            const dateObj = new Date(game.date);
+            const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-slate-950 flex flex-col items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-900/90" />
+                    <div className="relative z-10 flex flex-col items-center w-full">
+                        <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[6vmin] bg-blue-900/30 px-[3vmin] py-[1vmin] rounded-full border border-blue-500/30">
+                            {game.name || "NFL Playoff Matchup"}
+                        </div>
+                        
+                        <div className="flex items-center justify-center w-full gap-[8vmin]">
+                            <div className="flex flex-col items-center">
+                                <img src={away.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
+                                <div className="text-[6vmin] font-black text-white mt-[2vmin]">{away.team.shortDisplayName}</div>
+                                <div className="text-[3vmin] text-gray-400 font-bold">{away.records?.[0]?.summary}</div>
+                                {isFinal && <div className="text-[10vmin] font-black mt-[2vmin]">{away.score}</div>}
+                            </div>
+
+                            <div className="flex flex-col items-center justify-center h-full">
+                                {isFinal ? (
+                                    <div className="text-[4vmin] font-bold text-gray-500">FINAL</div>
+                                ) : (
+                                    <>
+                                            <div className="text-[8vmin] font-black italic text-white/20">VS</div>
+                                            <div className="text-[3vmin] font-bold text-white bg-red-700 px-[2vmin] py-[0.5vmin] rounded mt-[2vmin]">{dateStr}</div>
+                                            <div className="text-[3vmin] font-bold text-white mt-[1vmin]">{timeStr}</div>
+                                            <div className="text-[2vmin] text-gray-400 mt-[2vmin] max-w-[20vmin] text-center">{comp.venue?.fullName}</div>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <img src={home.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
+                                <div className="text-[6vmin] font-black text-white mt-[2vmin]">{home.team.shortDisplayName}</div>
+                                <div className="text-[3vmin] text-gray-400 font-bold">{home.records?.[0]?.summary}</div>
+                                {isFinal && <div className="text-[10vmin] font-black mt-[2vmin]">{home.score}</div>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const PlayoffOverviewCard = ({ games }) => {
+            const afcTeams = ['BAL','BUF','CIN','CLE','DEN','HOU','IND','JAX','KC','LAC','LV','MIA','NE','NYJ','PIT','TEN'];
+            const isAFC = (game) => {
+                const team = game.competitions[0].competitors[0].team.abbreviation;
+                return afcTeams.includes(team);
+            };
+
+            const afcGames = games.filter(g => isAFC(g));
+            const nfcGames = games.filter(g => !isAFC(g));
+
+            const MiniGameRow = ({ game }) => {
+                const comp = game.competitions[0];
+                const home = comp.competitors.find(c => c.homeAway === 'home');
+                const away = comp.competitors.find(c => c.homeAway === 'away');
+                const status = game.status.type.state; 
+                
+                return (
+                    <div className="flex items-center justify-between bg-white/10 rounded-lg p-[1vmin] mb-[1.5vmin] backdrop-blur-md border border-white/5">
+                        <div className="flex items-center gap-[1vmin] w-[30%]">
+                            <img src={away.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
+                            <span className="font-bold text-[2vmin]">{away.team.abbreviation}</span>
+                            {status !== 'pre' && <span className="font-black text-[2.5vmin] ml-auto">{away.score}</span>}
+                        </div>
+                        
+                        <div className="text-[1.5vmin] font-mono text-gray-400 w-[40%] text-center">
+                            {status === 'in' ? <span className="text-red-500 animate-pulse font-bold">LIVE</span> : 
+                             status === 'post' ? 'FINAL' : 
+                             new Date(game.date).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}
+                        </div>
+
+                        <div className="flex items-center gap-[1vmin] w-[30%] flex-row-reverse">
+                            <img src={home.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
+                            <span className="font-bold text-[2vmin]">{home.team.abbreviation}</span>
+                            {status !== 'pre' && <span className="font-black text-[2.5vmin] mr-auto">{home.score}</span>}
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="h-full w-full flex flex-col p-[3vmin] bg-slate-950 text-white relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950" />
+                    
+                    <div className="text-center mb-[4vmin] z-10">
+                        <h2 className="text-[4vmin] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-red-400">Playoff Picture</h2>
+                        <div className="text-[2vmin] text-gray-500 font-bold uppercase tracking-widest">Live Scoreboard</div>
+                    </div>
+
+                    <div className="flex w-full h-full gap-[4vmin] z-10">
+                        <div className="flex-1 flex flex-col">
+                            <div className="text-red-500 font-black text-[3vmin] uppercase mb-[2vmin] border-b border-red-500/30 pb-1">AFC</div>
+                            {afcGames.map(g => <MiniGameRow key={g.id} game={g} />)}
+                        </div>
+
+                        <div className="w-[2px] bg-white/10 rounded-full"></div>
+
+                        <div className="flex-1 flex flex-col items-end">
+                            <div className="text-blue-500 font-black text-[3vmin] uppercase mb-[2vmin] border-b border-blue-500/30 pb-1 w-full text-right">NFC</div>
+                            <div className="w-full">
+                                {nfcGames.map(g => <MiniGameRow key={g.id} game={g} />)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const TeamSelector = ({ title, teams, selected, onAdd, onRemove }) => {
+            const [showModal, setShowModal] = useState(false);
+            const sortedTeams = useMemo(() => [...teams].sort((a, b) => a.city.localeCompare(b.city)), [teams]);
+
+            return (
+                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                    <h3 className="font-bold text-white mb-2">{title}</h3>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        {selected.map(id => (
+                            <span key={id} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                                {teams.find(t=>t.id===id)?.city} {teams.find(t=>t.id===id)?.name}
+                                <button onClick={() => onRemove(id)} className="hover:text-red-400"><X size={14} /></button>
+                            </span>
+                        ))}
+                    </div>
+                    <button onClick={() => setShowModal(true)} className="w-full bg-slate-950 hover:bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-left text-white flex justify-between items-center transition-colors">
+                        <span className="text-slate-400">+ Add a Team...</span><Plus size={20} className="text-blue-500" />
+                    </button>
+                    {showModal && (
+                        <div className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4">
+                            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-5xl h-[80vh] flex flex-col shadow-2xl">
+                                <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 rounded-t-2xl">
+                                    <h3 className="text-xl font-bold text-white">Select {title}</h3>
+                                    <button onClick={() => setShowModal(false)} className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-bold">Close X</button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 custom-scrollbar">
+                                    {sortedTeams.map(t => {
+                                        const isSelected = selected.includes(t.id);
+                                        return (
+                                            <button key={t.id} onClick={() => { if (!isSelected) { onAdd(t.id); setShowModal(false); } }} disabled={isSelected} className={`text-left p-3 rounded-xl border flex flex-col transition-all active:scale-95 ${isSelected ? 'bg-slate-800 border-slate-700 opacity-50 cursor-not-allowed' : 'bg-slate-800 hover:bg-blue-900 border-slate-600 hover:border-blue-500 cursor-pointer'}`}>
+                                                <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">{t.city}</span>
+                                                <span className="text-lg font-black text-white leading-tight">{t.name}</span>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const ZipSelector = ({ zipList, onAdd, onRemove, onUpdate }) => {
+            const [inputZip, setInputZip] = useState('');
+            return (
+                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                    <label className="block text-sm text-slate-400 mb-2">Locations & Weather</label>
+                    <div className="flex flex-col gap-3 mb-4">
+                        {zipList.map(item => (
+                            <div key={item.id} className="bg-slate-900 border border-slate-700 p-3 rounded-lg flex flex-col gap-3">
+                                <div className="flex justify-between items-center"><span className="font-bold font-mono text-lg">{item.id}</span><button onClick={() => onRemove(item.id)} className="text-slate-500 hover:text-red-400"><X size={18} /></button></div>
+                                <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Forecast</span><button onClick={() => onUpdate(item.id, { showForecast: !item.showForecast })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showForecast ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
+                                {item.showForecast && (<div className="flex gap-2"><button onClick={() => onUpdate(item.id, { days: 3 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 3 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>3 Day</button><button onClick={() => onUpdate(item.id, { days: 5 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 5 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>5 Day</button></div>)}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex gap-2"><input type="text" value={inputZip} onChange={(e) => setInputZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white" placeholder="Enter ZIP" maxLength={5} /><button onClick={() => { if(inputZip.length === 5 && !zipList.find(z => z.id === inputZip)) { onAdd(inputZip); setInputZip(''); } }} className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button></div>
+                </div>
+            );
+        };
+
+        const TriviaCard = ({ data }) => {
+            const [progress, setProgress] = useState(100);
+            const [secondsLeft, setSecondsLeft] = useState(10);
+            const [isAnswerPhase, setIsAnswerPhase] = useState(false);
+
+            useEffect(() => {
+                if (!data) return;
+                // Reset state when data changes (new rotation)
+                setProgress(100);
+                setSecondsLeft(10);
+                setIsAnswerPhase(false);
+
+                // 10 Second Countdown Timer logic
+                const duration = 10000; // 10s
+                const startTime = Date.now();
+
+                const interval = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    const remaining = Math.max(0, duration - elapsed);
+                    
+                    // Update visual progress
+                    setProgress((remaining / duration) * 100);
+                    
+                    // Update Seconds Text
+                    setSecondsLeft(Math.ceil(remaining / 1000));
+
+                    if (remaining <= 0) {
+                        setIsAnswerPhase(true);
+                        clearInterval(interval);
+                    }
+                }, 30); // Fast update for smooth bar
+
+                return () => clearInterval(interval);
+            }, [data]);
+
+            if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
+
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans p-[3vmin] bg-gradient-to-br from-purple-900 via-fuchsia-900 to-indigo-900 text-white flex flex-col items-center justify-center text-center select-none transition-all duration-700">
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+                    
+                    {/* Top Status Bar */}
+                    <div className="absolute top-[3vmin] left-[3vmin] right-[3vmin] flex items-center justify-between">
+                         <div className="bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
+                            <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
+                        </div>
+                        
+                        {!isAnswerPhase && (
+                            <div className="text-[2.5vmin] font-mono font-bold text-white bg-black/30 px-[2vmin] py-[0.5vmin] rounded-lg border border-white/10">
+                                Revealing in {secondsLeft}s
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Progress Bar (Only during Question Phase) */}
+                    {!isAnswerPhase && (
+                        <div className="absolute top-0 left-0 h-[1vmin] bg-yellow-400 transition-all duration-75 ease-linear w-full shadow-[0_0_15px_rgba(250,204,21,0.5)]" style={{ width: `${progress}%` }}></div>
+                    )}
+                    
+                    <div className="mb-[5vmin] max-w-[85%] relative z-10">
+                        <h2 className="text-[4.5vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-[2.5vmin] w-full max-w-[100vmin] relative z-10 px-[2vmin]">
                         {data.answers.map((ans, idx) => {
