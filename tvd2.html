@@ -1203,12 +1203,7 @@
                 return () => clearTimeout(timer);
             }, [allCards, isPaused, isSettingsOpen, currentSlideIndex]);
 
-                const timer = setTimeout(() => { 
-                    setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
-                }, slideDuration);
-
-                return () => clearTimeout(timer);
-            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex, customImageDuration]);
+               
 
             const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3 }]); };
             const handleRemoveZip = (id) => { setZipConfigs(zipConfigs.filter(z => z.id !== id)); };
