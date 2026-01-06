@@ -798,73 +798,70 @@
 
                     if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
 
-                    // FETCH 1: Regular Season Schedule
+                 // ==========================================================
+                    // FIXED SCHEDULE LOGIC (REGULAR + POSTSEASON MERGE)
+                    // ==========================================================
+                    
                     const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`;
-                    let events = [];
+                    let allEvents = [];
+
+                    // 1. Fetch Regular Season (seasonType=2)
                     try {
-                        const scheduleRes = await fetch(scheduleUrl);
-                        if (scheduleRes.ok) {
-                            const scheduleData = await scheduleRes.json();
-                            events = scheduleData.events || [];
+                        const regRes = await fetch(scheduleUrl);
+                        if (regRes.ok) {
+                            const regData = await regRes.json();
+                            if (regData.events) allEvents.push(...regData.events);
                         }
                     } catch (e) {}
 
-                    // FETCH 2: Postseason Schedule (FORCE CHECK)
-                    // We now check postseason more aggressively to catch playoff games
-                    const now = new Date();
-                    // Cutoff is 4 hours ago. Games older than this are "past"
-                    const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); 
-                    
-                    const hasFutureEvent = events.some(e => new Date(e.date) > cutoff);
-                    // If regular schedule has no future games, OR just to be safe, fetch playoffs
-                    if (!hasFutureEvent || league === 'nfl') { 
-                         try {
-                             const postRes = await fetch(`${scheduleUrl}?seasonType=3`);
-                             if (postRes.ok) {
-                                 const postData = await postRes.json();
-                                 if (postData.events && postData.events.length > 0) {
-                                     // Merge unique events
-                                     const existingIds = new Set(events.map(e => e.id));
-                                     postData.events.forEach(pe => {
-                                         if(!existingIds.has(pe.id)) events.push(pe);
-                                     });
-                                 }
-                             }
-                         } catch(e) {}
-                    }
-
-                    let record = "0-0";
-                    if (teamInfoData.team.record?.items?.[0]?.summary) record = teamInfoData.team.record.items[0].summary;
-                    else record = calculateRecord(events, teamId, league);
-
-                    const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
-                    const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
-                    
-                    // --- CHANGED LOGIC HERE ---
-                    // 1. Get candidate from nextEvent
-                    let nextGameCandidate = null;
-                    if (teamInfoData.team.nextEvent && teamInfoData.team.nextEvent.length > 0) {
-                        nextGameCandidate = teamInfoData.team.nextEvent[0];
-                    }
-
-                    // 2. Validate candidate. If it's in the past (older than 4 hours ago), IGNORE IT.
-                    // This fixes the issue where completed games (like Penn State vs Clemson) show up as "Next"
-                    if (nextGameCandidate) {
-                        const candidateDate = new Date(nextGameCandidate.date);
-                        if (candidateDate < cutoff) {
-                            nextGameCandidate = null; 
+                    // 2. Fetch Postseason (seasonType=3) - ALWAYS CHECK THIS
+                    try {
+                        const postRes = await fetch(`${scheduleUrl}?seasonType=3`);
+                        if (postRes.ok) {
+                            const postData = await postRes.json();
+                            if (postData.events) allEvents.push(...postData.events);
                         }
+                    } catch (e) {}
+
+                    // 3. Deduplicate events (in case ESPN lists a game in both places)
+                    const uniqueEventsMap = new Map();
+                    allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
+                    const uniqueEvents = Array.from(uniqueEventsMap.values());
+
+                    // 4. Sort all events by Date
+                    uniqueEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                    // 5. Calculate Record
+                    let record = "0-0";
+                    if (teamInfoData.team.record?.items?.[0]?.summary) {
+                        record = teamInfoData.team.record.items[0].summary;
+                    } else {
+                        record = calculateRecord(uniqueEvents, teamId, league);
                     }
 
-                    // 3. If no valid nextEvent, look at the schedule array
-                    if (!nextGameCandidate) {
-                        const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
-                        if (futureGames.length > 0) nextGameCandidate = futureGames[0];
-                    }
+                    // 6. Define "Now" and "Cutoff"
+                    // Cutoff is 4 hours ago. Games older than this are considered "Past"
+                    const now = new Date();
+                    const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); 
+
+                    const validEvents = uniqueEvents.map(e => ({...e, dateObj: new Date(e.date)}));
                     
-                    const nextGame = nextGameCandidate;
+                    // 7. Find Previous Game (The most recent game that is OLDER than cutoff)
+                    const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
                     let prevGame = pastGames.length > 0 ? pastGames[0] : null;
-                    // --------------------------
+
+                    // 8. Find Next Game (The earliest game that is NEWER than cutoff)
+                    // We explicitly IGNORE teamInfoData.team.nextEvent because it is often wrong during playoffs
+                    const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
+                    
+                    let nextGame = null;
+                    if (futureGames.length > 0) {
+                        nextGame = futureGames[0];
+                    }
+
+                    // ==========================================================
+                    // END FIXED SCHEDULE LOGIC
+                    // ==========================================================
 
                     const fetchOpponentRecord = async (oppId) => {
                         if (!oppId) return null;
