@@ -128,11 +128,12 @@
             </div>
         );
 
+        /* --- UPDATED ZIP SELECTOR (WITH FLIGHT TOGGLE) --- */
         const ZipSelector = ({ zipList, onAdd, onRemove, onUpdate }) => {
             const [newZip, setNewZip] = useState('');
             return (
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                    <h3 className="font-bold text-white mb-2">Weather Locations (ZIP)</h3>
+                    <h3 className="font-bold text-white mb-2">Locations & Weather</h3>
                     <div className="flex gap-2 mb-3">
                         <input 
                             type="text" 
@@ -155,6 +156,13 @@
                                     <span className="text-slate-400">Show Forecast</span>
                                     <button onClick={() => onUpdate(zip.id, { showForecast: !zip.showForecast })} className={`w-8 h-4 rounded-full relative transition-colors ${zip.showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}>
                                         <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${zip.showForecast ? 'translate-x-4' : 'translate-x-0'}`}/>
+                                    </button>
+                                </div>
+                                {/* NEW FLIGHT TOGGLE */}
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-slate-400">Show Radar (Flights)</span>
+                                    <button onClick={() => onUpdate(zip.id, { showFlights: !zip.showFlights })} className={`w-8 h-4 rounded-full relative transition-colors ${zip.showFlights ? 'bg-green-500' : 'bg-slate-700'}`}>
+                                        <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${zip.showFlights ? 'translate-x-4' : 'translate-x-0'}`}/>
                                     </button>
                                 </div>
                                 {zip.showForecast && (
@@ -214,172 +222,6 @@
                             </div>
                         </div>
                     )}
-                </div>
-            );
-        };
-
-        const TriviaCard = ({ data, isActive }) => {
-            const [progress, setProgress] = useState(100);
-            const [secondsLeft, setSecondsLeft] = useState(10);
-            const [isAnswerPhase, setIsAnswerPhase] = useState(false);
-
-            useEffect(() => {
-                if (!isActive) {
-                    setSecondsLeft(10);
-                    setProgress(100);
-                    setIsAnswerPhase(false);
-                    return;
-                }
-
-                const duration = 10000; 
-                const startTime = Date.now();
-
-                const interval = setInterval(() => {
-                    const elapsed = Date.now() - startTime;
-                    const remaining = Math.max(0, duration - elapsed);
-                    
-                    setProgress((remaining / duration) * 100);
-                    setSecondsLeft(Math.ceil(remaining / 1000));
-
-                    if (remaining <= 0) {
-                        setIsAnswerPhase(true);
-                        clearInterval(interval);
-                    }
-                }, 30);
-
-                return () => clearInterval(interval);
-            }, [isActive, data]);
-
-            if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
-
-            return (
-                <div className="h-full w-full relative overflow-hidden font-sans p-[3vmin] bg-gradient-to-br from-purple-900 via-fuchsia-900 to-indigo-900 text-white flex flex-col items-center justify-center text-center select-none transition-all duration-700">
-                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
-                    
-                    <div className="absolute top-[3vmin] left-[3vmin] right-[3vmin] flex items-center justify-between">
-                         <div className="bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
-                            <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
-                        </div>
-                        
-                        {!isAnswerPhase && (
-                            <div className="text-[2.5vmin] font-mono font-bold text-white bg-black/30 px-[2vmin] py-[0.5vmin] rounded-lg border border-white/10">
-                                Revealing in {secondsLeft}s
-                            </div>
-                        )}
-                    </div>
-
-                    {!isAnswerPhase && (
-                        <div className="absolute top-0 left-0 h-[1.5vmin] bg-yellow-400 transition-all duration-75 ease-linear w-full shadow-[0_0_15px_rgba(250,204,21,0.5)] z-50" style={{ width: `${progress}%` }}></div>
-                    )}
-                    
-                    <div className="mb-[5vmin] max-w-[90%] relative z-10 flex-1 flex items-center justify-center">
-                        <h2 className="text-[6vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-[3vmin] w-full max-w-[120vmin] relative z-10 px-[2vmin] mb-[4vmin]">
-                        {data.answers.map((ans, idx) => {
-                            const isCorrect = ans === data.correct;
-                            let bgClass = "bg-white/10 border-white/10";
-                            
-                            if (isAnswerPhase) {
-                                if (isCorrect) {
-                                    bgClass = "bg-green-600 text-white border-green-400 shadow-[0_0_50px_rgba(34,197,94,0.6)] scale-[1.05] z-20 font-black ring-4 ring-green-400/50";
-                                } else {
-                                    bgClass = "bg-black/40 opacity-20 grayscale border-transparent scale-95 blur-[2px]";
-                                }
-                            }
-
-                            return (
-                                <div
-                                    key={idx}
-                                    className={`p-[3vmin] rounded-3xl font-bold text-[4vmin] transition-all duration-700 border backdrop-blur-md shadow-md flex items-center justify-center min-h-[12vmin] leading-tight ${bgClass}`}
-                                >
-                                    {ans}
-                                </div>
-                            );
-                        })}
-                    </div>
-                    
-                    {isAnswerPhase && (
-                        <div className="absolute bottom-[2vmin] text-[3vmin] font-bold text-green-400 animate-pulse z-20 uppercase tracking-widest">
-                            Correct Answer
-                        </div>
-                    )}
-
-                    <style>{`@keyframes widthFull { from { width: 100%; } to { width: 0%; } }`}</style>
-                </div>
-            );
-        };
-
-        const PlayoffOverviewCard = ({ games }) => {
-            return (
-                <div className="h-full w-full bg-slate-900 text-white p-[3vmin] font-sans flex flex-col">
-                    <div className="text-center mb-[2vmin]">
-                        <h2 className="text-[5vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-red-400 uppercase tracking-tighter">Playoff Picture</h2>
-                        <div className="w-[20vmin] h-1 bg-white/20 mx-auto rounded-full mt-2"></div>
-                    </div>
-                    <div className="flex-1 overflow-hidden grid grid-cols-2 md:grid-cols-3 gap-[2vmin]">
-                        {games.map(game => {
-                            const comp = game.competitions[0];
-                            const home = comp.competitors.find(c => c.homeAway === 'home');
-                            const away = comp.competitors.find(c => c.homeAway === 'away');
-                            const isLive = game.status.type.state === 'in';
-                            const isFinal = game.status.type.state === 'post';
-                            return (
-                                <div key={game.id} className="bg-white/5 rounded-xl p-[1.5vmin] flex flex-col justify-between border border-white/5 relative overflow-hidden">
-                                    {isLive && <div className="absolute top-0 right-0 bg-red-600 text-white text-[1.5vmin] font-bold px-2 py-0.5 rounded-bl-lg animate-pulse">LIVE</div>}
-                                    <div className="flex justify-between items-center mb-[1vmin] text-[2vmin] font-bold text-slate-400">
-                                        <span>{new Date(game.date).toLocaleTimeString([], {weekday:'short', hour:'numeric'})}</span>
-                                        <span>{isFinal ? 'FINAL' : game.status.type.detail}</span>
-                                    </div>
-                                    <div className="space-y-[1vmin]">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-[1vmin]">
-                                                <img src={away.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
-                                                <span className="text-[2.5vmin] font-bold">{away.team.abbreviation}</span>
-                                            </div>
-                                            <span className={`text-[3vmin] font-black ${parseInt(away.score) > parseInt(home.score) ? 'text-white' : 'text-slate-500'}`}>{away.score}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-[1vmin]">
-                                                <img src={home.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
-                                                <span className="text-[2.5vmin] font-bold">{home.team.abbreviation}</span>
-                                            </div>
-                                            <span className={`text-[3vmin] font-black ${parseInt(home.score) > parseInt(away.score) ? 'text-white' : 'text-slate-500'}`}>{home.score}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            );
-        };
-
-        const PlayoffCard = ({ game }) => {
-            const comp = game.competitions[0];
-            const home = comp.competitors.find(c => c.homeAway === 'home');
-            const away = comp.competitors.find(c => c.homeAway === 'away');
-            const status = game.status.type.shortDetail;
-            
-            return (
-                <div className="h-full w-full relative bg-slate-950 flex flex-col">
-                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
-                     <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-[4vmin]">
-                        <div className="text-[3vmin] font-bold text-slate-400 uppercase tracking-widest bg-slate-900/80 px-6 py-2 rounded-full border border-slate-700">{status}</div>
-                        <div className="flex items-center justify-center w-full gap-[6vmin]">
-                            <div className="flex flex-col items-center">
-                                <img src={away.team.logo} className="w-[20vmin] h-[20vmin] object-contain logo-glow" />
-                                <div className="text-[12vmin] font-black leading-none mt-4">{away.score}</div>
-                            </div>
-                            <div className="text-[6vmin] font-bold text-slate-600">VS</div>
-                             <div className="flex flex-col items-center">
-                                <img src={home.team.logo} className="w-[20vmin] h-[20vmin] object-contain logo-glow" />
-                                <div className="text-[12vmin] font-black leading-none mt-4">{home.score}</div>
-                            </div>
-                        </div>
-                        <div className="text-[3vmin] text-slate-400 max-w-[80%] text-center">{game.name}</div>
-                     </div>
                 </div>
             );
         };
@@ -623,6 +465,7 @@
             );
         };
         /* --- ALL CARDS COMPLETE IN PART 1 --- */
+        /* --- NEW FLIGHT TRACKER COMPONENT --- */
         const FlightTrackerCard = ({ lat, lon, location }) => {
             const [flights, setFlights] = useState([]);
             const [loading, setLoading] = useState(true);
@@ -710,7 +553,6 @@
                 </div>
             );
         };
-
         const App = () => {
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
@@ -722,7 +564,6 @@
             const [mlbData, setMlbData] = useState({});
             const [ncaafData, setNcaafData] = useState({});
 
-            // Added showFlights to zipConfigs default
             const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3, showFlights: false }]);
             const [weatherDataMap, setWeatherDataMap] = useState({});
             
@@ -792,15 +633,24 @@
                 } catch (e) { setTriviaData(fallback); }
             };
 
-            // Initial fetch if trivia is enabled
             useEffect(() => { if (showTrivia && !triviaData) fetchTrivia(); }, [showTrivia]);
 
-            // Playoff Fetcher
             useEffect(() => {
                 if (!showPlayoffMode) return;
                 const fetchPlayoffs = async () => {
                     try {
-                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`); 
+                        const now = new Date();
+                        const month = now.getMonth(); 
+                        const day = now.getDate();
+                        let urlParams = "";
+                        if (month === 0) {
+                            if (day < 14) urlParams = "?seasontype=3&week=1";        
+                            else if (day < 21) urlParams = "?seasontype=3&week=2"; 
+                            else urlParams = "?seasontype=3&week=3";                
+                        } else if (month === 1) {
+                            urlParams = "?seasontype=3&week=5";                      
+                        }
+                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard${urlParams}`); 
                         if (res.ok) { const data = await res.json(); if (data.events) setPlayoffGames(data.events); }
                     } catch (e) {}
                 };
@@ -809,7 +659,6 @@
                 return () => clearInterval(interval);
             }, [showPlayoffMode]);
 
-            // Weather Fetcher
             useEffect(() => {
                 const fetchWeather = async (zip) => {
                     try {
@@ -833,7 +682,7 @@
                                 temp: wData.current.temperature_2m, condition: wData.current.weather_code, 
                                 wind: wData.current.wind_speed_10m, precip: wData.current.precipitation, 
                                 aqi: aqiData.current?.us_aqi || 0, city: `${city}, ${state}`, 
-                                lat: lat, lon: lon, // Captured for Flight Tracker
+                                lat: lat, lon: lon, 
                                 timezoneOffset: wData.utc_offset_seconds || -14400, daily: wData.daily, loading: false 
                             }}));
                         }
@@ -842,7 +691,6 @@
                 if(Array.isArray(zipConfigs)) zipConfigs.forEach(conf => fetchWeather(conf.id));
             }, [zipConfigs]);
 
-            // Helper for Sport Records
             const calculateRecord = (events, teamId, league) => {
                 if (!events || !Array.isArray(events)) return "0-0";
                 let w = 0, l = 0, d = 0, otl = 0;
@@ -871,8 +719,7 @@
                 return `${w}-${l}`;
             };
 
-            // Main Sports Fetcher
-             const fetchSportData = async (sport, league, teamId) => {
+            const fetchSportData = async (sport, league, teamId) => {
                 try {
                     const idStr = String(teamId).toLowerCase(); 
                     const now = new Date();
@@ -900,6 +747,10 @@
                     try {
                         const regRes = await fetch(scheduleUrl);
                         if (regRes.ok) { const regData = await regRes.json(); if (regData.events) allEvents.push(...regData.events); }
+                    } catch (e) {}
+                    try {
+                        const postRes = await fetch(`${scheduleUrl}&seasonType=3`);
+                        if (postRes.ok) { const postData = await postRes.json(); if (postData.events) allEvents.push(...postData.events); }
                     } catch (e) {}
                     const uniqueEventsMap = new Map();
                     allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
@@ -977,7 +828,6 @@
                 } catch(e) { return { [teamId]: null }; }
             };
 
-            // Sports Fetcher
             useEffect(() => {
                 const loadAll = async () => {
                       const promises = [];
@@ -992,7 +842,6 @@
                 return () => clearInterval(interval);
             }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
 
-            // Controls logic
             const [showControls, setShowControls] = useState(false);
             const controlsTimeoutRef = useRef(null);
             const handleInteraction = () => {
@@ -1000,44 +849,79 @@
                 if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
                 controlsTimeoutRef.current = setTimeout(() => { setShowControls(false); }, 5000);
             };
-            useEffect(() => { handleInteraction(); }, []);
-
-            // --- ALL CARDS GENERATION ---
+            useEffect(() => { handleInteraction(); }, []);// --- ALL CARDS GENERATION ---
             const allCards = useMemo(() => {
                 const liveCards = [];
                 const standardCards = [];
 
                 const processSport = (list, dataMap, Component) => {
-                    if (Array.isArray(list)) list.forEach(id => {
-                        const data = dataMap[id];
-                        if (data) {
-                            const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> };
-                            standardCards.push(card);
-                            if (data.status === 'LIVE' || data.status === 'IN') liveCards.push(card);
-                        }
-                    });
+                    if (Array.isArray(list)) {
+                        list.forEach(id => {
+                            const data = dataMap[id];
+                            if (data) {
+                                const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> };
+                                standardCards.push(card);
+                                if (data.status === 'LIVE' || data.status === 'IN') {
+                                    liveCards.push(card);
+                                }
+                            }
+                        });
+                    }
                 };
+
                 processSport(nflTeamsSelected, nflData, NFLCard);
                 processSport(nhlTeamsSelected, nhlData, NHLCard);
                 processSport(mlbTeamsSelected, mlbData, MLBCard);
                 processSport(ncaafTeamsSelected, ncaafData, NCAAFCard);
 
-                if (Array.isArray(stockSymbols)) stockSymbols.forEach(symbol => {
-                    const data = stockData[symbol];
-                    standardCards.push({ id: `stock-${symbol}`, component: <StockCard symbol={symbol} data={data} /> });
-                });
+                // --- ADD STOCK CARDS ---
+                if (Array.isArray(stockSymbols)) {
+                    stockSymbols.forEach(symbol => {
+                        const data = stockData[symbol];
+                        standardCards.push({
+                            id: `stock-${symbol}`,
+                            component: <StockCard symbol={symbol} data={data} />
+                        });
+                    });
+                }
 
-                if (liveCards.length > 0) return liveCards;
+                if (liveCards.length > 0) {
+                    return liveCards;
+                }
 
                 const rotation = [];
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
-                if (Array.isArray(customImages)) customImages.forEach(img => { if (img.url) rotation.push({ id: `custom_image_${img.id}`, component: <CustomImageCard url={img.url} />, duration: parseInt(img.duration) || 10 }); });
-                if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
-                if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} /> });
                 
+                if (Array.isArray(customImages)) {
+                    customImages.forEach(img => {
+                        if (img.url) {
+                            rotation.push({ 
+                                id: `custom_image_${img.id}`, 
+                                component: <CustomImageCard url={img.url} />,
+                                duration: parseInt(img.duration) || 10 
+                            });
+                        }
+                    });
+                }
+
+                if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
+                
+                // Add Trivia
+                if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} /> });
+
                 if (showPlayoffMode && playoffGames.length > 0) {
-                    rotation.push({ id: 'playoff-overview', component: <PlayoffOverviewCard games={playoffGames} /> });
-                    playoffGames.forEach(game => { if (game.competitions && game.competitions[0]) rotation.push({ id: `playoff-${game.id}`, component: <PlayoffCard game={game} /> }); });
+                    rotation.push({
+                        id: 'playoff-overview',
+                        component: <PlayoffOverviewCard games={playoffGames} />
+                    });
+                    playoffGames.forEach(game => {
+                        if (game.competitions && game.competitions[0]) {
+                            rotation.push({
+                                id: `playoff-${game.id}`,
+                                component: <PlayoffCard game={game} />
+                            });
+                        }
+                    });
                 }
 
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
@@ -1053,10 +937,15 @@
                         const data = weatherDataMap[config.id];
                         if (data) {
                             rotation.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
-                            if (config.showForecast) rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> });
-                            // FLIGHT TRACKER INJECTION
+                            if (config.showForecast) { 
+                                rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); 
+                            }
+                            // --- FLIGHT TRACKER INJECTION ---
                             if (config.showFlights && data.lat && data.lon) {
-                                rotation.push({ id: `flights-${config.id}`, component: <FlightTrackerCard lat={data.lat} lon={data.lon} location={data.city} /> });
+                                rotation.push({ 
+                                    id: `flights-${config.id}`, 
+                                    component: <FlightTrackerCard lat={data.lat} lon={data.lon} location={data.city} /> 
+                                });
                             }
                         }
                     });
@@ -1071,30 +960,57 @@
                 if (allCards.length === 0) return;
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
+
                 let slideDuration = 6000; 
+                
                 const currentCard = allCards[currentSlideIndex];
                 if (currentCard) {
-                    if (String(currentCard.id).startsWith('custom_image_')) slideDuration = Math.max(3, currentCard.duration) * 1000;
-                    else if (currentCard.id === 'trivia') slideDuration = 15000; // 15s for trivia
-                    else if (String(currentCard.id).startsWith('flights-')) slideDuration = 10000; // 10s for radar
+                    if (String(currentCard.id).startsWith('custom_image_')) {
+                        slideDuration = Math.max(3, currentCard.duration) * 1000; 
+                    }
+                    else if (currentCard.id === 'trivia') { 
+                        slideDuration = 15000; // Give trivia 15 seconds
+                    }
+                    else if (String(currentCard.id).startsWith('flights-')) {
+                        slideDuration = 10000; // Give radar 10 seconds
+                    }
                 }
+
                 const timer = setTimeout(() => { 
-                    if (currentCard?.id === 'trivia') fetchTrivia(); 
+                    if (currentCard?.id === 'trivia') { fetchTrivia(); }
                     setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
                 }, slideDuration);
+
                 return () => clearTimeout(timer);
             }, [allCards, isPaused, isSettingsOpen, currentSlideIndex]);
 
             // Settings Handlers
-            const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3, showFlights: true }]); };
+            const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3, showFlights: false }]); };
             const handleRemoveZip = (id) => { setZipConfigs(zipConfigs.filter(z => z.id !== id)); };
             const handleUpdateZip = (id, newSettings) => { setZipConfigs(zipConfigs.map(z => z.id === id ? { ...z, ...newSettings } : z)); };
             const closeSettings = () => { setIsSettingsOpen(false); };
-            const addCustomImage = () => { const newId = Date.now().toString(); setCustomImages([...customImages, { id: newId, url: '', duration: 10 }]); };
-            const removeCustomImage = (id) => { setCustomImages(customImages.filter(img => img.id !== id)); };
-            const updateCustomImage = (id, field, value) => { setCustomImages(customImages.map(img => img.id === id ? { ...img, [field]: value } : img)); };
-            const addStock = () => { if (newStockInput && !stockSymbols.includes(newStockInput.toUpperCase())) { setStockSymbols([...stockSymbols, newStockInput.toUpperCase()]); setNewStockInput(''); } };
-            const removeStock = (sym) => { setStockSymbols(stockSymbols.filter(s => s !== sym)); };
+
+            const addCustomImage = () => {
+                const newId = Date.now().toString();
+                setCustomImages([...customImages, { id: newId, url: '', duration: 10 }]);
+            };
+            const removeCustomImage = (id) => {
+                setCustomImages(customImages.filter(img => img.id !== id));
+            };
+            const updateCustomImage = (id, field, value) => {
+                setCustomImages(customImages.map(img => img.id === id ? { ...img, [field]: value } : img));
+            };
+
+            // --- STOCK HANDLERS ---
+            const addStock = () => {
+                if (newStockInput && !stockSymbols.includes(newStockInput.toUpperCase())) {
+                    setStockSymbols([...stockSymbols, newStockInput.toUpperCase()]);
+                    setNewStockInput('');
+                }
+            };
+            const removeStock = (sym) => {
+                setStockSymbols(stockSymbols.filter(s => s !== sym));
+            };
 
             return (
                 <div className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]" onMouseMove={handleInteraction} onClick={handleInteraction} onTouchStart={handleInteraction}>
@@ -1116,58 +1032,106 @@
                                     <button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button>
                                 </div>
                                 <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
+                                    
+                                    {/* --- STOCKS SECTION --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-2">Stocks</h3>
                                         <div className="flex flex-col gap-3">
-                                            <div className="flex flex-wrap gap-2 mb-2">{stockSymbols.map(sym => (<div key={sym} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2"><span className="font-mono font-bold">{sym}</span><button onClick={() => removeStock(sym)} className="hover:text-red-400"><X size={14} /></button></div>))}</div>
-                                            <div className="flex gap-2"><input type="text" value={newStockInput} onChange={(e) => setNewStockInput(e.target.value.toUpperCase())} placeholder="Enter Symbol (e.g. AAPL)" className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white uppercase" onKeyDown={(e) => e.key === 'Enter' && addStock()} /><button onClick={addStock} className="bg-green-600 px-4 py-2 rounded-lg text-white font-bold"><Plus size={18} /></button></div>
-                                            <div className="mt-2 pt-2 border-t border-slate-700"><label className="text-xs text-slate-400 block mb-1">Finnhub API Key</label><input type="text" value={finnhubKey} onChange={(e) => setFinnhubKey(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-slate-400 text-xs" /></div>
+                                            <div className="flex flex-wrap gap-2 mb-2">
+                                                {stockSymbols.map(sym => (
+                                                    <div key={sym} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                                                        <span className="font-mono font-bold">{sym}</span>
+                                                        <button onClick={() => removeStock(sym)} className="hover:text-red-400"><X size={14} /></button>
+                                                    </div>
+                                                ))}
+                                                {stockSymbols.length === 0 && <span className="text-slate-500 text-sm italic">No stocks added.</span>}
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    value={newStockInput} 
+                                                    onChange={(e) => setNewStockInput(e.target.value.toUpperCase())} 
+                                                    placeholder="Enter Symbol (e.g. AAPL)" 
+                                                    className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white uppercase" 
+                                                    onKeyDown={(e) => e.key === 'Enter' && addStock()}
+                                                />
+                                                <button onClick={addStock} className="bg-green-600 px-4 py-2 rounded-lg text-white font-bold"><Plus size={18} /></button>
+                                            </div>
+                                            <div className="mt-2 pt-2 border-t border-slate-700">
+                                                <label className="text-xs text-slate-400 block mb-1">Finnhub API Key</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={finnhubKey} 
+                                                    onChange={(e) => setFinnhubKey(e.target.value)} 
+                                                    className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-slate-400 text-xs" 
+                                                />
+                                            </div>
                                         </div>
                                     </div>
+
+                                    {/* --- WELCOME SLIDE --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-2">Locations & Weather</h3>
-                                        <div className="flex flex-col gap-3 mb-4">
-                                            {zipConfigs.map(item => (
-                                                <div key={item.id} className="bg-slate-900 border border-slate-700 p-3 rounded-lg flex flex-col gap-3">
-                                                    <div className="flex justify-between items-center"><span className="font-bold font-mono text-lg">{item.id}</span><button onClick={() => handleRemoveZip(item.id)} className="text-slate-500 hover:text-red-400"><X size={18} /></button></div>
-                                                    <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Forecast</span><button onClick={() => handleUpdateZip(item.id, { showForecast: !item.showForecast })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showForecast ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
-                                                    {/* FLIGHT TRACKER TOGGLE */}
-                                                    <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Radar (Flights)</span><button onClick={() => handleUpdateZip(item.id, { showFlights: !item.showFlights })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showFlights ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showFlights ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
-                                                    {item.showForecast && (<div className="flex gap-2"><button onClick={() => handleUpdateZip(item.id, { days: 3 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 3 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>3 Day</button><button onClick={() => handleUpdateZip(item.id, { days: 5 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 5 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>5 Day</button></div>)}
+                                        <h3 className="font-bold text-white mb-3">Welcome Slide</h3>
+                                        <div className="flex flex-col gap-4">
+                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Show Welcome</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
+                                        </div>
+                                    </div>
+
+                                    {/* --- CUSTOM IMAGE SLIDESHOW --- */}
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                        <h3 className="font-bold text-white mb-3 flex items-center justify-between">
+                                            Custom Slideshow
+                                            <button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1">
+                                                <Plus size={14} /> Add Slide
+                                            </button>
+                                        </h3>
+                                        <div className="flex flex-col gap-3">
+                                            {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
+                                            {customImages.map((img, index) => (
+                                                <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded-full">{index + 1}</span>
+                                                        <button onClick={() => removeCustomImage(img.id)} className="ml-auto text-red-400 hover:text-red-300"><X size={16} /></button>
+                                                    </div>
+                                                    <input type="text" value={img.url} onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} placeholder="Image URL..." className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" />
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-slate-400">Duration (sec):</span>
+                                                        <input type="number" value={img.duration} onChange={(e) => updateCustomImage(img.id, 'duration', e.target.value)} className="w-16 bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" min="3" />
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
-                                        <div className="flex gap-2"><input type="text" placeholder="Enter ZIP" maxLength={5} onKeyDown={(e) => e.key === 'Enter' && handleAddZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white" /><button className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button></div>
                                     </div>
+
+                                    {/* --- EXTRAS TOGGLES --- */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Year Progress</span>
+                                            <button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Trivia Mode</span>
+                                            <button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-purple-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Playoff Mode</span>
+                                            <button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><label className="block text-sm text-slate-400 mb-2">Clock Color</label><select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">{CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
+                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
                                     <div className="mt-4 space-y-8">
                                         <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
                                         <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
                                         <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
                                         <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
-                                    </div>
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-3">Custom Slideshow</h3>
-                                        <div className="flex items-center justify-between mb-3"><span className="text-sm text-slate-400">Add Images</span><button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1"><Plus size={14} /> Add Slide</button></div>
-                                        <div className="flex flex-col gap-3">
-                                            {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
-                                            {customImages.map((img, index) => (
-                                                <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
-                                                    <div className="flex items-center gap-2"><span className="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded-full">{index + 1}</span><button onClick={() => removeCustomImage(img.id)} className="ml-auto text-red-400 hover:text-red-300"><X size={16} /></button></div>
-                                                    <input type="text" value={img.url} onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} placeholder="Image URL..." className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" />
-                                                    <div className="flex items-center gap-2"><span className="text-xs text-slate-400">Duration (sec):</span><input type="number" value={img.duration} onChange={(e) => updateCustomImage(img.id, 'duration', e.target.value)} className="w-16 bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" min="3" /></div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Year Progress</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
-                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Trivia Mode</span><button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-purple-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
-                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Playoff Mode</span><button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
-                                    </div>
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-3">Welcome Slide</h3>
-                                        <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Show Welcome</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
                                     </div>
                                 </div>
                                 <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end"><button onClick={closeSettings} className="w-fit bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 transition-colors shadow-lg"><Check size={20} /> Done</button></div>
