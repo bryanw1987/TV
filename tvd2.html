@@ -68,6 +68,7 @@
         };
 
         const CLOCK_COLORS = [ { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' }, { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' }, { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' }, { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' } ];
+
         const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
         const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
         const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
@@ -128,8 +129,6 @@
             </div>
         );
 
-        /* --- RESTORING MISSING COMPONENTS & FIXING TRIVIA --- */
-        
         const ZipSelector = ({ zipList, onAdd, onRemove, onUpdate }) => {
             const [newZip, setNewZip] = useState('');
             return (
@@ -226,7 +225,6 @@
             const [isAnswerPhase, setIsAnswerPhase] = useState(false);
 
             useEffect(() => {
-                // IMPORTANT: Only start counting if the slide is ACTIVE on screen
                 if (!isActive) {
                     setSecondsLeft(10);
                     setProgress(100);
@@ -251,7 +249,7 @@
                 }, 30);
 
                 return () => clearInterval(interval);
-            }, [isActive, data]); // Re-run when it becomes active or data changes
+            }, [isActive, data]);
 
             if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
 
@@ -276,7 +274,6 @@
                     )}
                     
                     <div className="mb-[5vmin] max-w-[90%] relative z-10 flex-1 flex items-center justify-center">
-                        {/* INCREASED SIZE HERE */}
                         <h2 className="text-[6vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
                     </div>
                     
@@ -296,7 +293,6 @@
                             return (
                                 <div
                                     key={idx}
-                                    // INCREASED SIZE HERE
                                     className={`p-[3vmin] rounded-3xl font-bold text-[4vmin] transition-all duration-700 border backdrop-blur-md shadow-md flex items-center justify-center min-h-[12vmin] leading-tight ${bgClass}`}
                                 >
                                     {ans}
@@ -388,189 +384,6 @@
                 </div>
             );
         };
-        
-        /* --- END RESTORING MISSING COMPONENTS --- */
-
-        const YearProgressCard = () => {
-            const [progress, setProgress] = useState(0);
-            useEffect(() => {
-                const update = () => {
-                    const now = new Date();
-                    const start = new Date(now.getFullYear(), 0, 1);
-                    const end = new Date(now.getFullYear() + 1, 0, 1);
-                    const pct = ((now - start) / (end - start) * 100).toFixed(1);
-                    setProgress(pct);
-                };
-                update();
-                const interval = setInterval(update, 600000); 
-                return () => clearInterval(interval);
-            }, []);
-            return (
-                <div className="h-full w-full flex flex-col justify-center items-center bg-zinc-900 text-white p-10 font-sans">
-                    <h2 className="text-[14vmin] font-bold text-green-400 mb-[4vmin] tracking-widest uppercase">Year Progress</h2>
-                    <div className="w-full h-[6vmin] bg-zinc-800 rounded-full overflow-hidden border border-zinc-700 relative">
-                        <div className="h-full bg-gradient-to-r from-red-500 to-green-600 transition-all duration-1000 ease-out flex items-center justify-end px-4" style={{ width: `${progress}%` }}></div>
-                        <div className="absolute inset-0 flex items-center justify-center text-[3vmin] font-black z-10 mix-blend-difference text-white">{progress}%</div>
-                    </div>
-                    <div className="mt-[4vmin] text-[2vmin] text-zinc-500 font-mono">{new Date().getFullYear()} IS {progress}% COMPLETE</div>
-                </div>
-            );
-        };
-
-        const WelcomeCard = ({ message, animation }) => {
-            let animClass = "anim-fade"; 
-            if (animation === 'drop') animClass = "anim-drop";
-            if (animation === 'scroll') animClass = "anim-scroll";
-            return (
-                <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 text-center overflow-hidden">
-                    <h1 className={`text-[10vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-orange-500 leading-tight uppercase ${animClass}`}>{message || "ENTER YOUR CUSTOM TEXT HERE"}</h1>
-                    <p className="text-[4vmin] text-gray-400 mt-4 animate-pulse">BROUGHT TO YOU BY WWW.WEEKENDCUSTOMCREATIONS.COM</p>
-                </div>
-            );
-        };
-
-        const CustomImageCard = ({ url }) => (
-            <div className="h-full w-full relative bg-black flex items-center justify-center">
-                {url ? <img src={url} className="max-w-full max-h-full object-contain" alt="Custom Slide" /> : <div className="flex items-center justify-center h-full text-gray-500">No Image URL Set</div>}
-            </div>
-        );
-
-        const ClockCard = ({ timezoneOffset, color = 'text-white' }) => {
-            const [time, setTime] = useState(new Date());
-            useEffect(() => {
-                const timer = setInterval(() => {
-                    const now = new Date();
-                    if (timezoneOffset !== null && timezoneOffset !== undefined) {
-                        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                        const targetTime = new Date(utc + (1000 * timezoneOffset));
-                        setTime(targetTime);
-                    } else { setTime(now); }
-                }, 1000);
-                return () => clearInterval(timer);
-            }, [timezoneOffset]);
-            const formatTime = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).replace(' AM', '').replace(' PM', '');
-            const [hours, minutes] = formatTime(time).split(':');
-            const getAmPm = (date) => date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).slice(-2);
-            const formatDate = (date) => date.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-            return (
-                <div className="h-full w-full flex flex-col justify-center items-center p-[4vh] bg-[#0D0D0D] text-white relative overflow-hidden font-sans">
-                    <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/20 to-transparent pointer-events-none" />
-                    <div className="relative z-10 flex flex-col items-center justify-center h-full">
-                        <div className={`text-[4vw] font-medium tracking-[0.2em] uppercase mb-[2vh] opacity-90 ${color}`}>{formatDate(time)}</div>
-                        <div className={`flex items-baseline gap-[1vh] leading-none select-none ${color}`}>
-                            <span className="text-[35vw] font-bold tracking-tighter drop-shadow-2xl flex items-baseline leading-[0.8]">{hours}<span className="animate-blink">:</span>{minutes}</span>
-                            <span className="text-[8vw] font-light uppercase opacity-80 self-end mb-[4vw]">{getAmPm(time)}</span>
-                        </div>
-                        <div className="mt-[4vh] flex items-center gap-[1.5vh] text-slate-400 text-[2vw] font-mono tracking-widest border-t border-white/10 pt-[2vh] px-[4vh]">
-                           <div className="w-[1.5vw] h-[1.5vw] rounded-full bg-green-500 animate-pulse" />
-                           {timezoneOffset !== null ? 'LOCAL TIME' : 'SYSTEM SYNC'}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const WeatherCard = ({ weatherData }) => {
-            if (!weatherData) return null;
-            const { temp, condition, wind, city, loading, error, daily, precip, aqi } = weatherData;
-            const getConditionText = (code) => {
-                if (code === 0) return "Clear Sky";
-                if (code <= 3) return "Partly Cloudy";
-                if (code <= 45) return "Foggy";
-                if (code <= 67) return "Rainy";
-                if (code <= 77) return "Snow";
-                if (code >= 95) return "Thunderstorms";
-                return "Cloudy";
-            };
-            const getPrecipText = (amount, code) => {
-                if (amount === 0) return '0"';
-                if (amount < 0.01) return `<.01"`;
-                return `${amount.toFixed(2)}"`;
-            };
-            const getAqiColor = (val) => {
-                if (val <= 50) return 'text-green-400';
-                if (val <= 100) return 'text-yellow-400';
-                if (val <= 150) return 'text-orange-400';
-                if (val <= 200) return 'text-red-500';
-                if (val <= 300) return 'text-purple-500';
-                return 'text-rose-900';
-            };
-            if (loading) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
-            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading weather.</p></div>;
-            const high = daily?.temperature_2m_max?.[0];
-            const low = daily?.temperature_2m_min?.[0];
-            return (
-                <div className="h-full w-full relative overflow-hidden font-sans bg-gradient-to-br from-blue-600 to-cyan-500 text-white p-[2vmin]">
-                    <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1vmin] opacity-80 z-20">
-                        <MapPin className="w-[4vmin] h-[4vmin]" />
-                        <span className="text-[4vmin] font-bold uppercase tracking-wider">{city}</span>
-                    </div>
-                    <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10">
-                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10">
-                            <div className="drop-shadow-2xl filter">{getWeatherIcon(condition, "w-[30vmin] h-[30vmin]")}</div>
-                            <h1 className="text-[40vmin] font-black leading-none tracking-tighter drop-shadow-lg -mt-[5vmin]">{Math.round(temp)}°</h1>
-                        </div>
-                        <div className="flex flex-col items-center landscape:items-start landscape:justify-center landscape:w-1/2 landscape:pl-[4vmin] gap-[4vmin]">
-                            <div className="text-[10vmin] font-bold leading-none text-center landscape:text-left text-white drop-shadow-md">{getConditionText(condition)}</div>
-                            {high !== undefined && low !== undefined && (
-                                <div className="flex items-center gap-[8vmin]">
-                                    <div className="flex flex-col items-center landscape:items-start"><span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">High</span><span className="text-[12vmin] font-black leading-none">{Math.round(high)}°</span></div>
-                                    <div className="w-[1px] h-[12vmin] bg-white/30 rounded-full"></div>
-                                    <div className="flex flex-col items-center landscape:items-start"><span className="text-[3vmin] font-bold uppercase tracking-widest opacity-70">Low</span><span className="text-[12vmin] font-black leading-none text-blue-100">{Math.round(low)}°</span></div>
-                                </div>
-                            )}
-                            <div className="grid grid-cols-3 gap-[2vmin] bg-white/10 p-[3vmin] rounded-3xl backdrop-blur-md w-full max-w-[80vmin] border border-white/10 mt-[1vmin]">
-                                <div className="text-center"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Wind</div><div className="font-bold text-[5vmin] leading-none">{wind} <span className="text-[2vmin] opacity-70">mph</span></div></div>
-                                <div className="text-center border-l border-white/20"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">Precip</div><div className="font-bold text-[5vmin] leading-none">{getPrecipText(precip, condition)}</div></div>
-                                <div className="text-center border-l border-white/20"><div className="opacity-75 text-[2.5vmin] uppercase font-bold tracking-wider mb-[0.5vmin]">AQI</div><div className={`font-black text-[5vmin] leading-none ${getAqiColor(aqi)}`}>{aqi || '--'}</div></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="absolute -bottom-[10%] -right-[10%] w-[50vmin] h-[50vmin] opacity-10 text-white pointer-events-none rotate-12"><CloudFilled className="w-full h-full" /></div>
-                </div>
-            );
-        };
-        const ForecastCard = ({ weatherData, days }) => {
-            if (!weatherData) return null;
-            const { daily, loading, error, city } = weatherData;
-            if (loading || !daily) return <div className="h-full w-full flex items-center justify-center bg-blue-900 text-white"><Loader className="w-12 h-12 animate-spin" /></div>;
-            if (error) return <div className="h-full w-full flex items-center justify-center bg-red-900 text-white"><p>Error loading forecast.</p></div>;
-            const limit = Math.min(days, 5);
-            const baseScale = days === 3 ? 1.6 : 1.2; 
-            const forecastItems = [];
-            if (daily && daily.time) {
-                for (let i = 1; i <= limit; i++) {
-                    if (daily.time[i]) {
-                        const parts = daily.time[i].split('-');
-                        const localDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                        forecastItems.push({ date: localDate, max: Math.round(daily.temperature_2m_max[i]), min: Math.round(daily.temperature_2m_min[i]), precip: daily.precipitation_sum ? daily.precipitation_sum[i] : 0, code: daily.weather_code[i] });
-                    }
-                }
-            }
-            const getPrecipLabel = (amount, code) => {
-                if (!amount || amount < 0.01) return null;
-                const type = (code >= 71 && code <= 77) || (code === 85 || code === 86) ? 'Snow' : 'Rain';
-                return `${amount.toFixed(2)}" ${type}`;
-            };
-            return (
-                <div className="h-full w-full flex flex-col p-[3vmin] bg-gradient-to-br from-indigo-900 to-blue-800 text-white font-sans relative overflow-hidden">
-                    <div className="flex items-center gap-[1.5vmin] mb-[2vmin] relative z-10 flex-none"><CalendarIcon className="w-[5vmin] h-[5vmin] text-blue-300" /><div><h2 className="text-[4vmin] font-bold leading-none">Forecast</h2><p className="text-[2vmin] opacity-70 uppercase tracking-widest">{city}</p></div></div>
-                    <div className="flex-1 flex flex-row gap-[2vmin] relative z-10 min-h-0">
-                        {forecastItems.map((day, idx) => (
-                            <div key={idx} className="flex-1 flex flex-col items-center justify-evenly bg-white/10 rounded-3xl p-[2vmin] backdrop-blur-md border border-white/5 shadow-xl transition-transform hover:scale-105">
-                                <div className="text-center mt-[1vmin]">
-                                    <div style={{ fontSize: `clamp(1.5rem, ${4.5 * baseScale}vmin, 5rem)` }} className="font-black uppercase text-blue-200 leading-none">{day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                                    <div style={{ fontSize: `clamp(1rem, ${2 * baseScale}vmin, 2rem)` }} className="font-bold text-blue-300 mt-[0.5vmin]">{day.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                                </div>
-                                <div className="flex flex-col items-center justify-center flex-1 w-full">{getWeatherIcon(day.code, "", { width: `${15 * baseScale}vmin`, height: `${15 * baseScale}vmin` })}{day.precip > 0.01 && (<div style={{ fontSize: `clamp(0.8rem, ${2 * baseScale}vmin, 1.5rem)` }} className="font-bold text-white mt-[1.5vmin] bg-blue-600/80 px-[2vmin] py-[0.5vmin] rounded-full whitespace-nowrap shadow-md">{getPrecipLabel(day.precip, day.code)}</div>)}</div>
-                                <div className="text-center mb-[1vmin]"><div style={{ fontSize: `clamp(3rem, ${10 * baseScale}vmin, 12rem)` }} className="font-black leading-none tracking-tighter drop-shadow-lg">{day.max}°</div><div style={{ fontSize: `clamp(1.5rem, ${5 * baseScale}vmin, 5rem)` }} className="opacity-60 font-medium text-blue-100">{day.min}°</div></div>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="absolute -bottom-10 -right-10 w-[40vmin] h-[40vmin] opacity-5 text-white pointer-events-none"><CloudFilled className="w-full h-full" /></div>
-                </div>
-            );
-        };
 
         const StockCard = ({ symbol, data }) => {
             if (!data) return (
@@ -629,348 +442,94 @@
                 </div>
             );
         };
+        const FlightTrackerCard = ({ lat, lon, location }) => {
+            const [flights, setFlights] = useState([]);
+            const [loading, setLoading] = useState(true);
 
-        const SportsCardLayout = ({ team, isLive, children }) => (
-            <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
-                <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20">
-                    <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md logo-glow" />
-                    <div><h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2><div className="flex items-center gap-[1vmin]"><span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>{isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}</div></div>
-                </div>
-                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[8vmin]">{children}</div>
-            </div>
-        );
+            useEffect(() => {
+                const fetchFlights = async () => {
+                    // Create a bounding box ~50 miles around the location
+                    const lamin = lat - 0.7;
+                    const lomin = lon - 0.7;
+                    const lamax = lat + 0.7;
+                    const lomax = lon + 0.7;
 
-        const FootballField = ({ yardLine, possession, homeTeam, awayTeam }) => {
-            const isHome = String(possession) === String(homeTeam.id);
-            const activeTeam = isHome ? homeTeam : awayTeam;
-            const activeColor = activeTeam.color || '#555';
-            const activeLogo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/${activeTeam.abbrev ? activeTeam.abbrev.toLowerCase() : 'scoreboard'}.png`;
-            const teamAbbrev = activeTeam.abbrev || (activeTeam.name ? activeTeam.name.substring(0,3).toUpperCase() : '');
-            let displayWidth = yardLine;
-            if (!isHome) { displayWidth = 100 - yardLine; }
-            const widthPct = Math.min(Math.max(displayWidth, 0), 100);
-            const gridLines = [];
-            for (let i = 5; i < 100; i += 5) { gridLines.push(i); }
-            const [logoError, setLogoError] = useState(false);
+                    try {
+                        const res = await fetch(`https://opensky-network.org/api/states/all?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.states) {
+                                // Map raw array to object
+                                const formatted = data.states.map(s => ({
+                                    icao24: s[0],
+                                    callsign: s[1]?.trim(),
+                                    country: s[2],
+                                    lon: s[5],
+                                    lat: s[6],
+                                    alt: s[7], // meters
+                                    velocity: s[9], // m/s
+                                    heading: s[10]
+                                })).filter(f => f.callsign && f.alt > 0).slice(0, 5); // Limit to top 5 visible
+                                setFlights(formatted);
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Flight fetch error", e);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                fetchFlights();
+                const interval = setInterval(fetchFlights, 20000); // Poll every 20s
+                return () => clearInterval(interval);
+            }, [lat, lon]);
+
             return (
-                <div className="w-[90%] h-[15vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
-                    <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}>{homeTeam.logo ? <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80 logo-glow" /> : <span className="-rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>}</div>
-                    <div className="w-[83.334%] h-full relative z-0">
-                        {gridLines.map((num) => { const isTen = num % 10 === 0; return (<div key={num} className={`absolute top-0 bottom-0 border-l flex flex-col justify-between py-[0.5vmin] ${isTen ? 'border-white/40' : 'border-white/10'}`} style={{ left: `${num}%` }}>{isTen && (<><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span></>)}</div>); })}
-                        <div className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out z-20 flex items-center overflow-visible" style={{ left: isHome ? '0%' : 'auto', right: isHome ? 'auto' : '0%', width: `${widthPct}%`, backgroundColor: activeColor, opacity: 0.9, boxShadow: '0 0 10px rgba(0,0,0,0.5)', justifyContent: isHome ? 'flex-end' : 'flex-start' }}><div className={`w-[8vmin] h-[8vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}>{!logoError ? <img src={activeLogo} className="w-full h-full object-contain" onError={() => setLogoError(true)} /> : <span className="text-black font-bold text-[1.5vmin]">{teamAbbrev}</span>}</div></div>
+                <div className="h-full w-full bg-slate-900 relative overflow-hidden font-sans flex flex-col p-4">
+                    {/* Radar Background Effect */}
+                    <div className="absolute inset-0 z-0 opacity-20">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vmin] h-[80vmin] border border-green-500/30 rounded-full"></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vmin] h-[60vmin] border border-green-500/30 rounded-full"></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vmin] h-[40vmin] border border-green-500/30 rounded-full"></div>
+                        <div className="absolute top-1/2 left-1/2 w-1/2 h-1 bg-green-500/20 origin-left animate-[spin_4s_linear_infinite]"></div>
                     </div>
-                    <div className="w-[8.333%] h-full border-l-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: awayTeam.color }}>{awayTeam.logo ? <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80 logo-glow" /> : <span className="rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>}</div>
-                </div>
-            );
-        };
 
-        const NFLCard = ({ teamId, realData }) => {
-            const teamConfig = NFL_TEAMS.find(t => t.id === teamId);
-            const team = useMemo(() => {
-                if (!teamConfig) return null;
-                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId.toLowerCase()}.png` };
-                if (realData) { 
-                    const oppColor = NFL_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
-                    if (realData.live) realData.live.opponentColor = oppColor;
-                    return { ...base, ...realData }; 
-                }
-                return { ...base, status: 'OFFLINE', record: '0-0', schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } } };
-            }, [teamId, teamConfig, realData]);
-
-            if (!team) return null;
-            const isLive = team.status === 'LIVE' || team.status === 'IN';
-            const isSeasonEnd = team.schedule?.next?.opponent === 'Season End';
-            const possessionId = String(team.live?.possession || '');
-            const homeId = String(team.live?.homeTeam?.id || '');
-            const awayId = String(team.live?.awayTeam?.id || '');
-            const isHomePossession = possessionId === homeId;
-            const isMyPossession = (String(team.live?.homeTeam?.abbrev) === String(team.id) && isHomePossession) || (String(team.live?.awayTeam?.abbrev) === String(team.id) && possessionId === awayId);
-            const isOppPossession = (String(team.live?.homeTeam?.abbrev) === String(team.id) && possessionId === awayId) || (String(team.live?.awayTeam?.abbrev) === String(team.id) && isHomePossession);
-            
-            let ballOnText = "50";
-            if (isLive && team.live) {
-                const yl = team.live.yardLine;
-                if (yl === 50) ballOnText = "50";
-                else {
-                    if (isHomePossession) { if (yl < 50) ballOnText = `OWN ${yl}`; else ballOnText = `OPP ${100 - yl}`; } 
-                    else { if (yl > 50) ballOnText = `OWN ${100 - yl}`; else ballOnText = `OPP ${yl}`; }
-                }
-            }
-
-            return (
-                <SportsCardLayout team={team} isLive={isLive}>
-                    {isLive ? (
-                        <>
-                            <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">{isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}<img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" /></div><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />{isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}</div><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div><div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
-                            </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]"><div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay || "Coverage starting..."}</div>{team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}<div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]"><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5"><div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Down & Dist</div><div className="text-[4vmin] font-black">{team.live.down > 0 ? `${team.live.down}${getOrdinal(team.live.down)} & ${team.live.distance}` : "1st & 10"}</div></div><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5"><div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div><div className="text-[4vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>{ballOnText}</div></div></div></div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                {isSeasonEnd ? (
-                                    <div className="flex flex-col items-center landscape:items-end justify-center h-full">
-                                            <div className="text-[5vmin] font-bold text-gray-500 uppercase tracking-widest mb-[2vmin]">Season Complete</div>
-                                            <div className="text-[18vmin] font-black leading-none text-white tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.record}</div>
-                                            <div className="text-[3vmin] font-bold text-gray-400 mt-[2vmin] uppercase tracking-wider">Final Record</div>
-                                    </div>
-                                ) : (
-                                    <>
-                                            <div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl logo-glow" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
-                        </>
-                    )}
-                </SportsCardLayout>
-            );
-        };
-
-        const NCAAFCard = ({ teamId, realData }) => {
-             const teamConfig = NCAAF_TEAMS.find(t => t.id === teamId);
-            const team = useMemo(() => {
-                if (!teamConfig) return null;
-                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/ncaa/500/${teamId}.png` };
-                if (realData) { 
-                    const oppColor = NCAAF_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
-                    if (realData.live) realData.live.opponentColor = oppColor;
-                    return { ...base, ...realData }; 
-                }
-                return { ...base, status: 'OFFLINE', record: '0-0', schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } } };
-            }, [teamId, teamConfig, realData]);
-
-            if (!team) return null;
-            const isLive = team.status === 'LIVE' || team.status === 'IN';
-            const isSeasonEnd = team.schedule?.next?.opponent === 'Season End';
-            const possessionId = String(team.live?.possession || '');
-            const homeId = String(team.live?.homeTeam?.id || '');
-            const isHomePossession = possessionId === homeId;
-            const myAbbrev = String(team.id);
-            const isMyPossession = possessionId === myAbbrev;
-            const isOppPossession = !isMyPossession && possessionId !== 'null' && possessionId !== '';
-            
-            let ballOnText = "50";
-            if (isLive && team.live) {
-                const yl = team.live.yardLine;
-                if (yl === 50) ballOnText = "50";
-                else {
-                    if (isHomePossession) { if (yl < 50) ballOnText = `OWN ${yl}`; else ballOnText = `OPP ${100 - yl}`; } 
-                    else { if (yl > 50) ballOnText = `OWN ${100 - yl}`; else ballOnText = `OPP ${yl}`; }
-                }
-            }
-
-            return (
-                <SportsCardLayout team={team} isLive={isLive}>
-                    {isLive ? (
-                        <>
-                            <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">{isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}<img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" /></div><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/ncaa/500/ncaa.png`} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />{isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}</div><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div><div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
-                            </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]"><div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay}</div>{team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}<div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]"><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md"><div className="text-[2vmin] text-gray-400 uppercase font-bold">Down & Dist</div><div className="text-[4vmin] font-black">{team.live.down}{getOrdinal(team.live.down)} & {team.live.distance}</div></div><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md"><div className="text-[2vmin] text-gray-400 uppercase font-bold">Ball On</div><div className="text-[4vmin] font-black" style={{ color: '#fff' }}>{ballOnText}</div></div></div></div>
-                        </>
-                    ) : (
-                         <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                {isSeasonEnd ? (
-                                    <div className="flex flex-col items-center landscape:items-end justify-center h-full">
-                                            <div className="text-[5vmin] font-bold text-gray-500 uppercase tracking-widest mb-[2vmin]">Season Complete</div>
-                                            <div className="text-[18vmin] font-black leading-none text-white tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.record}</div>
-                                            <div className="text-[3vmin] font-bold text-gray-400 mt-[2vmin] uppercase tracking-wider">Final Record</div>
-                                    </div>
-                                ) : (
-                                    <>
-                                            <div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl logo-glow" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
-                        </>
-                    )}
-                </SportsCardLayout>
-            );
-        };
-
-        const NHLCard = ({ teamId, realData }) => {
-            const teamConfig = NHL_TEAMS.find(t => t.id === teamId);
-            const team = useMemo(() => {
-                if (!teamConfig) return null;
-                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/nhl/500/${teamId.toLowerCase()}.png` };
-                if (realData) { return { ...base, ...realData }; }
-                return { ...base, status: 'OFFLINE', record: '0-0-0', schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } } };
-            }, [teamId, teamConfig, realData]);
-
-            if (!team) return null;
-            const isLive = team.status === 'LIVE' || team.status === 'IN';
-            const isSeasonEnd = team.schedule?.next?.opponent === 'Season End';
-
-            return (
-                <SportsCardLayout team={team} isLive={isLive}>
-                    {isLive ? (
-                        <>
-                            <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]">
-                                    <div className="flex flex-col items-center"><img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin] logo-glow" /><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div>
-                                    <div className="text-[6vmin] font-bold text-gray-600">-</div>
-                                    <div className="flex flex-col items-center"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nhl/500/nhl.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin] logo-glow" /><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div>
-                                </div>
-                                <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.time} | P{team.live.period}</div>
-                            </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]">
-                                <div className="text-[6vmin] font-bold text-white">vs {team.live.opponent}</div>
-                                <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90">{team.live.lastPlay}</div>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                {isSeasonEnd ? (
-                                    <div className="flex flex-col items-center landscape:items-end justify-center h-full">
-                                            <div className="text-[5vmin] font-bold text-gray-500 uppercase tracking-widest mb-[2vmin]">Season Complete</div>
-                                            <div className="text-[18vmin] font-black leading-none text-white tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.record}</div>
-                                            <div className="text-[3vmin] font-bold text-gray-400 mt-[2vmin] uppercase tracking-wider">Final Record</div>
-                                    </div>
-                                ) : (
-                                    <>
-                                            <div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl logo-glow" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
-                        </>
-                    )}
-                </SportsCardLayout>
-            );
-        };
-
-        const MLBCard = ({ teamId, realData }) => {
-            const teamConfig = MLB_TEAMS.find(t => t.id === teamId);
-            const team = useMemo(() => {
-                if (!teamConfig) return null;
-                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/mlb/500/${teamId.toLowerCase()}.png` };
-                if (realData) { return { ...base, ...realData }; }
-                return { ...base, status: 'OFFLINE', record: '0-0', schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } } };
-            }, [teamId, teamConfig, realData]);
-
-            if (!team) return null;
-            const isLive = team.status === 'LIVE' || team.status === 'IN';
-            const isSeasonEnd = team.schedule?.next?.opponent === 'Season End';
-            
-            const Diamond = ({ runners }) => (
-                <div className="relative w-[20vmin] h-[20vmin] rotate-45 border-4 border-[#8B4513] bg-[#5D4037] mx-auto">
-                    <div className="absolute inset-0 border-[0.5vmin] border-white/30"></div>
-                    <div className={`absolute top-0 right-0 w-[3vmin] h-[3vmin] -mt-[1.5vmin] -mr-[1.5vmin] border-2 border-white transition-colors duration-500 ${runners.first ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
-                    <div className={`absolute top-0 left-0 w-[3vmin] h-[3vmin] -mt-[1.5vmin] -ml-[1.5vmin] border-2 border-white transition-colors duration-500 ${runners.second ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
-                    <div className={`absolute bottom-0 left-0 w-[3vmin] h-[3vmin] -mb-[1.5vmin] -ml-[1.5vmin] border-2 border-white transition-colors duration-500 ${runners.third ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.8)]' : 'bg-white'}`}></div>
-                    <div className="absolute bottom-0 right-0 w-[3vmin] h-[3vmin] -mb-[1.5vmin] -mr-[1.5vmin] bg-white" style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
-                </div>
-            );
-
-            return (
-                <SportsCardLayout team={team} isLive={isLive}>
-                    {isLive ? (
-                        <>
-                            <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/2 landscape:pr-[4vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin] logo-glow" /><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/mlb/500/mlb.png`} className="w-[10vmin] h-[10vmin] object-contain mb-[1vmin] logo-glow" /><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div><div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.inningState}</div>
-                            </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-1/2 landscape:pl-[4vmin] w-full gap-[2vmin]"><Diamond runners={team.live.runners} /><div className="flex gap-[2vmin] mt-[2vmin]"><div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">B: {team.live.balls}</div><div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full">S: {team.live.strikes}</div><div className="text-[3vmin] font-bold bg-white/10 px-[2vmin] py-[1vmin] rounded-full text-red-400">O: {team.live.outs}</div></div></div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                {isSeasonEnd ? (
-                                    <div className="flex flex-col items-center landscape:items-end justify-center h-full">
-                                            <div className="text-[5vmin] font-bold text-gray-500 uppercase tracking-widest mb-[2vmin]">Season Complete</div>
-                                            <div className="text-[18vmin] font-black leading-none text-white tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.record}</div>
-                                            <div className="text-[3vmin] font-bold text-gray-400 mt-[2vmin] uppercase tracking-wider">Final Record</div>
-                                    </div>
-                                ) : (
-                                    <>
-                                            <div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl logo-glow" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
-                        </>
-                    )}
-                </SportsCardLayout>
-            );
-        };
-        
-        const PlayoffOverviewCard = ({ games }) => {
-            return (
-                <div className="h-full w-full bg-slate-900 text-white p-[3vmin] font-sans flex flex-col">
-                    <div className="text-center mb-[2vmin]">
-                        <h2 className="text-[5vmin] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-red-400 uppercase tracking-tighter">Playoff Picture</h2>
-                        <div className="w-[20vmin] h-1 bg-white/20 mx-auto rounded-full mt-2"></div>
-                    </div>
-                    <div className="flex-1 overflow-hidden grid grid-cols-2 md:grid-cols-3 gap-[2vmin]">
-                        {games.map(game => {
-                            const comp = game.competitions[0];
-                            const home = comp.competitors.find(c => c.homeAway === 'home');
-                            const away = comp.competitors.find(c => c.homeAway === 'away');
-                            const isLive = game.status.type.state === 'in';
-                            const isFinal = game.status.type.state === 'post';
-                            return (
-                                <div key={game.id} className="bg-white/5 rounded-xl p-[1.5vmin] flex flex-col justify-between border border-white/5 relative overflow-hidden">
-                                    {isLive && <div className="absolute top-0 right-0 bg-red-600 text-white text-[1.5vmin] font-bold px-2 py-0.5 rounded-bl-lg animate-pulse">LIVE</div>}
-                                    <div className="flex justify-between items-center mb-[1vmin] text-[2vmin] font-bold text-slate-400">
-                                        <span>{new Date(game.date).toLocaleTimeString([], {weekday:'short', hour:'numeric'})}</span>
-                                        <span>{isFinal ? 'FINAL' : game.status.type.detail}</span>
-                                    </div>
-                                    <div className="space-y-[1vmin]">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-[1vmin]">
-                                                <img src={away.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
-                                                <span className="text-[2.5vmin] font-bold">{away.team.abbreviation}</span>
-                                            </div>
-                                            <span className={`text-[3vmin] font-black ${parseInt(away.score) > parseInt(home.score) ? 'text-white' : 'text-slate-500'}`}>{away.score}</span>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-[1vmin]">
-                                                <img src={home.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
-                                                <span className="text-[2.5vmin] font-bold">{home.team.abbreviation}</span>
-                                            </div>
-                                            <span className={`text-[3vmin] font-black ${parseInt(home.score) > parseInt(away.score) ? 'text-white' : 'text-slate-500'}`}>{home.score}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            );
-        };
-
-        const PlayoffCard = ({ game }) => {
-            const comp = game.competitions[0];
-            const home = comp.competitors.find(c => c.homeAway === 'home');
-            const away = comp.competitors.find(c => c.homeAway === 'away');
-            const status = game.status.type.shortDetail;
-            
-            return (
-                <div className="h-full w-full relative bg-slate-950 flex flex-col">
-                     <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
-                     <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-[4vmin]">
-                        <div className="text-[3vmin] font-bold text-slate-400 uppercase tracking-widest bg-slate-900/80 px-6 py-2 rounded-full border border-slate-700">{status}</div>
-                        <div className="flex items-center justify-center w-full gap-[6vmin]">
-                            <div className="flex flex-col items-center">
-                                <img src={away.team.logo} className="w-[20vmin] h-[20vmin] object-contain logo-glow" />
-                                <div className="text-[12vmin] font-black leading-none mt-4">{away.score}</div>
-                            </div>
-                            <div className="text-[6vmin] font-bold text-slate-600">VS</div>
-                             <div className="flex flex-col items-center">
-                                <img src={home.team.logo} className="w-[20vmin] h-[20vmin] object-contain logo-glow" />
-                                <div className="text-[12vmin] font-black leading-none mt-4">{home.score}</div>
-                            </div>
+                    <div className="relative z-10 flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+                        <div>
+                            <h2 className="text-3xl font-black text-green-400 uppercase tracking-widest">LIVE RADAR</h2>
+                            <p className="text-sm text-green-600 font-mono">SECTOR: {location.toUpperCase()}</p>
                         </div>
-                        <div className="text-[3vmin] text-slate-400 max-w-[80%] text-center">{game.name}</div>
-                     </div>
+                        <div className="animate-pulse w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+
+                    <div className="relative z-10 flex-1 flex flex-col gap-2 overflow-hidden">
+                        {loading ? (
+                            <div className="text-green-800 font-mono text-xl animate-pulse">SCANNING AIRSPACE...</div>
+                        ) : flights.length === 0 ? (
+                            <div className="text-green-800 font-mono text-xl">NO TRAFFIC DETECTED</div>
+                        ) : (
+                            flights.map(f => (
+                                <div key={f.icao24} className="flex items-center justify-between bg-green-900/20 border border-green-500/30 p-3 rounded-lg backdrop-blur-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-2xl">✈️</div>
+                                        <div>
+                                            <div className="text-2xl font-black text-green-100 leading-none">{f.callsign}</div>
+                                            <div className="text-xs text-green-400 font-mono">{f.country}</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-right font-mono text-green-300 text-sm">
+                                        <div>ALT: {Math.round(f.alt * 3.28084).toLocaleString()} ft</div>
+                                        <div>SPD: {Math.round(f.velocity * 2.23694)} mph</div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             );
         };
-        
+
         const App = () => {
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
@@ -982,7 +541,8 @@
             const [mlbData, setMlbData] = useState({});
             const [ncaafData, setNcaafData] = useState({});
 
-            const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3 }]);
+            // Added showFlights to zipConfigs default
+            const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3, showFlights: false }]);
             const [weatherDataMap, setWeatherDataMap] = useState({});
             
             const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -997,33 +557,25 @@
             
             const [customImages, setCustomImages] = usePersistedState('customImagesList', []);
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
-            
             const [showTrivia, setShowTrivia] = usePersistedState('showTrivia', false);
             const [triviaData, setTriviaData] = useState(null);
-
             const [showPlayoffMode, setShowPlayoffMode] = usePersistedState('showPlayoffMode', false);
             const [playoffGames, setPlayoffGames] = useState([]);
 
-            // --- STOCKS STATE ---
             const [finnhubKey, setFinnhubKey] = usePersistedState('finnhubKey', 'd5ensbhr01qmi0sjs2ggd5ensbhr01qmi0sjs2h0');
             const [stockSymbols, setStockSymbols] = usePersistedState('stockSymbols', []);
             const [stockData, setStockData] = useState({});
             const [newStockInput, setNewStockInput] = useState('');
 
-            // --- FETCH STOCKS ---
+            // --- FETCHERS ---
             useEffect(() => {
                 const fetchStocks = async () => {
                     if (!finnhubKey || stockSymbols.length === 0) return;
-                    
                     const newStockData = { ...stockData };
-                    
                     for (const symbol of stockSymbols) {
                         try {
-                            // 1. Get Quote (Price)
                             const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubKey}`);
                             const quote = await quoteRes.json();
-
-                            // 2. Get Profile (Company Name) - Only if we don't have it or name is missing
                             let name = newStockData[symbol]?.name;
                             if (!name) {
                                 try {
@@ -1032,89 +584,41 @@
                                     name = profile.name;
                                 } catch (e) {}
                             }
-
-                            if (quote.c === 0 && quote.d === null) {
-                                // Likely invalid symbol
-                                newStockData[symbol] = { error: true };
-                            } else {
-                                newStockData[symbol] = { ...quote, name: name || symbol, error: false };
-                            }
-                        } catch (e) {
-                            console.error("Stock fetch error", e);
-                        }
+                            if (quote.c === 0 && quote.d === null) newStockData[symbol] = { error: true };
+                            else newStockData[symbol] = { ...quote, name: name || symbol, error: false };
+                        } catch (e) {}
                     }
                     setStockData(newStockData);
                 };
-
                 fetchStocks();
-                const interval = setInterval(fetchStocks, 60000); // Update every minute
+                const interval = setInterval(fetchStocks, 60000);
                 return () => clearInterval(interval);
             }, [stockSymbols, finnhubKey]);
 
-            // --- TRIVIA FETCHER ---
             const fetchTrivia = async () => {
-                const fallback = {
-                    category: "General Knowledge",
-                    difficulty: "easy",
-                    question: "Which planet is known as the Red Planet?",
-                    correct: "Mars",
-                    answers: ["Mars", "Venus", "Jupiter", "Saturn"].sort(() => Math.random() - 0.5)
-                };
-
+                const fallback = { category: "General", difficulty: "easy", question: "Which planet is known as the Red Planet?", correct: "Mars", answers: ["Mars", "Venus", "Jupiter", "Saturn"] };
                 try {
                     const res = await fetch('https://opentdb.com/api.php?amount=1');
                     if (res.ok) {
                         const data = await res.json();
                         if (data.results && data.results.length > 0) {
-                            const decode = (str) => {
-                                const txt = document.createElement("textarea");
-                                txt.innerHTML = str;
-                                return txt.value;
-                            };
+                            const decode = (str) => { const txt = document.createElement("textarea"); txt.innerHTML = str; return txt.value; };
                             const q = data.results[0];
-                            const allAnswers = [...q.incorrect_answers, q.correct_answer]
-                                .sort(() => Math.random() - 0.5)
-                                .map(a => decode(a));
-                            
-                            setTriviaData({
-                                category: decode(q.category),
-                                question: decode(q.question),
-                                correct: decode(q.correct_answer),
-                                answers: allAnswers,
-                                difficulty: q.difficulty
-                            });
+                            const allAnswers = [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5).map(a => decode(a));
+                            setTriviaData({ category: decode(q.category), question: decode(q.question), correct: decode(q.correct_answer), answers: allAnswers, difficulty: q.difficulty });
                         } else { setTriviaData(fallback); }
                     } else { setTriviaData(fallback); }
                 } catch (e) { setTriviaData(fallback); }
             };
 
-            // Fetch initial trivia on mount if enabled
-            useEffect(() => {
-                if (showTrivia && !triviaData) fetchTrivia();
-            }, [showTrivia]);
+            useEffect(() => { if (showTrivia && !triviaData) fetchTrivia(); }, [showTrivia]);
 
-            // --- PLAYOFF FETCHER ---
             useEffect(() => {
                 if (!showPlayoffMode) return;
                 const fetchPlayoffs = async () => {
                     try {
-                        const now = new Date();
-                        const month = now.getMonth(); 
-                        const day = now.getDate();
-                        let urlParams = "";
-                        // Simple logic to try and get playoffs based on date
-                        if (month === 0) { // Jan
-                            if (day < 14) urlParams = "?seasontype=3&week=1";        
-                            else if (day < 21) urlParams = "?seasontype=3&week=2"; 
-                            else urlParams = "?seasontype=3&week=3";                
-                        } else if (month === 1) { // Feb
-                            urlParams = "?seasontype=3&week=5";                      
-                        }
-                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard${urlParams}`);
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (data.events) setPlayoffGames(data.events);
-                        }
+                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`); 
+                        if (res.ok) { const data = await res.json(); if (data.events) setPlayoffGames(data.events); }
                     } catch (e) {}
                 };
                 fetchPlayoffs();
@@ -1122,19 +626,8 @@
                 return () => clearInterval(interval);
             }, [showPlayoffMode]);
 
-            const [showControls, setShowControls] = useState(false);
-            const controlsTimeoutRef = useRef(null);
-
-            const handleInteraction = () => {
-                setShowControls(true);
-                if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
-                controlsTimeoutRef.current = setTimeout(() => { setShowControls(false); }, 5000);
-            };
-
-            useEffect(() => { handleInteraction(); }, []);
-
             useEffect(() => {
-                const fetchWeatherForZip = async (zip) => {
+                const fetchWeather = async (zip) => {
                     try {
                         let lat = 40.71, lon = -74.00, city = "New York", state = "NY";
                         try {
@@ -1147,251 +640,23 @@
                                 state = zipData.places[0].state;
                             }
                         } catch (e) {}
-
                         const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
                         const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`);
-
                         if (weatherRes.ok) {
                             const wData = await weatherRes.json();
                             const aqiData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }};
-                            setWeatherDataMap(prev => ({
-                                ...prev,
-                                [zip]: {
-                                    temp: wData.current.temperature_2m,
-                                    condition: wData.current.weather_code,
-                                    wind: wData.current.wind_speed_10m,
-                                    precip: wData.current.precipitation, 
-                                    aqi: aqiData.current?.us_aqi || 0,
-                                    city: `${city}, ${state}`,
-                                    timezoneOffset: wData.utc_offset_seconds || -14400,
-                                    daily: wData.daily,
-                                    loading: false, error: false
-                                }
-                            }));
+                            setWeatherDataMap(prev => ({ ...prev, [zip]: { 
+                                temp: wData.current.temperature_2m, condition: wData.current.weather_code, 
+                                wind: wData.current.wind_speed_10m, precip: wData.current.precipitation, 
+                                aqi: aqiData.current?.us_aqi || 0, city: `${city}, ${state}`, 
+                                lat: lat, lon: lon, // Captured for Flight Tracker
+                                timezoneOffset: wData.utc_offset_seconds || -14400, daily: wData.daily, loading: false 
+                            }}));
                         }
                     } catch (err) {}
                 };
-                if(Array.isArray(zipConfigs)) zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
+                if(Array.isArray(zipConfigs)) zipConfigs.forEach(conf => fetchWeather(conf.id));
             }, [zipConfigs]);
-
-            const calculateRecord = (events, teamId, league) => {
-                if (!events || !Array.isArray(events)) return "0-0";
-                let w = 0, l = 0, d = 0, otl = 0;
-                const targetId = String(teamId).toLowerCase();
-                events.forEach(e => {
-                    const comp = e.competitions?.[0];
-                    if (comp?.status?.type?.completed) {
-                        const myTeam = comp.competitors.find(c => String(c.team.id) === targetId || (c.team.abbreviation && c.team.abbreviation.toLowerCase() === targetId));
-                        if (myTeam) {
-                            const myScore = parseInt(myTeam.score?.value || 0, 10);
-                            const oppTeam = comp.competitors.find(c => c.id !== myTeam.id);
-                            const oppScore = parseInt(oppTeam?.score?.value || 0, 10);
-                            let isWin = false, isTie = false;
-                            if (myTeam.winner === true) isWin = true;
-                            else if (myTeam.winner === false) {} 
-                            else { if (myScore > oppScore) isWin = true; else if (myScore === oppScore) isTie = true; }
-                            if (isWin) w++;
-                            else if (isTie && (league === 'nfl' || league === 'college-football')) d++;
-                            else if (league === 'nhl' && comp.status.period > 3) otl++; 
-                            else l++;
-                        }
-                    }
-                });
-                if (league === 'nhl') return `${w}-${l}-${otl}`;
-                if ((league === 'nfl' || league === 'college-football') && d > 0) return `${w}-${l}-${d}`;
-                return `${w}-${l}`;
-            };
-
-            const fetchSportData = async (sport, league, teamId) => {
-                try {
-                    const idStr = String(teamId).toLowerCase(); 
-                    const now = new Date();
-                    let seasonYear = now.getFullYear();
-                    if (now.getMonth() < 7 && ['nfl', 'college-football'].includes(league)) {
-                        seasonYear -= 1;
-                    }
-
-                    let liveScoreboardGame = null;
-                    try {
-                        const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
-                        if(sbRes.ok) {
-                            const sbData = await sbRes.json();
-                            liveScoreboardGame = sbData.events?.find(e => {
-                                const isTeamInGame = e.competitions[0].competitors.some(c => String(c.team.id) === idStr || (c.team.abbreviation && c.team.abbreviation.toLowerCase() === idStr));
-                                return isTeamInGame && e.status.type.state === 'in';
-                            });
-                        }
-                    } catch(e) {}
-
-                    let teamInfoData = null;
-                    try {
-                        const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
-                        if (teamInfoRes.ok) teamInfoData = await teamInfoRes.json();
-                    } catch (e) {}
-
-                    if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
-
-                    const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule?season=${seasonYear}`;
-                    let allEvents = [];
-                    try {
-                        const regRes = await fetch(scheduleUrl);
-                        if (regRes.ok) {
-                            const regData = await regRes.json();
-                            if (regData.events) allEvents.push(...regData.events);
-                        }
-                    } catch (e) {}
-                    try {
-                        const postRes = await fetch(`${scheduleUrl}&seasonType=3`);
-                        if (postRes.ok) {
-                            const postData = await postRes.json();
-                            if (postData.events) allEvents.push(...postData.events);
-                        }
-                    } catch (e) {}
-
-                    const uniqueEventsMap = new Map();
-                    allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
-                    const events = Array.from(uniqueEventsMap.values()); 
-                    events.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                    let record = "0-0";
-                    if (teamInfoData.team.record?.items?.[0]?.summary) record = teamInfoData.team.record.items[0].summary;
-                    else record = calculateRecord(events, teamId, league);
-
-                    const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000));
-                    const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
-                    const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
-                    const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
-                    
-                    let prevGame = pastGames.length > 0 ? pastGames[0] : null;
-                    let nextGame = futureGames.length > 0 ? futureGames[0] : null;
-
-                    if (!nextGame && teamInfoData.team.nextEvent && teamInfoData.team.nextEvent.length > 0) {
-                        const fallbackGame = teamInfoData.team.nextEvent[0];
-                        const fallbackDate = new Date(fallbackGame.date);
-                        if (fallbackDate >= cutoff) nextGame = fallbackGame;
-                    }
-
-                    const fetchOpponentRecord = async (oppId) => {
-                        if (!oppId) return null;
-                        try {
-                            const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`);
-                            if(res.ok) {
-                                const d = await res.json();
-                                return d.team?.record?.items?.[0]?.summary || null;
-                            }
-                        } catch (e) { return null; }
-                        return null;
-                    };
-                    const isMe = (comp) => {
-                        const target = String(teamId).toLowerCase();
-                        const compId = String(comp.team.id).toLowerCase();
-                        const compAbbrev = comp.team.abbreviation ? comp.team.abbreviation.toLowerCase() : '';
-                        return compId === target || compAbbrev === target;
-                    };
-
-                    let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null, prevGameData = null;
-
-                    if (prevGame && prevGame.competitions) {
-                        const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
-                        const myComp = prevGame.competitions[0].competitors.find(c => isMe(c));
-                        if (prevComp && myComp) {
-                            if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href;
-                            prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
-                            const myScore = parseInt(myComp.score?.value || 0, 10);
-                            const oppScore = parseInt(prevComp.score?.value || 0, 10);
-                            const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore);
-                            prevGameData = {
-                                opponent: prevComp.team.abbreviation || 'OPP',
-                                opponentLogo: prevOppLogo,
-                                opponentRecord: prevOppRecord,
-                                myScore: myScore,
-                                oppScore: oppScore,
-                                isWin: isWin,
-                                score: `${myScore}-${oppScore}`,
-                                result: isWin ? `W ${myScore}-${oppScore}` : `L ${myScore}-${oppScore}`,
-                                date: new Date(prevGame.date).toLocaleDateString()
-                            };
-                        }
-                    }
-
-                    if (nextGame && nextGame.competitions) {
-                        const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
-                        if (nextComp) {
-                            if (nextComp.team.logos?.length > 0) nextOppLogo = nextComp.team.logos[0].href;
-                            nextOppRecord = await fetchOpponentRecord(nextComp.team.id);
-                        }
-                    }
-
-                    let liveGame = liveScoreboardGame;
-                    if (!liveGame) {
-                        const localLive = events.find(e => e.status?.type?.state === 'in');
-                        if (localLive) {
-                             try {
-                                const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${localLive.id}`);
-                                if (summaryRes.ok) liveGame = await summaryRes.json();
-                            } catch(e) {}
-                        }
-                    }
-
-                    let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
-                    mapped.schedule = {
-                        prev: prevGameData || { opponent: 'None', result: '-', date: '-' },
-                        next: nextGame ? {
-                            opponent: nextGame.competitions?.[0]?.competitors?.find(c => !isMe(c))?.team?.abbreviation || 'TBD',
-                            opponentLogo: nextOppLogo,
-                            opponentRecord: nextOppRecord,
-                            rawDate: nextGame.date,
-                            id: nextGame.id, 
-                            date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
-                            time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                            location: nextGame.competitions?.[0]?.venue?.fullName || 'TBD'
-                        } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
-                    };
-
-                    if (liveGame) {
-                        const comp = liveGame.competitions ? liveGame.competitions[0] : (liveGame.header ? liveGame.header.competitions[0] : null);
-                        if (comp) {
-                            const myTeam = comp.competitors.find(c => isMe(c));
-                            const oppTeam = comp.competitors.find(c => !isMe(c));
-                            const homeComp = comp.competitors.find(c => c.homeAway === 'home');
-                            const awayComp = comp.competitors.find(c => c.homeAway === 'away');
-                            let oppLogo = null;
-                            if (oppTeam.team.logos?.length > 0) { oppLogo = oppTeam.team.logos[0].href; } else {
-                                const abbrev = oppTeam.team.abbreviation ? oppTeam.team.abbreviation.toLowerCase() : '';
-                                if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id.toLowerCase() === abbrev); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
-                                else if (league === 'nhl') { oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${abbrev}.png`; } 
-                                else if (league === 'mlb') { oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${abbrev}.png`; } 
-                                else if (league === 'college-football') { oppLogo = `https://a.espncdn.com/i/teamlogos/ncaa/500/${oppTeam.team.id}.png`; }
-                            }
-                            const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
-                            const liveBase = {
-                                id: liveGame.id || (liveGame.header ? liveGame.header.id : 'unknown'),
-                                opponent: oppTeam.team.abbreviation,
-                                opponentLogo: oppLogo,
-                                opponentRecord: liveOppRecord,
-                                score: { myScore: myTeam.score, oppScore: oppTeam.score },
-                                time: comp.status.displayClock,
-                                homeTeam: { id: homeComp.team.id, abbrev: homeComp.team.abbreviation, name: homeComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===homeComp.team.abbreviation)?.color : '#333') || '#333', logo: homeComp.team.logos?.[0]?.href },
-                                awayTeam: { id: awayComp.team.id, abbrev: awayComp.team.abbreviation, name: awayComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===awayComp.team.abbreviation)?.color : '#fff') || '#fff', logo: awayComp.team.logos?.[0]?.href }
-                            };
-                            if (league === 'nfl' || league === 'college-football') {
-                                const situation = comp.situation || (liveGame.situation) || {};
-                                const lastPlayText = situation.lastPlay?.text || (liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress");
-                                mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: lastPlayText, opponentColor: '#333' };
-                            } else if (league === 'nhl') { 
-                                const situation = comp.situation || (liveGame.situation) || {};
-                                const lastPlayText = situation.lastPlay?.text || "Update in progress...";
-                                mapped.live = { ...liveBase, period: comp.status.period, lastPlay: lastPlayText };
-                            } 
-                            else if (league === 'mlb') {
-                                const sit = liveGame.situation || {};
-                                mapped.live = { ...liveBase, inning: comp.status.period, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } };
-                            }
-                        }
-                    }
-                    return { [teamId]: mapped };
-                } catch(e) { return { [teamId]: null }; }
-            };
 
             useEffect(() => {
                 const loadAll = async () => {
@@ -1407,78 +672,52 @@
                 return () => clearInterval(interval);
             }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
 
+            // Controls logic
+            const [showControls, setShowControls] = useState(false);
+            const controlsTimeoutRef = useRef(null);
+            const handleInteraction = () => {
+                setShowControls(true);
+                if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+                controlsTimeoutRef.current = setTimeout(() => { setShowControls(false); }, 5000);
+            };
+            useEffect(() => { handleInteraction(); }, []);
+
+            // --- ALL CARDS GENERATION ---
             const allCards = useMemo(() => {
                 const liveCards = [];
                 const standardCards = [];
 
                 const processSport = (list, dataMap, Component) => {
-                    if (Array.isArray(list)) {
-                        list.forEach(id => {
-                            const data = dataMap[id];
-                            if (data) {
-                                const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> };
-                                standardCards.push(card);
-                                if (data.status === 'LIVE' || data.status === 'IN') {
-                                    liveCards.push(card);
-                                }
-                            }
-                        });
-                    }
+                    if (Array.isArray(list)) list.forEach(id => {
+                        const data = dataMap[id];
+                        if (data) {
+                            const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> };
+                            standardCards.push(card);
+                            if (data.status === 'LIVE' || data.status === 'IN') liveCards.push(card);
+                        }
+                    });
                 };
-
                 processSport(nflTeamsSelected, nflData, NFLCard);
                 processSport(nhlTeamsSelected, nhlData, NHLCard);
                 processSport(mlbTeamsSelected, mlbData, MLBCard);
                 processSport(ncaafTeamsSelected, ncaafData, NCAAFCard);
 
-                // --- ADD STOCK CARDS ---
-                if (Array.isArray(stockSymbols)) {
-                    stockSymbols.forEach(symbol => {
-                        const data = stockData[symbol];
-                        standardCards.push({
-                            id: `stock-${symbol}`,
-                            component: <StockCard symbol={symbol} data={data} />
-                        });
-                    });
-                }
+                if (Array.isArray(stockSymbols)) stockSymbols.forEach(symbol => {
+                    const data = stockData[symbol];
+                    standardCards.push({ id: `stock-${symbol}`, component: <StockCard symbol={symbol} data={data} /> });
+                });
 
-                if (liveCards.length > 0) {
-                    return liveCards;
-                }
+                if (liveCards.length > 0) return liveCards;
 
                 const rotation = [];
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
-                
-                if (Array.isArray(customImages)) {
-                    customImages.forEach(img => {
-                        if (img.url) {
-                            rotation.push({ 
-                                id: `custom_image_${img.id}`, 
-                                component: <CustomImageCard url={img.url} />,
-                                duration: parseInt(img.duration) || 10 
-                            });
-                        }
-                    });
-                }
-
+                if (Array.isArray(customImages)) customImages.forEach(img => { if (img.url) rotation.push({ id: `custom_image_${img.id}`, component: <CustomImageCard url={img.url} />, duration: parseInt(img.duration) || 10 }); });
                 if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
-                
-                // Add Trivia
                 if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} /> });
-
+                
                 if (showPlayoffMode && playoffGames.length > 0) {
-                    rotation.push({
-                        id: 'playoff-overview',
-                        component: <PlayoffOverviewCard games={playoffGames} />
-                    });
-                    playoffGames.forEach(game => {
-                        if (game.competitions && game.competitions[0]) {
-                            rotation.push({
-                                id: `playoff-${game.id}`,
-                                component: <PlayoffCard game={game} />
-                            });
-                        }
-                    });
+                    rotation.push({ id: 'playoff-overview', component: <PlayoffOverviewCard games={playoffGames} /> });
+                    playoffGames.forEach(game => { if (game.competitions && game.competitions[0]) rotation.push({ id: `playoff-${game.id}`, component: <PlayoffCard game={game} /> }); });
                 }
 
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
@@ -1494,7 +733,11 @@
                         const data = weatherDataMap[config.id];
                         if (data) {
                             rotation.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
-                            if (config.showForecast) { rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); }
+                            if (config.showForecast) rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> });
+                            // FLIGHT TRACKER INJECTION
+                            if (config.showFlights && data.lat && data.lon) {
+                                rotation.push({ id: `flights-${config.id}`, component: <FlightTrackerCard lat={data.lat} lon={data.lon} location={data.city} /> });
+                            }
                         }
                     });
                 }
@@ -1503,57 +746,35 @@
                 return rotation;
             }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showYearProgress, welcomeMessage, welcomeAnimation, customImages, showTrivia, triviaData, showPlayoffMode, playoffGames, stockSymbols, stockData]);
 
+            // Carousel Logic
             useEffect(() => {
                 if (allCards.length === 0) return;
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
-
                 let slideDuration = 6000; 
-                
                 const currentCard = allCards[currentSlideIndex];
                 if (currentCard) {
-                    if (String(currentCard.id).startsWith('custom_image_')) {
-                        slideDuration = Math.max(3, currentCard.duration) * 1000; 
-                    }
-                    else if (currentCard.id === 'trivia') { 
-                        slideDuration = 15000; 
-                    }
+                    if (String(currentCard.id).startsWith('custom_image_')) slideDuration = Math.max(3, currentCard.duration) * 1000;
+                    else if (currentCard.id === 'trivia') slideDuration = 15000; // 15s for trivia
+                    else if (String(currentCard.id).startsWith('flights-')) slideDuration = 10000; // 10s for radar
                 }
-
                 const timer = setTimeout(() => { 
-                    if (currentCard?.id === 'trivia') { fetchTrivia(); }
+                    if (currentCard?.id === 'trivia') fetchTrivia(); 
                     setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
                 }, slideDuration);
-
                 return () => clearTimeout(timer);
             }, [allCards, isPaused, isSettingsOpen, currentSlideIndex]);
 
-            const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3 }]); };
+            // Settings Handlers
+            const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3, showFlights: false }]); };
             const handleRemoveZip = (id) => { setZipConfigs(zipConfigs.filter(z => z.id !== id)); };
             const handleUpdateZip = (id, newSettings) => { setZipConfigs(zipConfigs.map(z => z.id === id ? { ...z, ...newSettings } : z)); };
             const closeSettings = () => { setIsSettingsOpen(false); };
-
-            const addCustomImage = () => {
-                const newId = Date.now().toString();
-                setCustomImages([...customImages, { id: newId, url: '', duration: 10 }]);
-            };
-            const removeCustomImage = (id) => {
-                setCustomImages(customImages.filter(img => img.id !== id));
-            };
-            const updateCustomImage = (id, field, value) => {
-                setCustomImages(customImages.map(img => img.id === id ? { ...img, [field]: value } : img));
-            };
-
-            // --- STOCK HANDLERS ---
-            const addStock = () => {
-                if (newStockInput && !stockSymbols.includes(newStockInput.toUpperCase())) {
-                    setStockSymbols([...stockSymbols, newStockInput.toUpperCase()]);
-                    setNewStockInput('');
-                }
-            };
-            const removeStock = (sym) => {
-                setStockSymbols(stockSymbols.filter(s => s !== sym));
-            };
+            const addCustomImage = () => { const newId = Date.now().toString(); setCustomImages([...customImages, { id: newId, url: '', duration: 10 }]); };
+            const removeCustomImage = (id) => { setCustomImages(customImages.filter(img => img.id !== id)); };
+            const updateCustomImage = (id, field, value) => { setCustomImages(customImages.map(img => img.id === id ? { ...img, [field]: value } : img)); };
+            const addStock = () => { if (newStockInput && !stockSymbols.includes(newStockInput.toUpperCase())) { setStockSymbols([...stockSymbols, newStockInput.toUpperCase()]); setNewStockInput(''); } };
+            const removeStock = (sym) => { setStockSymbols(stockSymbols.filter(s => s !== sym)); };
 
             return (
                 <div className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]" onMouseMove={handleInteraction} onClick={handleInteraction} onTouchStart={handleInteraction}>
@@ -1575,106 +796,59 @@
                                     <button onClick={closeSettings} className="text-slate-400 hover:text-white"><X size={24} /></button>
                                 </div>
                                 <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1 bg-slate-900">
-                                    
-                                    {/* --- STOCKS SECTION --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-2">Stocks</h3>
                                         <div className="flex flex-col gap-3">
-                                            <div className="flex flex-wrap gap-2 mb-2">
-                                                {stockSymbols.map(sym => (
-                                                    <div key={sym} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2">
-                                                        <span className="font-mono font-bold">{sym}</span>
-                                                        <button onClick={() => removeStock(sym)} className="hover:text-red-400"><X size={14} /></button>
-                                                    </div>
-                                                ))}
-                                                {stockSymbols.length === 0 && <span className="text-slate-500 text-sm italic">No stocks added.</span>}
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <input 
-                                                    type="text" 
-                                                    value={newStockInput} 
-                                                    onChange={(e) => setNewStockInput(e.target.value.toUpperCase())} 
-                                                    placeholder="Enter Symbol (e.g. AAPL)" 
-                                                    className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white uppercase" 
-                                                    onKeyDown={(e) => e.key === 'Enter' && addStock()}
-                                                />
-                                                <button onClick={addStock} className="bg-green-600 px-4 py-2 rounded-lg text-white font-bold"><Plus size={18} /></button>
-                                            </div>
-                                            <div className="mt-2 pt-2 border-t border-slate-700">
-                                                <label className="text-xs text-slate-400 block mb-1">Finnhub API Key</label>
-                                                <input 
-                                                    type="text" 
-                                                    value={finnhubKey} 
-                                                    onChange={(e) => setFinnhubKey(e.target.value)} 
-                                                    className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-slate-400 text-xs" 
-                                                />
-                                            </div>
+                                            <div className="flex flex-wrap gap-2 mb-2">{stockSymbols.map(sym => (<div key={sym} className="bg-slate-700 text-white px-3 py-1 rounded-full text-sm flex items-center gap-2"><span className="font-mono font-bold">{sym}</span><button onClick={() => removeStock(sym)} className="hover:text-red-400"><X size={14} /></button></div>))}</div>
+                                            <div className="flex gap-2"><input type="text" value={newStockInput} onChange={(e) => setNewStockInput(e.target.value.toUpperCase())} placeholder="Enter Symbol (e.g. AAPL)" className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white uppercase" onKeyDown={(e) => e.key === 'Enter' && addStock()} /><button onClick={addStock} className="bg-green-600 px-4 py-2 rounded-lg text-white font-bold"><Plus size={18} /></button></div>
+                                            <div className="mt-2 pt-2 border-t border-slate-700"><label className="text-xs text-slate-400 block mb-1">Finnhub API Key</label><input type="text" value={finnhubKey} onChange={(e) => setFinnhubKey(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-slate-400 text-xs" /></div>
                                         </div>
                                     </div>
-
-                                    {/* --- WELCOME SLIDE --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-3">Welcome Slide</h3>
-                                        <div className="flex flex-col gap-4">
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Show Welcome</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
-                                        </div>
-                                    </div>
-
-                                    {/* --- CUSTOM IMAGE SLIDESHOW --- */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-3 flex items-center justify-between">
-                                            Custom Slideshow
-                                            <button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1">
-                                                <Plus size={14} /> Add Slide
-                                            </button>
-                                        </h3>
-                                        <div className="flex flex-col gap-3">
-                                            {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
-                                            {customImages.map((img, index) => (
-                                                <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded-full">{index + 1}</span>
-                                                        <button onClick={() => removeCustomImage(img.id)} className="ml-auto text-red-400 hover:text-red-300"><X size={16} /></button>
-                                                    </div>
-                                                    <input type="text" value={img.url} onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} placeholder="Image URL..." className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" />
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-xs text-slate-400">Duration (sec):</span>
-                                                        <input type="number" value={img.duration} onChange={(e) => updateCustomImage(img.id, 'duration', e.target.value)} className="w-16 bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" min="3" />
-                                                    </div>
+                                        <h3 className="font-bold text-white mb-2">Locations & Weather</h3>
+                                        <div className="flex flex-col gap-3 mb-4">
+                                            {zipConfigs.map(item => (
+                                                <div key={item.id} className="bg-slate-900 border border-slate-700 p-3 rounded-lg flex flex-col gap-3">
+                                                    <div className="flex justify-between items-center"><span className="font-bold font-mono text-lg">{item.id}</span><button onClick={() => handleRemoveZip(item.id)} className="text-slate-500 hover:text-red-400"><X size={18} /></button></div>
+                                                    <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Forecast</span><button onClick={() => handleUpdateZip(item.id, { showForecast: !item.showForecast })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showForecast ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
+                                                    {/* FLIGHT TRACKER TOGGLE */}
+                                                    <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Radar (Flights)</span><button onClick={() => handleUpdateZip(item.id, { showFlights: !item.showFlights })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showFlights ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showFlights ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
+                                                    {item.showForecast && (<div className="flex gap-2"><button onClick={() => handleUpdateZip(item.id, { days: 3 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 3 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>3 Day</button><button onClick={() => handleUpdateZip(item.id, { days: 5 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 5 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>5 Day</button></div>)}
                                                 </div>
                                             ))}
                                         </div>
+                                        <div className="flex gap-2"><input type="text" placeholder="Enter ZIP" maxLength={5} onKeyDown={(e) => e.key === 'Enter' && handleAddZip(e.target.value)} className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white" /><button className="bg-blue-600 px-3 py-2 rounded-lg text-white"><Plus size={16} /></button></div>
                                     </div>
-
-                                    {/* --- EXTRAS TOGGLES --- */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
-                                            <span className="font-bold text-white">Year Progress</span>
-                                            <button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}>
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} />
-                                            </button>
-                                        </div>
-                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
-                                            <span className="font-bold text-white">Trivia Mode</span>
-                                            <button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-purple-500' : 'bg-slate-700'}`}>
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} />
-                                            </button>
-                                        </div>
-                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
-                                            <span className="font-bold text-white">NFL Playoff Mode</span>
-                                            <button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}>
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} />
-                                            </button>
-                                        </div>
-                                    </div>
-
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><label className="block text-sm text-slate-400 mb-2">Clock Color</label><select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">{CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
-                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
                                     <div className="mt-4 space-y-8">
                                         <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
                                         <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
                                         <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
                                         <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
+                                    </div>
+                                    {/* Extras Section */}
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                        <h3 className="font-bold text-white mb-3">Custom Slideshow</h3>
+                                        <div className="flex items-center justify-between mb-3"><span className="text-sm text-slate-400">Add Images</span><button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1"><Plus size={14} /> Add Slide</button></div>
+                                        <div className="flex flex-col gap-3">
+                                            {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
+                                            {customImages.map((img, index) => (
+                                                <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
+                                                    <div className="flex items-center gap-2"><span className="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded-full">{index + 1}</span><button onClick={() => removeCustomImage(img.id)} className="ml-auto text-red-400 hover:text-red-300"><X size={16} /></button></div>
+                                                    <input type="text" value={img.url} onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} placeholder="Image URL..." className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" />
+                                                    <div className="flex items-center gap-2"><span className="text-xs text-slate-400">Duration (sec):</span><input type="number" value={img.duration} onChange={(e) => updateCustomImage(img.id, 'duration', e.target.value)} className="w-16 bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" min="3" /></div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Year Progress</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Trivia Mode</span><button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-purple-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Playoff Mode</span><button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
+                                    </div>
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                        <h3 className="font-bold text-white mb-3">Welcome Slide</h3>
+                                        <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Show Welcome</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
                                     </div>
                                 </div>
                                 <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end"><button onClick={closeSettings} className="w-fit bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 transition-colors shadow-lg"><Check size={20} /> Done</button></div>
