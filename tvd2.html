@@ -872,10 +872,116 @@
             const [customImageDuration, setCustomImageDuration] = usePersistedState('customImgDuration', 10);
             
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
+            // --- TRIVIA STATE ---
+            const [showTrivia, setShowTrivia] = usePersistedState('showTrivia', false);
+            const [triviaData, setTriviaData] = useState(null);
+
+            const fetchTrivia = async () => {
+                try {
+                    // Fetches 1 random question from Open Trivia DB
+                    const res = await fetch('https://opentdb.com/api.php?amount=1');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.results && data.results.length > 0) {
+                            // Decode HTML entities (e.g. &quot; to ")
+                            const decode = (str) => {
+                                const txt = document.createElement("textarea");
+                                txt.innerHTML = str;
+                                return txt.value;
+                            };
+                            const q = data.results[0];
+                            // Mix correct answer with incorrect answers and shuffle
+                            const allAnswers = [...q.incorrect_answers, q.correct_answer]
+                                .sort(() => Math.random() - 0.5)
+                                .map(a => decode(a));
+                            
+                            setTriviaData({
+                                category: decode(q.category),
+                                question: decode(q.question),
+                                correct: decode(q.correct_answer),
+                                answers: allAnswers,
+                                difficulty: q.difficulty
+                            });
+                        }
+                    }
+                } catch (e) { console.error("Trivia fetch error", e); }
+            };
+
+            // Auto-update trivia every 1 hour (3600000 ms) if enabled
+            useEffect(() => {
+                if (!showTrivia) return;
+                fetchTrivia();
+                const interval = setInterval(fetchTrivia, 3600000); 
+                return () => clearInterval(interval);
+            }, [showTrivia]);
+            //end triva app card info
 
             // =============================================================================
             // ⬇️⬇️⬇️ SECTION 2: ADD NEW TOGGLES HERE (STATE) ⬇️⬇️⬇️
             // =============================================================================
+            // --- TRIVIA CARD COMPONENT ---
+        const TriviaCard = ({ data, onNext }) => {
+            const [revealed, setRevealed] = useState(false);
+
+            // Reset revealed state when we get a new question
+            useEffect(() => { setRevealed(false); }, [data]);
+
+            if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
+
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans p-[3vmin] bg-gradient-to-br from-purple-900 via-fuchsia-900 to-indigo-900 text-white flex flex-col items-center justify-center text-center select-none">
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+                    
+                    {/* Header Badge */}
+                    <div className="absolute top-[3vmin] left-[3vmin] bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
+                        <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
+                    </div>
+
+                    {/* The Question */}
+                    <div className="mb-[5vmin] max-w-[85%] relative z-10">
+                        <h2 className="text-[4.5vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
+                    </div>
+
+                    {/* Answers Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-[2.5vmin] w-full max-w-[100vmin] relative z-10 px-[2vmin]">
+                        {data.answers.map((ans, idx) => {
+                            const isCorrect = ans === data.correct;
+                            // Styling Logic: If revealed, Green for correct, Grey for wrong.
+                            let bgClass = "bg-white/10 hover:bg-white/20 hover:scale-[1.02] border-white/10";
+                            if (revealed) {
+                                if (isCorrect) bgClass = "bg-green-500 text-black border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)] scale-[1.03] z-20 font-black";
+                                else bgClass = "bg-black/20 opacity-40 grayscale border-transparent scale-95";
+                            }
+
+                            return (
+                                <button
+                                    key={idx}
+                                    onClick={() => setRevealed(true)}
+                                    disabled={revealed}
+                                    className={`p-[2.5vmin] rounded-2xl font-bold text-[2.5vmin] transition-all duration-500 border backdrop-blur-md shadow-md ${bgClass}`}
+                                >
+                                    {ans}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Next Button (Only appears after revealing) */}
+                    <div className="absolute bottom-[4vmin] h-[6vmin] flex items-center justify-center w-full z-20">
+                        {revealed ? (
+                            <button onClick={onNext} className="bg-white text-purple-900 font-black px-[5vmin] py-[1.5vmin] rounded-full text-[2.5vmin] hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)] flex items-center gap-2">
+                                Next Question <span className="text-xl">➜</span>
+                            </button>
+                        ) : (
+                            <div className="text-[2vmin] text-white/40 animate-pulse font-mono tracking-widest uppercase">Tap an answer to reveal</div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+            // END TRIVIA CARD 
+            
             // --- PLAYOFF MODE STATE ---
            // --- PLAYOFF MODE STATE ---
             // --- PLAYOFF MODE STATE ---
@@ -1267,7 +1373,8 @@
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
                 if (showImage) rotation.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
                 if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
-
+                if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} onNext={fetchTrivia} /> });
+                
                 // =========================================================================
                 // ⬇️⬇️⬇️ SECTION 3: ADD TO ROTATION HERE ⬇️⬇️⬇️
                 // =========================================================================
@@ -1406,6 +1513,16 @@
                                             {/* =================================================================== */}
                                             {/* ⬇️⬇️⬇️ SECTION 4: ADD SETTINGS TOGGLES HERE ⬇️⬇️⬇️ */}
                                             {/* =================================================================== */}
+
+                                            {/* --- TRIVIA TOGGLE --- */}
+                                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between">
+                                        <span className="text-slate-200">Trivia Card</span>
+                                        <button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-green-500' : 'bg-slate-700'}`}>
+                                            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} />
+                                        </button>
+                                    </div>
+                                            // END TRIVIA TOGGLE
+                                            
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between border-l-4 border-l-blue-500">
                                                 <div>
                                                     <span className="text-white font-bold block">NFL Playoff Mode</span>
