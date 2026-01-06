@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sports & Smart Dashboard v2.0</title>
+    <title>Sports & Smart Dashboard v2.3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -27,8 +27,6 @@
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        
-        /* Stronger white glow for visibility on black backgrounds */
         .logo-glow { filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6)); }
     </style>
 </head>
@@ -38,7 +36,6 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef, Component } = React;
 
-        // --- ERROR BOUNDARY ---
         class ErrorBoundary extends Component {
             constructor(props) { super(props); this.state = { hasError: false, error: null }; }
             static getDerivedStateFromError(error) { return { hasError: true, error }; }
@@ -48,7 +45,6 @@
                         <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-900 text-white p-10 text-center">
                             <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
                             <p className="mb-4 text-red-200">The dashboard crashed. Please try the reset button.</p>
-                            <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">{this.state.error.toString()}</div>
                             <button onClick={() => { localStorage.clear(); window.location.reload(); }} className="bg-white text-red-900 font-bold py-3 px-8 rounded-lg text-xl hover:bg-gray-200">FACTORY RESET & RELOAD</button>
                         </div>
                     );
@@ -73,7 +69,6 @@
 
         const CLOCK_COLORS = [ { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' }, { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' }, { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' }, { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' } ];
 
-        // --- TEAM DATA ---
         const NFL_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Cardinals', color: '#97233F' }, { id: 'ATL', city: 'Atlanta', name: 'Falcons', color: '#A71930' }, { id: 'BAL', city: 'Baltimore', name: 'Ravens', color: '#241773' }, { id: 'BUF', city: 'Buffalo', name: 'Bills', color: '#00338D' }, { id: 'CAR', city: 'Carolina', name: 'Panthers', color: '#0085CA' }, { id: 'CHI', city: 'Chicago', name: 'Bears', color: '#C83803' }, { id: 'CIN', city: 'Cincinnati', name: 'Bengals', color: '#FB4F14' }, { id: 'CLE', city: 'Cleveland', name: 'Browns', color: '#311D00' }, { id: 'DAL', city: 'Dallas', name: 'Cowboys', color: '#003594' }, { id: 'DEN', city: 'Denver', name: 'Broncos', color: '#FB4F14' }, { id: 'DET', city: 'Detroit', name: 'Lions', color: '#0076B6' }, { id: 'GB',  city: 'Green Bay', name: 'Packers', color: '#203731' }, { id: 'HOU', city: 'Houston', name: 'Texans', color: '#03202F' }, { id: 'IND', city: 'Indianapolis', name: 'Colts', color: '#002C5F' }, { id: 'JAX', city: 'Jacksonville', name: 'Jaguars', color: '#006778' }, { id: 'KC',  city: 'Kansas City', name: 'Chiefs', color: '#E31837' }, { id: 'LV',  city: 'Las Vegas', name: 'Raiders', color: '#000000' }, { id: 'LAC', city: 'Los Angeles', name: 'Chargers', color: '#0080C6' }, { id: 'LAR', city: 'Los Angeles', name: 'Rams', color: '#003594' }, { id: 'MIA', city: 'Miami', name: 'Dolphins', color: '#008E97' }, { id: 'MIN', city: 'Minnesota', name: 'Vikings', color: '#4F2683' }, { id: 'NE',  city: 'New England', name: 'Patriots', color: '#002244' }, { id: 'NO',  city: 'New Orleans', name: 'Saints', color: '#D3BC8D' }, { id: 'NYG', city: 'New York', name: 'Giants', color: '#0B2265' }, { id: 'NYJ', city: 'New York', name: 'Jets', color: '#125740' }, { id: 'PHI', city: 'Philadelphia', name: 'Eagles', color: '#004C54' }, { id: 'PIT', city: 'Pittsburgh', name: 'Steelers', color: '#FFB612' }, { id: 'SF',  city: 'San Francisco', name: '49ers', color: '#AA0000' }, { id: 'SEA', city: 'Seattle', name: 'Seahawks', color: '#69BE28' }, { id: 'TB',  city: 'Tampa Bay', name: 'Buccaneers', color: '#D50A0A' }, { id: 'TEN', city: 'Tennessee', name: 'Titans', color: '#4B92DB' }, { id: 'WAS', city: 'Washington', name: 'Commanders', color: '#5A1414' } ];
         const NHL_TEAMS = [ { id: 'ANA', city: 'Anaheim', name: 'Ducks', color: '#F47A38' }, { id: 'BOS', city: 'Boston', name: 'Bruins', color: '#FFB81C' }, { id: 'BUF', city: 'Buffalo', name: 'Sabres', color: '#002654' }, { id: 'CGY', city: 'Calgary', name: 'Flames', color: '#C8102E' }, { id: 'CAR', city: 'Carolina', name: 'Hurricanes', color: '#CC0000' }, { id: 'CHI', city: 'Chicago', name: 'Blackhawks', color: '#CF0A2C' }, { id: 'COL', city: 'Colorado', name: 'Avalanche', color: '#6F263D' }, { id: 'CBJ', city: 'Columbus', name: 'Blue Jackets', color: '#002654' }, { id: 'DAL', city: 'Dallas', name: 'Stars', color: '#006847' }, { id: 'DET', city: 'Detroit', name: 'Red Wings', color: '#CE1126' }, { id: 'EDM', city: 'Edmonton', name: 'Oilers', color: '#041E42' }, { id: 'FLA', city: 'Florida', name: 'Panthers', color: '#041E42' }, { id: 'LA',  city: 'Los Angeles', name: 'Kings', color: '#111111' }, { id: 'MIN', city: 'Minnesota', name: 'Wild', color: '#154734' }, { id: 'MTL', city: 'Montreal', name: 'Canadiens', color: '#AF1E2D' }, { id: 'NSH', city: 'Nashville', name: 'Predators', color: '#FFB81C' }, { id: 'NJD', city: 'New Jersey', name: 'Devils', color: '#CE1126' }, { id: 'NYI', city: 'New York', name: 'Islanders', color: '#00539B' }, { id: 'NYR', city: 'New York', name: 'Rangers', color: '#0038A8' }, { id: 'OTT', city: 'Ottawa', name: 'Senators', color: '#DA1A32' }, { id: 'PHI', city: 'Philadelphia', name: 'Flyers', color: '#F74902' }, { id: 'PIT', city: 'Pittsburgh', name: 'Penguins', color: '#FCB514' }, { id: 'SJ',  city: 'San Jose', name: 'Sharks', color: '#006D75' }, { id: 'SEA', city: 'Seattle', name: 'Kraken', color: '#99D9D9' }, { id: 'STL', city: 'St. Louis', name: 'Blues', color: '#002F87' }, { id: 'TB',  city: 'Tampa Bay', name: 'Lightning', color: '#002868' }, { id: 'TOR', city: 'Toronto', name: 'Maple Leafs', color: '#00205B' }, { id: 'UTA', city: 'Utah', name: 'Hockey Club', color: '#71AFE5' }, { id: 'VAN', city: 'Vancouver', name: 'Canucks', color: '#00205B' }, { id: 'VGK', city: 'Vegas', name: 'Golden Knights', color: '#B4975A' }, { id: 'WSH', city: 'Washington', name: 'Capitals', color: '#041E42' }, { id: 'WPG', city: 'Winnipeg', name: 'Jets', color: '#041E42' } ];
         const MLB_TEAMS = [ { id: 'ARI', city: 'Arizona', name: 'Diamondbacks', color: '#A71930' }, { id: 'ATL', city: 'Atlanta', name: 'Braves', color: '#CE1141' }, { id: 'BAL', city: 'Baltimore', name: 'Orioles', color: '#DF4601' }, { id: 'BOS', city: 'Boston', name: 'Red Sox', color: '#BD3039' }, { id: 'CHC', city: 'Chicago', name: 'Cubs', color: '#0E3386' }, { id: 'CWS', city: 'Chicago', name: 'White Sox', color: '#27251F' }, { id: 'CIN', city: 'Cincinnati', name: 'Reds', color: '#C6011F' }, { id: 'CLE', city: 'Cleveland', name: 'Guardians', color: '#00385D' }, { id: 'COL', city: 'Colorado', name: 'Rockies', color: '#333366' }, { id: 'DET', city: 'Detroit', name: 'Tigers', color: '#0C2340' }, { id: 'HOU', city: 'Houston', name: 'Astros', color: '#002D62' }, { id: 'KC',  city: 'Kansas City', name: 'Royals', color: '#004687' }, { id: 'LAA', city: 'Los Angeles', name: 'Angels', color: '#BA0021' }, { id: 'LAD', city: 'Los Angeles', name: 'Dodgers', color: '#005A9C' }, { id: 'MIA', city: 'Miami', name: 'Marlins', color: '#00A3E0' }, { id: 'MIL', city: 'Milwaukee', name: 'Brewers', color: '#FFC52F' }, { id: 'MIN', city: 'Minnesota', name: 'Twins', color: '#002B5C' }, { id: 'NYM', city: 'New York', name: 'Mets', color: '#FF5910' }, { id: 'NYY', city: 'New York', name: 'Yankees', color: '#003087' }, { id: 'OAK', city: 'Oakland', name: 'Athletics', color: '#003831' }, { id: 'PHI', city: 'Philadelphia', name: 'Phillies', color: '#E81828' }, { id: 'PIT', city: 'Pittsburgh', name: 'Pirates', color: '#FDB827' }, { id: 'SD',  city: 'San Diego', name: 'Padres', color: '#2F241D' }, { id: 'SF',  city: 'San Francisco', name: 'Giants', color: '#FD5A1E' }, { id: 'SEA', city: 'Seattle', name: 'Mariners', color: '#005C5C' }, { id: 'STL', city: 'St. Louis', name: 'Cardinals', color: '#C41E3A' }, { id: 'TB',  city: 'Tampa Bay', name: 'Rays', color: '#092C5C' }, { id: 'TEX', city: 'Texas', name: 'Rangers', color: '#003278' }, { id: 'TOR', city: 'Toronto', name: 'Blue Jays', color: '#134A8E' }, { id: 'WSH', city: 'Washington', name: 'Nationals', color: '#AB0003' } ];
@@ -574,13 +569,13 @@
                                     </>
                                 )}
                             </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
             );
         };
-        
+        // end sect 1
         const PlayoffCard = ({ game }) => {
             const comp = game.competitions[0];
             const home = comp.competitors.find(c => c.homeAway === 'home');
@@ -619,22 +614,22 @@
                 };
                 return (
                     <SportsCardLayout team={liveData} isLive={true}>
-                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
+                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full h-full">
                             <div className="flex items-center gap-[3vmin]">
                                 <div className="flex flex-col items-center">
-                                    <img src={home.team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />
+                                    <img src={home.team.logo} className="w-[12vmin] h-[12vmin] object-contain logo-glow" />
                                     <div className="text-[14vmin] font-black leading-none tracking-tighter">{home.score}</div>
                                 </div>
                                 <div className="text-[6vmin] font-bold text-gray-600">-</div>
                                 <div className="flex flex-col items-center">
-                                    <img src={away.team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />
+                                    <img src={away.team.logo} className="w-[12vmin] h-[12vmin] object-contain logo-glow" />
                                     <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{away.score}</div>
                                 </div>
                             </div>
-                            <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{game.status.type.shortDetail}</div>
+                            <div className="text-[5vmin] font-bold text-gray-400 mt-[2vmin] uppercase tracking-widest">{game.status.type.shortDetail}</div>
                         </div>
-                        <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
-                             <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{game.situation?.lastPlay?.text || "Game in progress..."}</div>
+                        <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full h-full justify-center gap-[3vmin]">
+                             <div className="text-[4vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight w-full opacity-90 mb-[1vmin]">{game.situation?.lastPlay?.text || "Game in progress..."}</div>
                              <FootballField yardLine={game.situation?.yardLine || 50} possession={game.situation?.possession} homeTeam={{...home.team, color: homeColor}} awayTeam={{...away.team, color: awayColor}} />
                         </div>
                     </SportsCardLayout>
@@ -646,40 +641,47 @@
             const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
             return (
-                <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-slate-950 flex flex-col items-center justify-center">
+                <div className="h-full w-full relative overflow-hidden font-sans p-[2vmin] bg-slate-950 flex flex-col">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-900/90" />
-                    <div className="relative z-10 flex flex-col items-center w-full">
-                        <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[6vmin] bg-blue-900/30 px-[3vmin] py-[1vmin] rounded-full border border-blue-500/30">
+                    
+                    {/* Header */}
+                    <div className="relative z-10 w-full text-center mt-[2vmin] mb-[4vmin]">
+                        <div className="inline-block text-[5vmin] font-black text-blue-400 uppercase tracking-widest bg-blue-900/30 px-[6vmin] py-[1.5vmin] rounded-full border border-blue-500/30 shadow-lg">
                             {game.name || "NFL Playoff Matchup"}
                         </div>
+                    </div>
                         
-                        <div className="flex items-center justify-center w-full gap-[8vmin]">
-                            <div className="flex flex-col items-center">
-                                <img src={away.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
-                                <div className="text-[6vmin] font-black text-white mt-[2vmin]">{away.team.shortDisplayName}</div>
-                                <div className="text-[3vmin] text-gray-400 font-bold">{away.records?.[0]?.summary}</div>
-                                {isFinal && <div className="text-[10vmin] font-black mt-[2vmin]">{away.score}</div>}
-                            </div>
+                    {/* Main Content - Expanded to fill space */}
+                    <div className="relative z-10 flex-1 flex items-center justify-around w-full px-[5vmin]">
+                        
+                        {/* Away Team */}
+                        <div className="flex flex-col items-center justify-center">
+                            <img src={away.team.logo} className="w-[28vmin] h-[28vmin] object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] logo-glow transform hover:scale-105 transition-transform" />
+                            <div className="text-[8vmin] font-black text-white mt-[2vmin] leading-none text-center">{away.team.shortDisplayName}</div>
+                            <div className="text-[4vmin] text-gray-400 font-bold mt-[1vmin]">{away.records?.[0]?.summary}</div>
+                            {isFinal && <div className="text-[12vmin] font-black mt-[2vmin] text-white">{away.score}</div>}
+                        </div>
 
-                            <div className="flex flex-col items-center justify-center h-full">
-                                {isFinal ? (
-                                    <div className="text-[4vmin] font-bold text-gray-500">FINAL</div>
-                                ) : (
-                                    <>
-                                            <div className="text-[8vmin] font-black italic text-white/20">VS</div>
-                                            <div className="text-[3vmin] font-bold text-white bg-red-700 px-[2vmin] py-[0.5vmin] rounded mt-[2vmin]">{dateStr}</div>
-                                            <div className="text-[3vmin] font-bold text-white mt-[1vmin]">{timeStr}</div>
-                                            <div className="text-[2vmin] text-gray-400 mt-[2vmin] max-w-[20vmin] text-center">{comp.venue?.fullName}</div>
-                                    </>
-                                )}
-                            </div>
+                        {/* Center Info */}
+                        <div className="flex flex-col items-center justify-center h-full px-[4vmin]">
+                            {isFinal ? (
+                                <div className="text-[6vmin] font-bold text-gray-500 bg-white/10 px-[4vmin] py-[1vmin] rounded-xl">FINAL</div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-[2vmin]">
+                                    <div className="text-[10vmin] font-black italic text-white/10">VS</div>
+                                    <div className="text-[4vmin] font-bold text-white bg-red-700 px-[4vmin] py-[1vmin] rounded-lg shadow-lg">{dateStr}</div>
+                                    <div className="text-[4vmin] font-bold text-white">{timeStr}</div>
+                                    <div className="text-[2.5vmin] text-gray-400 mt-[1vmin] max-w-[30vmin] text-center uppercase tracking-wider">{comp.venue?.fullName}</div>
+                                </div>
+                            )}
+                        </div>
 
-                            <div className="flex flex-col items-center">
-                                <img src={home.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
-                                <div className="text-[6vmin] font-black text-white mt-[2vmin]">{home.team.shortDisplayName}</div>
-                                <div className="text-[3vmin] text-gray-400 font-bold">{home.records?.[0]?.summary}</div>
-                                {isFinal && <div className="text-[10vmin] font-black mt-[2vmin]">{home.score}</div>}
-                            </div>
+                        {/* Home Team */}
+                        <div className="flex flex-col items-center justify-center">
+                            <img src={home.team.logo} className="w-[28vmin] h-[28vmin] object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.3)] logo-glow transform hover:scale-105 transition-transform" />
+                            <div className="text-[8vmin] font-black text-white mt-[2vmin] leading-none text-center">{home.team.shortDisplayName}</div>
+                            <div className="text-[4vmin] text-gray-400 font-bold mt-[1vmin]">{home.records?.[0]?.summary}</div>
+                            {isFinal && <div className="text-[12vmin] font-black mt-[2vmin] text-white">{home.score}</div>}
                         </div>
                     </div>
                 </div>
@@ -703,23 +705,26 @@
                 const status = game.status.type.state; 
                 
                 return (
-                    <div className="flex items-center justify-between bg-white/10 rounded-lg p-[1vmin] mb-[1.5vmin] backdrop-blur-md border border-white/5">
-                        <div className="flex items-center gap-[1vmin] w-[30%]">
-                            <img src={away.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
-                            <span className="font-bold text-[2vmin]">{away.team.abbreviation}</span>
-                            {status !== 'pre' && <span className="font-black text-[2.5vmin] ml-auto">{away.score}</span>}
+                    <div className="flex items-center justify-between bg-white/10 rounded-xl p-[1.5vmin] mb-[2vmin] backdrop-blur-md border border-white/10 shadow-md">
+                        {/* Away */}
+                        <div className="flex items-center gap-[2vmin] w-[35%]">
+                            <img src={away.team.logo} className="w-[6vmin] h-[6vmin] object-contain" />
+                            <span className="font-black text-[4vmin] leading-none tracking-tight">{away.team.abbreviation}</span>
+                            {status !== 'pre' && <span className="font-black text-[5vmin] ml-auto text-yellow-400">{away.score}</span>}
                         </div>
                         
-                        <div className="text-[1.5vmin] font-mono text-gray-400 w-[40%] text-center">
-                            {status === 'in' ? <span className="text-red-500 animate-pulse font-bold">LIVE</span> : 
+                        {/* Status */}
+                        <div className="text-[2.5vmin] font-bold font-mono text-gray-400 w-[30%] text-center">
+                            {status === 'in' ? <span className="text-red-500 animate-pulse font-black bg-red-900/30 px-2 py-1 rounded">LIVE</span> : 
                              status === 'post' ? 'FINAL' : 
                              new Date(game.date).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}
                         </div>
 
-                        <div className="flex items-center gap-[1vmin] w-[30%] flex-row-reverse">
-                            <img src={home.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
-                            <span className="font-bold text-[2vmin]">{home.team.abbreviation}</span>
-                            {status !== 'pre' && <span className="font-black text-[2.5vmin] mr-auto">{home.score}</span>}
+                        {/* Home */}
+                        <div className="flex items-center gap-[2vmin] w-[35%] flex-row-reverse">
+                            <img src={home.team.logo} className="w-[6vmin] h-[6vmin] object-contain" />
+                            <span className="font-black text-[4vmin] leading-none tracking-tight">{home.team.abbreviation}</span>
+                            {status !== 'pre' && <span className="font-black text-[5vmin] mr-auto text-yellow-400">{home.score}</span>}
                         </div>
                     </div>
                 );
@@ -729,22 +734,23 @@
                 <div className="h-full w-full flex flex-col p-[3vmin] bg-slate-950 text-white relative overflow-hidden">
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950" />
                     
-                    <div className="text-center mb-[4vmin] z-10">
-                        <h2 className="text-[4vmin] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-red-400">Playoff Picture</h2>
-                        <div className="text-[2vmin] text-gray-500 font-bold uppercase tracking-widest">Live Scoreboard</div>
+                    <div className="text-center mb-[3vmin] z-10 shrink-0">
+                        <h2 className="text-[5vmin] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-red-400 drop-shadow-sm">Playoff Picture</h2>
                     </div>
 
-                    <div className="flex w-full h-full gap-[4vmin] z-10">
-                        <div className="flex-1 flex flex-col">
-                            <div className="text-red-500 font-black text-[3vmin] uppercase mb-[2vmin] border-b border-red-500/30 pb-1">AFC</div>
-                            {afcGames.map(g => <MiniGameRow key={g.id} game={g} />)}
+                    <div className="flex w-full h-full gap-[6vmin] z-10 min-h-0">
+                        <div className="flex-1 flex flex-col h-full overflow-hidden">
+                            <div className="text-red-500 font-black text-[5vmin] uppercase mb-[2vmin] border-b-4 border-red-600 pb-2">AFC</div>
+                            <div className="flex-1 flex flex-col justify-start overflow-y-auto no-scrollbar">
+                                {afcGames.map(g => <MiniGameRow key={g.id} game={g} />)}
+                            </div>
                         </div>
 
-                        <div className="w-[2px] bg-white/10 rounded-full"></div>
+                        <div className="w-[2px] bg-white/10 rounded-full h-full"></div>
 
-                        <div className="flex-1 flex flex-col items-end">
-                            <div className="text-blue-500 font-black text-[3vmin] uppercase mb-[2vmin] border-b border-blue-500/30 pb-1 w-full text-right">NFC</div>
-                            <div className="w-full">
+                        <div className="flex-1 flex flex-col items-end h-full overflow-hidden">
+                            <div className="text-blue-500 font-black text-[5vmin] uppercase mb-[2vmin] border-b-4 border-blue-600 pb-2 w-full text-right">NFC</div>
+                            <div className="w-full flex-1 flex flex-col justify-start overflow-y-auto no-scrollbar">
                                 {nfcGames.map(g => <MiniGameRow key={g.id} game={g} />)}
                             </div>
                         </div>
@@ -815,66 +821,102 @@
             );
         };
 
-        const TriviaCard = ({ data, onNext }) => {
-            const [revealed, setRevealed] = useState(false);
-            
+        const TriviaCard = ({ data, isActive }) => {
+            const [progress, setProgress] = useState(100);
+            const [secondsLeft, setSecondsLeft] = useState(10);
+            const [isAnswerPhase, setIsAnswerPhase] = useState(false);
+
             useEffect(() => {
-                setRevealed(false); 
-                const timer = setTimeout(() => {
-                    setRevealed(true);
-                }, 10000); 
-                return () => clearTimeout(timer);
-            }, [data]);
+                // IMPORTANT: Only start counting if the slide is ACTIVE on screen
+                if (!isActive) {
+                    setSecondsLeft(10);
+                    setProgress(100);
+                    setIsAnswerPhase(false);
+                    return;
+                }
+
+                const duration = 10000; 
+                const startTime = Date.now();
+
+                const interval = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    const remaining = Math.max(0, duration - elapsed);
+                    
+                    setProgress((remaining / duration) * 100);
+                    setSecondsLeft(Math.ceil(remaining / 1000));
+
+                    if (remaining <= 0) {
+                        setIsAnswerPhase(true);
+                        clearInterval(interval);
+                    }
+                }, 30);
+
+                return () => clearInterval(interval);
+            }, [isActive, data]); // Re-run when it becomes active or data changes
 
             if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
 
             return (
-                <div className="h-full w-full relative overflow-hidden font-sans p-[3vmin] bg-gradient-to-br from-purple-900 via-fuchsia-900 to-indigo-900 text-white flex flex-col items-center justify-center text-center select-none">
+                <div className="h-full w-full relative overflow-hidden font-sans p-[3vmin] bg-gradient-to-br from-purple-900 via-fuchsia-900 to-indigo-900 text-white flex flex-col items-center justify-center text-center select-none transition-all duration-700">
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
-                    <div className="absolute top-[3vmin] left-[3vmin] bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
-                        <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
-                    </div>
-                    {!revealed && <div className="absolute top-0 left-0 h-[1vmin] bg-yellow-400/50 transition-all duration-[10000ms] ease-linear w-full" style={{ width: '0%', animation: 'widthFull 10s linear forwards' }}></div>}
                     
-                    <div className="mb-[5vmin] max-w-[85%] relative z-10">
-                        <h2 className="text-[4.5vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
+                    <div className="absolute top-[3vmin] left-[3vmin] right-[3vmin] flex items-center justify-between">
+                         <div className="bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
+                            <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
+                        </div>
+                        
+                        {!isAnswerPhase && (
+                            <div className="text-[2.5vmin] font-mono font-bold text-white bg-black/30 px-[2vmin] py-[0.5vmin] rounded-lg border border-white/10">
+                                Revealing in {secondsLeft}s
+                            </div>
+                        )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-[2.5vmin] w-full max-w-[100vmin] relative z-10 px-[2vmin]">
+
+                    {!isAnswerPhase && (
+                        <div className="absolute top-0 left-0 h-[1.5vmin] bg-yellow-400 transition-all duration-75 ease-linear w-full shadow-[0_0_15px_rgba(250,204,21,0.5)] z-50" style={{ width: `${progress}%` }}></div>
+                    )}
+                    
+                    <div className="mb-[5vmin] max-w-[90%] relative z-10 flex-1 flex items-center justify-center">
+                        {/* INCREASED SIZE HERE */}
+                        <h2 className="text-[6vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-[3vmin] w-full max-w-[120vmin] relative z-10 px-[2vmin] mb-[4vmin]">
                         {data.answers.map((ans, idx) => {
                             const isCorrect = ans === data.correct;
-                            let bgClass = "bg-white/10 hover:bg-white/20 hover:scale-[1.02] border-white/10";
-                            if (revealed) {
-                                if (isCorrect) bgClass = "bg-green-500 text-black border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)] scale-[1.03] z-20 font-black";
-                                else bgClass = "bg-black/20 opacity-40 grayscale border-transparent scale-95";
+                            let bgClass = "bg-white/10 border-white/10";
+                            
+                            if (isAnswerPhase) {
+                                if (isCorrect) {
+                                    bgClass = "bg-green-600 text-white border-green-400 shadow-[0_0_50px_rgba(34,197,94,0.6)] scale-[1.05] z-20 font-black ring-4 ring-green-400/50";
+                                } else {
+                                    bgClass = "bg-black/40 opacity-20 grayscale border-transparent scale-95 blur-[2px]";
+                                }
                             }
+
                             return (
-                                <button
+                                <div
                                     key={idx}
-                                    onClick={() => setRevealed(true)}
-                                    disabled={revealed}
-                                    className={`p-[2.5vmin] rounded-2xl font-bold text-[2.5vmin] transition-all duration-500 border backdrop-blur-md shadow-md ${bgClass}`}
+                                    // INCREASED SIZE HERE
+                                    className={`p-[3vmin] rounded-3xl font-bold text-[4vmin] transition-all duration-700 border backdrop-blur-md shadow-md flex items-center justify-center min-h-[12vmin] leading-tight ${bgClass}`}
                                 >
                                     {ans}
-                                </button>
+                                </div>
                             );
                         })}
                     </div>
-                    <div className="absolute bottom-[4vmin] h-[6vmin] flex items-center justify-center w-full z-20">
-                        {revealed ? (
-                            <div className="text-[2.5vmin] font-bold text-white animate-bounce">
-                                Next question coming up...
-                            </div>
-                        ) : (
-                            <button onClick={() => setRevealed(true)} className="text-[2vmin] text-white/40 hover:text-white font-mono tracking-widest uppercase transition-colors">
-                                Tap to reveal
-                            </button>
-                        )}
-                    </div>
+                    
+                    {isAnswerPhase && (
+                        <div className="absolute bottom-[2vmin] text-[3vmin] font-bold text-green-400 animate-pulse z-20 uppercase tracking-widest">
+                            Correct Answer
+                        </div>
+                    )}
+
                     <style>{`@keyframes widthFull { from { width: 100%; } to { width: 0%; } }`}</style>
                 </div>
             );
         };
-        // end sect 1
+
         const App = () => {
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
             const [nhlTeamsSelected, setNhlTeamsSelected] = usePersistedState('nhlTeams', []);
@@ -899,20 +941,15 @@
             const [welcomeAnimation, setWelcomeAnimation] = usePersistedState('welcomeAnim', 'fade');
             const [showAnimModal, setShowAnimModal] = useState(false);
             
-            // --- NEW: Multiple Custom Images State ---
             const [customImages, setCustomImages] = usePersistedState('customImagesList', []);
-            
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
             
-            // --- NEW: Trivia State ---
             const [showTrivia, setShowTrivia] = usePersistedState('showTrivia', false);
             const [triviaData, setTriviaData] = useState(null);
 
-            // --- PLAYOFF MODE STATE ---
             const [showPlayoffMode, setShowPlayoffMode] = usePersistedState('showPlayoffMode', false);
             const [playoffGames, setPlayoffGames] = useState([]);
 
-            // --- TRIVIA FETCHER ---
             const fetchTrivia = async () => {
                 const fallback = {
                     category: "General Knowledge",
@@ -949,6 +986,11 @@
                 } catch (e) { setTriviaData(fallback); }
             };
 
+            // Fetch initial trivia on mount if enabled
+            useEffect(() => {
+                if (showTrivia && !triviaData) fetchTrivia();
+            }, [showTrivia]);
+
             // --- PLAYOFF FETCHER ---
             useEffect(() => {
                 if (!showPlayoffMode) return;
@@ -957,27 +999,22 @@
                         const now = new Date();
                         const month = now.getMonth(); 
                         const day = now.getDate();
-                        
                         let urlParams = "";
-                        if (month === 0) {
+                        // Simple logic to try and get playoffs based on date
+                        if (month === 0) { // Jan
                             if (day < 14) urlParams = "?seasontype=3&week=1";       
                             else if (day < 21) urlParams = "?seasontype=3&week=2"; 
                             else urlParams = "?seasontype=3&week=3";                
-                        } 
-                        else if (month === 1) {
+                        } else if (month === 1) { // Feb
                             urlParams = "?seasontype=3&week=5";                     
                         }
-
                         const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard${urlParams}`);
                         if (res.ok) {
                             const data = await res.json();
-                            if (data.events) {
-                                setPlayoffGames(data.events);
-                            }
+                            if (data.events) setPlayoffGames(data.events);
                         }
-                    } catch (e) { console.error("Playoff fetch error", e); }
+                    } catch (e) {}
                 };
-                
                 fetchPlayoffs();
                 const interval = setInterval(fetchPlayoffs, 60000);
                 return () => clearInterval(interval);
@@ -994,7 +1031,6 @@
 
             useEffect(() => { handleInteraction(); }, []);
 
-            // --- WEATHER FETCHER ---
             useEffect(() => {
                 const fetchWeatherForZip = async (zip) => {
                     try {
@@ -1067,7 +1103,6 @@
             const fetchSportData = async (sport, league, teamId) => {
                 try {
                     const idStr = String(teamId).toLowerCase(); 
-                    
                     const now = new Date();
                     let seasonYear = now.getFullYear();
                     if (now.getMonth() < 7 && ['nfl', 'college-football'].includes(league)) {
@@ -1096,7 +1131,6 @@
 
                     const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule?season=${seasonYear}`;
                     let allEvents = [];
-
                     try {
                         const regRes = await fetch(scheduleUrl);
                         if (regRes.ok) {
@@ -1104,7 +1138,6 @@
                             if (regData.events) allEvents.push(...regData.events);
                         }
                     } catch (e) {}
-
                     try {
                         const postRes = await fetch(`${scheduleUrl}&seasonType=3`);
                         if (postRes.ok) {
@@ -1124,7 +1157,6 @@
 
                     const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000));
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
-
                     const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
                     const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
                     
@@ -1134,9 +1166,7 @@
                     if (!nextGame && teamInfoData.team.nextEvent && teamInfoData.team.nextEvent.length > 0) {
                         const fallbackGame = teamInfoData.team.nextEvent[0];
                         const fallbackDate = new Date(fallbackGame.date);
-                        if (fallbackDate >= cutoff) {
-                             nextGame = fallbackGame;
-                        }
+                        if (fallbackDate >= cutoff) nextGame = fallbackGame;
                     }
 
                     const fetchOpponentRecord = async (oppId) => {
@@ -1306,7 +1336,6 @@
                 const rotation = [];
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
                 
-                // --- NEW: Multiple Custom Images Logic ---
                 if (Array.isArray(customImages)) {
                     customImages.forEach(img => {
                         if (img.url) {
@@ -1321,8 +1350,8 @@
 
                 if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
                 
-                // --- NEW: Trivia Card Logic ---
-                if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} onNext={fetchTrivia} /> });
+                // Add Trivia
+                if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} /> });
 
                 if (showPlayoffMode && playoffGames.length > 0) {
                     rotation.push({
@@ -1368,22 +1397,19 @@
 
                 let slideDuration = 6000; 
                 
-                // --- NEW: Dynamic Duration Handling ---
                 const currentCard = allCards[currentSlideIndex];
                 if (currentCard) {
-                    // Check for custom image prefix
                     if (String(currentCard.id).startsWith('custom_image_')) {
-                        // The duration was stored directly in the card object during useMemo generation
                         slideDuration = Math.max(3, currentCard.duration) * 1000; 
                     }
-                    // Check for Trivia
+                    // Trivia timing logic
                     else if (currentCard.id === 'trivia') { 
-                        slideDuration = 15000; // 15 seconds for trivia
+                        slideDuration = 15000; 
                     }
                 }
 
                 const timer = setTimeout(() => { 
-                    // If current slide is trivia, fetch new data for next time
+                    // If finishing trivia, fetch new data for NEXT rotation
                     if (currentCard?.id === 'trivia') { fetchTrivia(); }
                     setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
                 }, slideDuration);
@@ -1396,7 +1422,6 @@
             const handleUpdateZip = (id, newSettings) => { setZipConfigs(zipConfigs.map(z => z.id === id ? { ...z, ...newSettings } : z)); };
             const closeSettings = () => { setIsSettingsOpen(false); };
 
-            // --- NEW: Image List Handlers ---
             const addCustomImage = () => {
                 const newId = Date.now().toString();
                 setCustomImages([...customImages, { id: newId, url: '', duration: 10 }]);
@@ -1413,7 +1438,7 @@
                     <div className="w-full h-full relative" onMouseEnter={() => setIsPaused(false)} onMouseLeave={() => setIsPaused(false)}>
                         {allCards.map((card, index) => (
                             <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === currentSlideIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
-                                {card.component}
+                                {card.id === 'trivia' ? React.cloneElement(card.component, { isActive: index === currentSlideIndex }) : card.component}
                             </div>
                         ))}
                     </div>
@@ -1437,7 +1462,7 @@
                                         </div>
                                     </div>
 
-                                    {/* --- NEW: CUSTOM IMAGE SLIDESHOW --- */}
+                                    {/* --- CUSTOM IMAGE SLIDESHOW --- */}
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-3 flex items-center justify-between">
                                             Custom Slideshow
