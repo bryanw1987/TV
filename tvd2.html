@@ -913,12 +913,21 @@
             const [showTrivia, setShowTrivia] = usePersistedState('showTrivia', false);
             const [triviaData, setTriviaData] = useState(null);
 
-            const fetchTrivia = async () => {
-                setTriviaData(null); // Clear data to show "Loading..." state
+           const fetchTrivia = async () => {
+                // 1. Define a fallback in case the API is down/rate-limited
+                const fallback = {
+                    category: "General Knowledge",
+                    difficulty: "easy",
+                    question: "Which planet is known as the Red Planet?",
+                    correct: "Mars",
+                    answers: ["Mars", "Venus", "Jupiter", "Saturn"].sort(() => Math.random() - 0.5)
+                };
+
                 try {
                     const res = await fetch('https://opentdb.com/api.php?amount=1');
                     if (res.ok) {
                         const data = await res.json();
+                        // 2. Check if we actually got results (sometimes it returns empty code 429)
                         if (data.results && data.results.length > 0) {
                             const decode = (str) => {
                                 const txt = document.createElement("textarea");
@@ -937,9 +946,21 @@
                                 answers: allAnswers,
                                 difficulty: q.difficulty
                             });
+                        } else {
+                            // API worked but returned no question -> Use Fallback
+                            console.warn("Trivia API Empty - Using Fallback");
+                            setTriviaData(fallback);
                         }
+                    } else {
+                        // API Failed (404, 500, etc) -> Use Fallback
+                        console.warn("Trivia API Error - Using Fallback");
+                        setTriviaData(fallback);
                     }
-                } catch (e) { console.error("Trivia fetch error", e); }
+                } catch (e) { 
+                    // Network Error -> Use Fallback
+                    console.error("Trivia Network Error", e); 
+                    setTriviaData(fallback);
+                }
             };
 
             // Initial fetch only - NO INTERVAL (We handle updates in rotation now)
