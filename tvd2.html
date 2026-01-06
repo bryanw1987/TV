@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sports & Smart Dashboard v2.1</title>
+    <title>Sports & Smart Dashboard v2.2</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -45,7 +45,6 @@
                         <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-900 text-white p-10 text-center">
                             <h1 className="text-4xl font-bold mb-4">Something went wrong</h1>
                             <p className="mb-4 text-red-200">The dashboard crashed. Please try the reset button.</p>
-                            <div className="bg-black/50 p-4 rounded mb-6 text-left font-mono text-sm overflow-auto max-h-40 max-w-full">{this.state.error.toString()}</div>
                             <button onClick={() => { localStorage.clear(); window.location.reload(); }} className="bg-white text-red-900 font-bold py-3 px-8 rounded-lg text-xl hover:bg-gray-200">FACTORY RESET & RELOAD</button>
                         </div>
                     );
@@ -811,40 +810,37 @@
             );
         };
 
-        const TriviaCard = ({ data }) => {
+        const TriviaCard = ({ data, isActive }) => {
             const [progress, setProgress] = useState(100);
             const [secondsLeft, setSecondsLeft] = useState(10);
             const [isAnswerPhase, setIsAnswerPhase] = useState(false);
 
             useEffect(() => {
-                if (!data) return;
-                // Reset state when data changes (new rotation)
-                setProgress(100);
-                setSecondsLeft(10);
-                setIsAnswerPhase(false);
+                if (!isActive) {
+                    setSecondsLeft(10);
+                    setProgress(100);
+                    setIsAnswerPhase(false);
+                    return;
+                }
 
-                // 10 Second Countdown Timer logic
-                const duration = 10000; // 10s
+                const duration = 10000; 
                 const startTime = Date.now();
 
                 const interval = setInterval(() => {
                     const elapsed = Date.now() - startTime;
                     const remaining = Math.max(0, duration - elapsed);
                     
-                    // Update visual progress
                     setProgress((remaining / duration) * 100);
-                    
-                    // Update Seconds Text
                     setSecondsLeft(Math.ceil(remaining / 1000));
 
                     if (remaining <= 0) {
                         setIsAnswerPhase(true);
                         clearInterval(interval);
                     }
-                }, 30); // Fast update for smooth bar
+                }, 30);
 
                 return () => clearInterval(interval);
-            }, [data]);
+            }, [isActive, data]);
 
             if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
 
@@ -852,7 +848,6 @@
                 <div className="h-full w-full relative overflow-hidden font-sans p-[3vmin] bg-gradient-to-br from-purple-900 via-fuchsia-900 to-indigo-900 text-white flex flex-col items-center justify-center text-center select-none transition-all duration-700">
                     <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
                     
-                    {/* Top Status Bar */}
                     <div className="absolute top-[3vmin] left-[3vmin] right-[3vmin] flex items-center justify-between">
                          <div className="bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
                             <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
@@ -865,7 +860,6 @@
                         )}
                     </div>
 
-                    {/* Progress Bar (Only during Question Phase) */}
                     {!isAnswerPhase && (
                         <div className="absolute top-0 left-0 h-[1vmin] bg-yellow-400 transition-all duration-75 ease-linear w-full shadow-[0_0_15px_rgba(250,204,21,0.5)]" style={{ width: `${progress}%` }}></div>
                     )}
@@ -878,7 +872,6 @@
                             const isCorrect = ans === data.correct;
                             let bgClass = "bg-white/10 border-white/10";
                             
-                            // Visual logic for Answer Phase
                             if (isAnswerPhase) {
                                 if (isCorrect) {
                                     bgClass = "bg-green-600 text-white border-green-400 shadow-[0_0_50px_rgba(34,197,94,0.6)] scale-[1.05] z-20 font-black ring-4 ring-green-400/50";
@@ -978,12 +971,10 @@
                 } catch (e) { setTriviaData(fallback); }
             };
 
-            // Fetch initial trivia on mount if enabled
             useEffect(() => {
                 if (showTrivia && !triviaData) fetchTrivia();
             }, [showTrivia]);
 
-            // --- PLAYOFF FETCHER ---
             useEffect(() => {
                 if (!showPlayoffMode) return;
                 const fetchPlayoffs = async () => {
@@ -1430,7 +1421,7 @@
                     <div className="w-full h-full relative" onMouseEnter={() => setIsPaused(false)} onMouseLeave={() => setIsPaused(false)}>
                         {allCards.map((card, index) => (
                             <div key={card.id} className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${index === currentSlideIndex ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 z-0'}`}>
-                                {card.component}
+                                {card.id === 'trivia' ? React.cloneElement(card.component, { isActive: index === currentSlideIndex }) : card.component}
                             </div>
                         ))}
                     </div>
