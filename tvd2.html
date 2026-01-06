@@ -869,6 +869,7 @@
             
             const [showImage, setShowImage] = usePersistedState('showImage', false);
             const [customImageUrl, setCustomImageUrl] = usePersistedState('customImgUrl', '');
+            const [customImageDuration, setCustomImageDuration] = usePersistedState('customImgDuration', 10);
             
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
 
@@ -1317,11 +1318,28 @@
 
             useEffect(() => {
                 if (allCards.length === 0) return;
+                // Boundary check
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
+                // Pause checks
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
-                const interval = setInterval(() => { setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); }, 6000); 
-                return () => clearInterval(interval);
-            }, [allCards.length, isPaused, isSettingsOpen, currentSlideIndex]);
+
+                // DYNAMIC DURATION LOGIC
+                let slideDuration = 6000; // Default global speed (6 seconds)
+                
+                // Check if the current slide is the Custom Image slide
+                if (allCards[currentSlideIndex]?.id === 'custom_image') {
+                    // Use custom duration (ensure it is at least 3 seconds to prevent loops)
+                    const durationVal = parseInt(customImageDuration) || 10;
+                    slideDuration = Math.max(3, durationVal) * 1000; 
+                }
+
+                // Use setTimeout instead of setInterval for variable timing
+                const timer = setTimeout(() => { 
+                    setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
+                }, slideDuration);
+
+                return () => clearTimeout(timer);
+            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex, customImageDuration]);
 
             const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3 }]); };
             const handleRemoveZip = (id) => { setZipConfigs(zipConfigs.filter(z => z.id !== id)); };
@@ -1352,8 +1370,38 @@
                                         <h3 className="font-bold text-white mb-3">Custom Slides</h3>
                                         <div className="flex flex-col gap-4">
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Custom Image</span><button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showImage && (<input type="text" value={customImageUrl} onChange={(e) => setCustomImageUrl(e.target.value)} placeholder="Paste Image URL here..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />)}</div>
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between"><span className="text-slate-200">Year Progress Bar</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
+                                            {/* // --- START CUSTOM IMAGE BLOCK --- // */}
+<div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
+    <div className="flex items-center justify-between">
+        <span className="text-slate-200">Custom Image</span>
+        <button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}>
+            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} />
+        </button>
+    </div>
+    {showImage && (
+        <div className="flex flex-col gap-2">
+            <input 
+                type="text" 
+                value={customImageUrl} 
+                onChange={(e) => setCustomImageUrl(e.target.value)} 
+                placeholder="Paste Image URL here..." 
+                className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" 
+            />
+            <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-400 whitespace-nowrap">Duration (sec):</span>
+                <input 
+                    type="number" 
+                    min="3" 
+                    max="300" 
+                    value={customImageDuration} 
+                    onChange={(e) => setCustomImageDuration(parseInt(e.target.value) || 10)} 
+                    className="w-20 bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-sm text-center" 
+                />
+            </div>
+        </div>
+    )}
+</div>
+{/* // --- END CUSTOM IMAGE BLOCK --- // */}
 
                                             {/* =================================================================== */}
                                             {/* ⬇️⬇️⬇️ SECTION 4: ADD SETTINGS TOGGLES HERE ⬇️⬇️⬇️ */}
