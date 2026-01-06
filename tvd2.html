@@ -818,7 +818,15 @@
 
         const TriviaCard = ({ data, onNext }) => {
             const [revealed, setRevealed] = useState(false);
-            useEffect(() => { setRevealed(false); }, [data]);
+            
+            // UPDATED: Auto-reveal answer after 10 seconds
+            useEffect(() => {
+                setRevealed(false); // Reset when data changes
+                const timer = setTimeout(() => {
+                    setRevealed(true);
+                }, 10000); // 10 Seconds
+                return () => clearTimeout(timer);
+            }, [data]);
 
             if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
 
@@ -828,6 +836,9 @@
                     <div className="absolute top-[3vmin] left-[3vmin] bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
                         <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
                     </div>
+                    {/* Progress Bar for the 10s timer (Optional visual flair) */}
+                    {!revealed && <div className="absolute top-0 left-0 h-[1vmin] bg-yellow-400/50 transition-all duration-[10000ms] ease-linear w-full" style={{ width: '0%', animation: 'widthFull 10s linear forwards' }}></div>}
+                    
                     <div className="mb-[5vmin] max-w-[85%] relative z-10">
                         <h2 className="text-[4.5vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
                     </div>
@@ -851,15 +862,19 @@
                             );
                         })}
                     </div>
+                    {/* Countdown/Next indicator */}
                     <div className="absolute bottom-[4vmin] h-[6vmin] flex items-center justify-center w-full z-20">
                         {revealed ? (
-                            <button onClick={onNext} className="bg-white text-purple-900 font-black px-[5vmin] py-[1.5vmin] rounded-full text-[2.5vmin] hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)] flex items-center gap-2">
-                                Next Question <span className="text-xl">➜</span>
-                            </button>
+                            <div className="text-[2.5vmin] font-bold text-white animate-bounce">
+                                Next question coming up...
+                            </div>
                         ) : (
-                            <div className="text-[2vmin] text-white/40 animate-pulse font-mono tracking-widest uppercase">Tap an answer to reveal</div>
+                            <button onClick={() => setRevealed(true)} className="text-[2vmin] text-white/40 hover:text-white font-mono tracking-widest uppercase transition-colors">
+                                Tap to reveal
+                            </button>
                         )}
                     </div>
+                    <style>{`@keyframes widthFull { from { width: 100%; } to { width: 0%; } }`}</style>
                 </div>
             );
         };
@@ -899,6 +914,7 @@
             const [triviaData, setTriviaData] = useState(null);
 
             const fetchTrivia = async () => {
+                setTriviaData(null); // Clear data to show "Loading..." state
                 try {
                     const res = await fetch('https://opentdb.com/api.php?amount=1');
                     if (res.ok) {
@@ -926,12 +942,35 @@
                 } catch (e) { console.error("Trivia fetch error", e); }
             };
 
+            // Initial fetch only - NO INTERVAL (We handle updates in rotation now)
             useEffect(() => {
-                if (!showTrivia) return;
-                fetchTrivia();
-                const interval = setInterval(fetchTrivia, 3600000); 
-                return () => clearInterval(interval);
-            }, [showTrivia]);
+                if (allCards.length === 0) return;
+                if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
+                if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
+
+                let slideDuration = 6000; // Default 6 seconds
+                const currentCardId = allCards[currentSlideIndex]?.id;
+
+                // 1. Custom Image Timing
+                if (currentCardId === 'custom_image') {
+                    const durationVal = parseInt(customImageDuration) || 10;
+                    slideDuration = Math.max(3, durationVal) * 1000; 
+                }
+                // 2. Trivia Timing (10s waiting + 5s revealed = 15s total)
+                else if (currentCardId === 'trivia') {
+                    slideDuration = 15000;
+                }
+
+                const timer = setTimeout(() => { 
+                    // If we are leaving the Trivia card, fetch a NEW one for next time
+                    if (currentCardId === 'trivia') {
+                        fetchTrivia();
+                    }
+                    setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
+                }, slideDuration);
+
+                return () => clearTimeout(timer);
+            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex, customImageDuration]);
 
             // --- PLAYOFF MODE STATE ---
             const [showPlayoffMode, setShowPlayoffMode] = usePersistedState('showPlayoffMode', false);
