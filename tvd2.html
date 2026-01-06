@@ -71,6 +71,82 @@
             return [state, setState];
         };
 
+        // --- API FETCHER (Added this missing function) ---
+        const fetchSportData = async (sport, league, teamId) => {
+            try {
+                const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
+                if (!res.ok) return {};
+                const data = await res.json();
+                const event = data.events?.find(e => e.competitions[0].competitors.some(c => c.team.abbreviation === teamId || c.team.id === teamId));
+                
+                if (!event) return { [teamId]: { status: 'OFFLINE' } };
+
+                const comp = event.competitions[0];
+                const isLive = event.status.type.state === 'in';
+                const isPost = event.status.type.state === 'post';
+                
+                // Determine Home/Away/My Team
+                const homeComp = comp.competitors.find(c => c.homeAway === 'home');
+                const awayComp = comp.competitors.find(c => c.homeAway === 'away');
+                const myComp = comp.competitors.find(c => c.team.abbreviation === teamId || c.team.id === teamId);
+                const oppComp = comp.competitors.find(c => c.team.abbreviation !== teamId && c.team.id !== teamId);
+
+                return {
+                    [teamId]: {
+                        status: event.status.type.state === 'pre' ? 'OFFLINE' : (isLive ? 'LIVE' : 'FINAL'),
+                        record: myComp?.records?.[0]?.summary || '0-0',
+                        live: isLive ? {
+                            score: { myScore: myComp.score, oppScore: oppComp.score },
+                            quarter: event.status.period,
+                            time: event.status.displayClock,
+                            down: event.competitions[0].situation?.down || 0,
+                            distance: event.competitions[0].situation?.distance || 0,
+                            yardLine: event.competitions[0].situation?.yardLine || 50,
+                            possession: event.competitions[0].situation?.possession,
+                            lastPlay: event.competitions[0].situation?.lastPlay?.text || "Game in progress",
+                            opponent: oppComp.team.shortDisplayName,
+                            opponentLogo: oppComp.team.logo,
+                            opponentColor: oppComp.team.color, // Will be filled by mapped arrays later
+                            homeTeam: { id: homeComp.team.id, logo: homeComp.team.logo, abbrev: homeComp.team.abbreviation, color: '' },
+                            awayTeam: { id: awayComp.team.id, logo: awayComp.team.logo, abbrev: awayComp.team.abbreviation, color: '' },
+                            // Baseball specific
+                            inningState: event.status.type.detail,
+                            balls: event.competitions[0].situation?.balls || 0,
+                            strikes: event.competitions[0].situation?.strikes || 0,
+                            outs: event.competitions[0].situation?.outs || 0,
+                            runners: {
+                                first: event.competitions[0].situation?.onFirst,
+                                second: event.competitions[0].situation?.onSecond,
+                                third: event.competitions[0].situation?.onThird
+                            },
+                            // Hockey specific
+                            period: event.status.period
+                        } : null,
+                        schedule: {
+                            next: {
+                                opponent: oppComp.team.shortDisplayName,
+                                date: new Date(event.date).toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}),
+                                time: new Date(event.date).toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}),
+                                location: event.competitions[0].venue?.fullName || 'TBD',
+                                opponentLogo: oppComp.team.logo
+                            },
+                            prev: {
+                                isWin: parseInt(myComp.score) > parseInt(oppComp.score),
+                                myScore: myComp.score,
+                                oppScore: oppComp.score,
+                                opponent: oppComp.team.shortDisplayName,
+                                opponentLogo: oppComp.team.logo,
+                                date: new Date(event.date).toLocaleDateString()
+                            }
+                        }
+                    }
+                };
+            } catch (e) {
+                console.error("Fetch Error", e);
+                return {};
+            }
+        };
+
         const CLOCK_COLORS = [ { label: 'White', value: 'text-white' }, { label: 'Red', value: 'text-red-500' }, { label: 'Blue', value: 'text-blue-500' }, { label: 'Green', value: 'text-green-500' }, { label: 'Yellow', value: 'text-yellow-400' }, { label: 'Purple', value: 'text-purple-500' }, { label: 'Cyan', value: 'text-cyan-400' }, { label: 'Orange', value: 'text-orange-500' } ];
 
         // --- TEAM DATA ---
@@ -468,7 +544,7 @@
                                     </>
                                 )}
                             </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -903,9 +979,9 @@
             const [welcomeAnimation, setWelcomeAnimation] = usePersistedState('welcomeAnim', 'fade');
             const [showAnimModal, setShowAnimModal] = useState(false);
             
-            const [showImage, setShowImage] = usePersistedState('showImage', false);
-            const [customImageUrl, setCustomImageUrl] = usePersistedState('customImgUrl', '');
-            const [customImageDuration, setCustomImageDuration] = usePersistedState('customImgDuration', 10);
+            // --- FIX START: Added missing customImages state ---
+            const [customImages, setCustomImages] = usePersistedState('customImagesList', []);
+            // --- FIX END ---
             
             const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
             
@@ -973,9 +1049,15 @@
                 const currentCardId = allCards[currentSlideIndex]?.id;
 
                 // 1. Custom Image Timing
-                if (currentCardId === 'custom_image') {
-                    const durationVal = parseInt(customImageDuration) || 10;
-                    slideDuration = Math.max(3, durationVal) * 1000; 
+                if (String(currentCardId).startsWith('custom_image_')) {
+                      // Find the duration for this specific image
+                      const imgId = currentCardId.replace('custom_image_', '');
+                      const imgConfig = customImages.find(img => img.id === imgId);
+                      if (imgConfig) {
+                        slideDuration = Math.max(3, parseInt(imgConfig.duration) || 10) * 1000;
+                      } else {
+                        slideDuration = 10000;
+                      }
                 }
                 // 2. Trivia Timing (10s waiting + 5s revealed = 15s total)
                 else if (currentCardId === 'trivia') {
@@ -991,7 +1073,7 @@
                 }, slideDuration);
 
                 return () => clearTimeout(timer);
-            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex, customImageDuration]);
+            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex, customImages]);
 
             // --- PLAYOFF MODE STATE ---
             const [showPlayoffMode, setShowPlayoffMode] = usePersistedState('showPlayoffMode', false);
@@ -1006,12 +1088,12 @@
                         const day = now.getDate();
                         let urlParams = "";
                         if (month === 0) {
-                            if (day < 14) urlParams = "?seasontype=3&week=1";      
+                            if (day < 14) urlParams = "?seasontype=3&week=1";       
                             else if (day < 21) urlParams = "?seasontype=3&week=2"; 
-                            else urlParams = "?seasontype=3&week=3";               
+                            else urlParams = "?seasontype=3&week=3";                
                         } 
                         else if (month === 1) {
-                            urlParams = "?seasontype=3&week=5";                    
+                            urlParams = "?seasontype=3&week=5";                     
                         }
                         const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard${urlParams}`);
                         if (res.ok) {
@@ -1092,8 +1174,7 @@
                 const interval = setInterval(loadAll, 60000);
                 return () => clearInterval(interval);
             }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
-
-         const allCards = useMemo(() => {
+            const allCards = useMemo(() => {
                 const liveCards = [];
                 const standardCards = [];
 
@@ -1124,14 +1205,14 @@
                 const rotation = [];
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
                 
-                // UPDATED: Add every image from the list as its own slide
+                // Add Custom Images to rotation
                 if (Array.isArray(customImages)) {
                     customImages.forEach(img => {
                         if (img.url) {
                             rotation.push({ 
                                 id: `custom_image_${img.id}`, 
                                 component: <CustomImageCard url={img.url} />,
-                                duration: parseInt(img.duration) || 10 // Store duration directly on the card object
+                                duration: parseInt(img.duration) || 10 
                             });
                         }
                     });
@@ -1175,40 +1256,24 @@
 
                 rotation.push(...standardCards);
                 return rotation;
-            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showYearProgress, welcomeMessage, welcomeAnimation, showTrivia, triviaData, showPlayoffMode, playoffGames]);
-
-            // UPDATED ROTATION TIMER
-            useEffect(() => {
-                if (allCards.length === 0) return;
-                if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
-                if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
-
-                let slideDuration = 6000; // Default 6 seconds
-                const currentCard = allCards[currentSlideIndex];
-
-                // 1. Dynamic Duration (Used for Custom Images)
-                if (currentCard?.duration) {
-                    slideDuration = Math.max(3, currentCard.duration) * 1000;
-                }
-                // 2. Trivia Timing
-                else if (currentCard?.id === 'trivia') {
-                    slideDuration = 15000;
-                }
-
-                const timer = setTimeout(() => { 
-                    if (currentCard?.id === 'trivia') fetchTrivia();
-                    setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
-                }, slideDuration);
-
-                return () => clearTimeout(timer);
-            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex]);
-
-               
+            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, customImages, showYearProgress, welcomeMessage, welcomeAnimation, showTrivia, triviaData, showPlayoffMode, playoffGames]);
 
             const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3 }]); };
             const handleRemoveZip = (id) => { setZipConfigs(zipConfigs.filter(z => z.id !== id)); };
             const handleUpdateZip = (id, newSettings) => { setZipConfigs(zipConfigs.map(z => z.id === id ? { ...z, ...newSettings } : z)); };
             const closeSettings = () => { setIsSettingsOpen(false); };
+
+            // --- HELPER FUNCTIONS FOR CUSTOM IMAGES ---
+            const addCustomImage = () => {
+                const newId = Date.now().toString();
+                setCustomImages([...customImages, { id: newId, url: '', duration: 10 }]);
+            };
+            const removeCustomImage = (id) => {
+                setCustomImages(customImages.filter(img => img.id !== id));
+            };
+            const updateCustomImage = (id, field, value) => {
+                setCustomImages(customImages.map(img => img.id === id ? { ...img, [field]: value } : img));
+            };
 
             return (
                 <div className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]" onMouseMove={handleInteraction} onClick={handleInteraction} onTouchStart={handleInteraction}>
@@ -1235,86 +1300,84 @@
                                         <div className="flex flex-col gap-4">
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
                                             
-                                           {/* // --- START CUSTOM IMAGE BLOCK (UPDATED) --- // */}
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                                        <h3 className="font-bold text-white mb-3 flex items-center justify-between">
-                                            Custom Slideshow
-                                            <button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1">
-                                                <Plus size={14} /> Add Slide
-                                            </button>
-                                        </h3>
-                                        <div className="flex flex-col gap-3">
-                                            {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
-                                            {customImages.map((img, index) => (
-                                                <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="bg-slate-700 text-slate-300 text-xs font-bold px-2 py-1 rounded">#{index + 1}</span>
-                                                        <input 
-                                                            type="text" 
-                                                            value={img.url} 
-                                                            onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} 
-                                                            placeholder="Paste Image URL..." 
-                                                            className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-1 text-white text-sm" 
-                                                        />
-                                                        <button onClick={() => removeCustomImage(img.id)} className="bg-red-900/50 hover:bg-red-600 border border-red-800 text-white p-2 rounded-lg transition-colors">
-                                                            <X size={16} />
-                                                        </button>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 pl-10">
-                                                        <span className="text-xs text-slate-400">Duration (sec):</span>
-                                                        <input 
-                                                            type="number" 
-                                                            min="3" 
-                                                            max="300" 
-                                                            value={img.duration} 
-                                                            onChange={(e) => updateCustomImage(img.id, 'duration', parseInt(e.target.value) || 10)} 
-                                                            className="w-20 bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-sm text-center" 
-                                                        />
-                                                    </div>
+                                            {/* CUSTOM IMAGE SETTINGS BLOCK */}
+                                            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                                <h3 className="font-bold text-white mb-3 flex items-center justify-between">
+                                                    Custom Slideshow
+                                                    <button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1">
+                                                        <Plus size={14} /> Add Slide
+                                                    </button>
+                                                </h3>
+                                                <div className="flex flex-col gap-3">
+                                                    {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
+                                                    {customImages.map((img, index) => (
+                                                        <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded-full">{index + 1}</span>
+                                                                <button onClick={() => removeCustomImage(img.id)} className="ml-auto text-red-400 hover:text-red-300"><X size={16} /></button>
+                                                            </div>
+                                                            <input type="text" value={img.url} onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} placeholder="Image URL..." className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" />
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-slate-400">Duration (sec):</span>
+                                                                <input type="number" value={img.duration} onChange={(e) => updateCustomImage(img.id, 'duration', e.target.value)} className="w-16 bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" min="3" />
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* FEATURE TOGGLES */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Year Progress</span>
+                                            <button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Trivia Mode</span>
+                                            <button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-purple-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Playoff Mode</span>
+                                            <button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* WEATHER & TEAM SELECTORS */}
+                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                        <h3 className="font-bold text-white mb-2">Clock Color</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {CLOCK_COLORS.map(c => (
+                                                <button key={c.value} onClick={() => setClockColor(c.value)} className={`px-3 py-1 rounded border transition-all ${clockColor === c.value ? 'bg-white text-black border-white font-bold' : 'bg-slate-900 text-slate-400 border-slate-600 hover:border-slate-400'}`}>
+                                                    {c.label}
+                                                </button>
                                             ))}
                                         </div>
                                     </div>
-                                    {/* // --- END CUSTOM IMAGE BLOCK --- // */}
-
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between"><span className="text-slate-200">Year Progress Bar</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
-                                            
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between">
-                                                <span className="text-slate-200">Trivia Card</span>
-                                                <button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-green-500' : 'bg-slate-700'}`}>
-                                                    <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} />
-                                                </button>
-                                            </div>
-
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between border-l-4 border-l-blue-500">
-                                                <div>
-                                                    <span className="text-white font-bold block">NFL Playoff Mode</span>
-                                                    <span className="text-xs text-slate-400">Shows all matchups for the week</span>
-                                                </div>
-                                                <button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-600' : 'bg-slate-700'}`}>
-                                                    <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} />
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><label className="block text-sm text-slate-400 mb-2">Clock Color</label><select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">{CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
-                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
-                                    <div className="mt-4 space-y-8">
-                                        <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
-                                        <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
-                                        <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
-                                        <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
-                                    </div>
+                                    <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(x => x !== id))} />
+                                    <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(x => x !== id))} />
+                                    <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(x => x !== id))} />
+                                    <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(x => x !== id))} />
                                 </div>
-                                <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end"><button onClick={closeSettings} className="w-fit bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 transition-colors shadow-lg"><Check size={20} /> Done</button></div>
+                                <div className="p-4 border-t border-slate-700 bg-slate-900 shrink-0 z-10">
+                                    <div className="text-center text-slate-500 text-sm font-mono">Weekend Custom Creations v2.0</div>
+                                </div>
                             </div>
                         </div>
                     )}
+
                     {showAnimModal && (
-                        <SelectionModal 
-                            title="Select Animation" 
-                            options={[{ label: 'Fade In', value: 'fade' }, { label: 'Drop In', value: 'drop' }, { label: 'Scrolling', value: 'scroll' }]}
+                        <SelectionModal
+                            title="Select Animation"
+                            options={[{label: 'Fade', value: 'fade'}, {label: 'Drop In', value: 'drop'}, {label: 'Scrolling', value: 'scroll'}]}
                             selectedValue={welcomeAnimation}
                             onSelect={setWelcomeAnimation}
                             onClose={() => setShowAnimModal(false)}
@@ -1323,6 +1386,7 @@
                 </div>
             );
         };
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<ErrorBoundary><App /></ErrorBoundary>);
     </script>
