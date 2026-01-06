@@ -849,7 +849,8 @@
                 if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
                 controlsTimeoutRef.current = setTimeout(() => { setShowControls(false); }, 5000);
             };
-            useEffect(() => { handleInteraction(); }, []);// --- ALL CARDS GENERATION ---
+            useEffect(() => { handleInteraction(); }, []);
+            // --- ALL CARDS GENERATION ---
             const allCards = useMemo(() => {
                 const liveCards = [];
                 const standardCards = [];
