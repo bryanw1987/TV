@@ -776,214 +776,202 @@
                 return `${w}-${l}`;
             };
 
-            const fetchSportData = async (sport, league, teamId) => {
+           const fetchSportData = async (sport, league, teamId) => {
+            try {
+                const idStr = String(teamId).toLowerCase(); 
+                let liveScoreboardGame = null;
                 try {
-                    const idStr = String(teamId).toLowerCase(); 
-                    let liveScoreboardGame = null;
+                    const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
+                    if(sbRes.ok) {
+                        const sbData = await sbRes.json();
+                        liveScoreboardGame = sbData.events?.find(e => {
+                            const isTeamInGame = e.competitions[0].competitors.some(c => String(c.team.id) === idStr || (c.team.abbreviation && c.team.abbreviation.toLowerCase() === idStr));
+                            return isTeamInGame && e.status.type.state === 'in';
+                        });
+                    }
+                } catch(e) {}
+                let teamInfoData = null;
+                try {
+                    const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
+                    if (teamInfoRes.ok) teamInfoData = await teamInfoRes.json();
+                } catch (e) {}
+
+                if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
+
+                // ==========================================================
+                // FIXED SCHEDULE LOGIC START
+                // ==========================================================
+                const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`;
+                let allEvents = [];
+
+                // 1. Fetch Regular Season
+                try {
+                    const regRes = await fetch(scheduleUrl);
+                    if (regRes.ok) {
+                        const regData = await regRes.json();
+                        if (regData.events) allEvents.push(...regData.events);
+                    }
+                } catch (e) {}
+
+                // 2. Fetch Postseason (force check)
+                try {
+                    const postRes = await fetch(`${scheduleUrl}?seasonType=3`);
+                    if (postRes.ok) {
+                        const postData = await postRes.json();
+                        if (postData.events) allEvents.push(...postData.events);
+                    }
+                } catch (e) {}
+
+                // 3. Deduplicate and Sort
+                const uniqueEventsMap = new Map();
+                allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
+                
+                // *** CRITICAL FIX: We define 'events' here so downstream code works ***
+                const events = Array.from(uniqueEventsMap.values()); 
+                events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                // 4. Calculate Record
+                let record = "0-0";
+                if (teamInfoData.team.record?.items?.[0]?.summary) record = teamInfoData.team.record.items[0].summary;
+                else record = calculateRecord(events, teamId, league);
+
+                // 5. Define Time Cutoffs
+                const now = new Date();
+                const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); // 4 hours ago
+                const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
+
+                // 6. Determine Prev and Next Games
+                const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
+                const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
+                
+                let prevGame = pastGames.length > 0 ? pastGames[0] : null;
+                let nextGame = futureGames.length > 0 ? futureGames[0] : null;
+
+                // ==========================================================
+                // FIXED SCHEDULE LOGIC END
+                // ==========================================================
+
+                const fetchOpponentRecord = async (oppId) => {
+                    if (!oppId) return null;
                     try {
-                        const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
-                        if(sbRes.ok) {
-                            const sbData = await sbRes.json();
-                            liveScoreboardGame = sbData.events?.find(e => {
-                                const isTeamInGame = e.competitions[0].competitors.some(c => String(c.team.id) === idStr || (c.team.abbreviation && c.team.abbreviation.toLowerCase() === idStr));
-                                return isTeamInGame && e.status.type.state === 'in';
-                            });
+                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`);
+                        if(res.ok) {
+                            const d = await res.json();
+                            return d.team?.record?.items?.[0]?.summary || null;
                         }
-                    } catch(e) {}
-                    let teamInfoData = null;
-                    try {
-                        const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
-                        if (teamInfoRes.ok) teamInfoData = await teamInfoRes.json();
-                    } catch (e) {}
+                    } catch (e) { return null; }
+                    return null;
+                };
+                const isMe = (comp) => {
+                    const target = String(teamId).toLowerCase();
+                    const compId = String(comp.team.id).toLowerCase();
+                    const compAbbrev = comp.team.abbreviation ? comp.team.abbreviation.toLowerCase() : '';
+                    return compId === target || compAbbrev === target;
+                };
 
-                    if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
+                let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null, prevGameData = null;
 
-                 // ==========================================================
-                    // FIXED SCHEDULE LOGIC (REGULAR + POSTSEASON MERGE)
-                    // ==========================================================
-                    
-                    const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`;
-                    let allEvents = [];
-
-                    // 1. Fetch Regular Season (seasonType=2)
-                    try {
-                        const regRes = await fetch(scheduleUrl);
-                        if (regRes.ok) {
-                            const regData = await regRes.json();
-                            if (regData.events) allEvents.push(...regData.events);
-                        }
-                    } catch (e) {}
-
-                    // 2. Fetch Postseason (seasonType=3) - ALWAYS CHECK THIS
-                    try {
-                        const postRes = await fetch(`${scheduleUrl}?seasonType=3`);
-                        if (postRes.ok) {
-                            const postData = await postRes.json();
-                            if (postData.events) allEvents.push(...postData.events);
-                        }
-                    } catch (e) {}
-
-                    // 3. Deduplicate events (in case ESPN lists a game in both places)
-                    const uniqueEventsMap = new Map();
-                    allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
-                    const uniqueEvents = Array.from(uniqueEventsMap.values());
-
-                    // 4. Sort all events by Date
-                    uniqueEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                    // 5. Calculate Record
-                    let record = "0-0";
-                    if (teamInfoData.team.record?.items?.[0]?.summary) {
-                        record = teamInfoData.team.record.items[0].summary;
-                    } else {
-                        record = calculateRecord(uniqueEvents, teamId, league);
+                if (prevGame && prevGame.competitions) {
+                    const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
+                    const myComp = prevGame.competitions[0].competitors.find(c => isMe(c));
+                    if (prevComp && myComp) {
+                        if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href;
+                        prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
+                        const myScore = parseInt(myComp.score?.value || 0, 10);
+                        const oppScore = parseInt(prevComp.score?.value || 0, 10);
+                        const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore);
+                        prevGameData = {
+                            opponent: prevComp.team.abbreviation || 'OPP',
+                            opponentLogo: prevOppLogo,
+                            opponentRecord: prevOppRecord,
+                            myScore: myScore,
+                            oppScore: oppScore,
+                            isWin: isWin,
+                            score: `${myScore}-${oppScore}`,
+                            result: isWin ? `W ${myScore}-${oppScore}` : `L ${myScore}-${oppScore}`,
+                            date: new Date(prevGame.date).toLocaleDateString()
+                        };
                     }
+                }
 
-                    // 6. Define "Now" and "Cutoff"
-                    // Cutoff is 4 hours ago. Games older than this are considered "Past"
-                    const now = new Date();
-                    const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); 
-
-                    const validEvents = uniqueEvents.map(e => ({...e, dateObj: new Date(e.date)}));
-                    
-                    // 7. Find Previous Game (The most recent game that is OLDER than cutoff)
-                    const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
-                    let prevGame = pastGames.length > 0 ? pastGames[0] : null;
-
-                    // 8. Find Next Game (The earliest game that is NEWER than cutoff)
-                    // We explicitly IGNORE teamInfoData.team.nextEvent because it is often wrong during playoffs
-                    const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
-                    
-                    let nextGame = null;
-                    if (futureGames.length > 0) {
-                        nextGame = futureGames[0];
+                if (nextGame && nextGame.competitions) {
+                    const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
+                    if (nextComp) {
+                        if (nextComp.team.logos?.length > 0) nextOppLogo = nextComp.team.logos[0].href;
+                        nextOppRecord = await fetchOpponentRecord(nextComp.team.id);
                     }
+                }
 
-                    // ==========================================================
-                    // END FIXED SCHEDULE LOGIC
-                    // ==========================================================
+                let liveGame = liveScoreboardGame;
+                if (!liveGame) {
+                    const localLive = events.find(e => e.status?.type?.state === 'in');
+                    if (localLive) {
+                         try {
+                            const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${localLive.id}`);
+                            if (summaryRes.ok) liveGame = await summaryRes.json();
+                        } catch(e) {}
+                    }
+                }
 
-                    const fetchOpponentRecord = async (oppId) => {
-                        if (!oppId) return null;
-                        try {
-                            const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`);
-                            if(res.ok) {
-                                const d = await res.json();
-                                return d.team?.record?.items?.[0]?.summary || null;
-                            }
-                        } catch (e) { return null; }
-                        return null;
-                    };
-                    const isMe = (comp) => {
-                        const target = String(teamId).toLowerCase();
-                        const compId = String(comp.team.id).toLowerCase();
-                        const compAbbrev = comp.team.abbreviation ? comp.team.abbreviation.toLowerCase() : '';
-                        return compId === target || compAbbrev === target;
-                    };
+                let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
+                mapped.schedule = {
+                    prev: prevGameData || { opponent: 'None', result: '-', date: '-' },
+                    next: nextGame ? {
+                        opponent: nextGame.competitions?.[0]?.competitors?.find(c => !isMe(c))?.team?.abbreviation || 'TBD',
+                        opponentLogo: nextOppLogo,
+                        opponentRecord: nextOppRecord,
+                        rawDate: nextGame.date,
+                        id: nextGame.id, 
+                        date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
+                        time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                        location: nextGame.competitions?.[0]?.venue?.fullName || 'TBD'
+                    } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
+                };
 
-                    let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null, prevGameData = null;
-
-                    if (prevGame && prevGame.competitions) {
-                        const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
-                        const myComp = prevGame.competitions[0].competitors.find(c => isMe(c));
-                        if (prevComp && myComp) {
-                            if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href;
-                            prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
-                            const myScore = parseInt(myComp.score?.value || 0, 10);
-                            const oppScore = parseInt(prevComp.score?.value || 0, 10);
-                            const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore);
-                            prevGameData = {
-                                opponent: prevComp.team.abbreviation || 'OPP',
-                                opponentLogo: prevOppLogo,
-                                opponentRecord: prevOppRecord,
-                                myScore: myScore,
-                                oppScore: oppScore,
-                                isWin: isWin,
-                                score: `${myScore}-${oppScore}`,
-                                result: isWin ? `W ${myScore}-${oppScore}` : `L ${myScore}-${oppScore}`,
-                                date: new Date(prevGame.date).toLocaleDateString()
-                            };
+                if (liveGame) {
+                    const comp = liveGame.competitions ? liveGame.competitions[0] : (liveGame.header ? liveGame.header.competitions[0] : null);
+                    if (comp) {
+                        const myTeam = comp.competitors.find(c => isMe(c));
+                        const oppTeam = comp.competitors.find(c => !isMe(c));
+                        const homeComp = comp.competitors.find(c => c.homeAway === 'home');
+                        const awayComp = comp.competitors.find(c => c.homeAway === 'away');
+                        let oppLogo = null;
+                        if (oppTeam.team.logos?.length > 0) { oppLogo = oppTeam.team.logos[0].href; } else {
+                            const abbrev = oppTeam.team.abbreviation ? oppTeam.team.abbreviation.toLowerCase() : '';
+                            if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id.toLowerCase() === abbrev); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
+                            else if (league === 'nhl') { oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${abbrev}.png`; } 
+                            else if (league === 'mlb') { oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${abbrev}.png`; } 
+                            else if (league === 'college-football') { oppLogo = `https://a.espncdn.com/i/teamlogos/ncaa/500/${oppTeam.team.id}.png`; }
+                        }
+                        const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
+                        const liveBase = {
+                            id: liveGame.id || (liveGame.header ? liveGame.header.id : 'unknown'),
+                            opponent: oppTeam.team.abbreviation,
+                            opponentLogo: oppLogo,
+                            opponentRecord: liveOppRecord,
+                            score: { myScore: myTeam.score, oppScore: oppTeam.score },
+                            time: comp.status.displayClock,
+                            homeTeam: { id: homeComp.team.id, abbrev: homeComp.team.abbreviation, name: homeComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===homeComp.team.abbreviation)?.color : '#333') || '#333', logo: homeComp.team.logos?.[0]?.href },
+                            awayTeam: { id: awayComp.team.id, abbrev: awayComp.team.abbreviation, name: awayComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===awayComp.team.abbreviation)?.color : '#fff') || '#fff', logo: awayComp.team.logos?.[0]?.href }
+                        };
+                        if (league === 'nfl' || league === 'college-football') {
+                            const situation = comp.situation || (liveGame.situation) || {};
+                            const lastPlayText = situation.lastPlay?.text || (liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress");
+                            mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: lastPlayText, opponentColor: '#333' };
+                        } else if (league === 'nhl') { 
+                            const situation = comp.situation || (liveGame.situation) || {};
+                            const lastPlayText = situation.lastPlay?.text || "Update in progress...";
+                            mapped.live = { ...liveBase, period: comp.status.period, lastPlay: lastPlayText };
+                        } 
+                        else if (league === 'mlb') {
+                            const sit = liveGame.situation || {};
+                            mapped.live = { ...liveBase, inning: comp.status.period, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } };
                         }
                     }
-
-                    if (nextGame && nextGame.competitions) {
-                        const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
-                        if (nextComp) {
-                            if (nextComp.team.logos?.length > 0) nextOppLogo = nextComp.team.logos[0].href;
-                            nextOppRecord = await fetchOpponentRecord(nextComp.team.id);
-                        }
-                    }
-
-                    let liveGame = liveScoreboardGame;
-                    if (!liveGame) {
-                        const localLive = events.find(e => e.status?.type?.state === 'in');
-                        if (localLive) {
-                             try {
-                                const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${localLive.id}`);
-                                if (summaryRes.ok) liveGame = await summaryRes.json();
-                            } catch(e) {}
-                        }
-                    }
-
-                    let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
-                    mapped.schedule = {
-                        prev: prevGameData || { opponent: 'None', result: '-', date: '-' },
-                        next: nextGame ? {
-                            opponent: nextGame.competitions?.[0]?.competitors?.find(c => !isMe(c))?.team?.abbreviation || 'TBD',
-                            opponentLogo: nextOppLogo,
-                            opponentRecord: nextOppRecord,
-                            rawDate: nextGame.date,
-                            id: nextGame.id, 
-                            date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
-                            time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                            location: nextGame.competitions?.[0]?.venue?.fullName || 'TBD'
-                        } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
-                    };
-
-                    if (liveGame) {
-                        const comp = liveGame.competitions ? liveGame.competitions[0] : (liveGame.header ? liveGame.header.competitions[0] : null);
-                        if (comp) {
-                            const myTeam = comp.competitors.find(c => isMe(c));
-                            const oppTeam = comp.competitors.find(c => !isMe(c));
-                            const homeComp = comp.competitors.find(c => c.homeAway === 'home');
-                            const awayComp = comp.competitors.find(c => c.homeAway === 'away');
-                            let oppLogo = null;
-                            if (oppTeam.team.logos?.length > 0) { oppLogo = oppTeam.team.logos[0].href; } else {
-                                const abbrev = oppTeam.team.abbreviation ? oppTeam.team.abbreviation.toLowerCase() : '';
-                                if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id.toLowerCase() === abbrev); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
-                                else if (league === 'nhl') { oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${abbrev}.png`; } 
-                                else if (league === 'mlb') { oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${abbrev}.png`; } 
-                                else if (league === 'college-football') { oppLogo = `https://a.espncdn.com/i/teamlogos/ncaa/500/${oppTeam.team.id}.png`; }
-                            }
-                            const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
-                            const liveBase = {
-                                id: liveGame.id || (liveGame.header ? liveGame.header.id : 'unknown'),
-                                opponent: oppTeam.team.abbreviation,
-                                opponentLogo: oppLogo,
-                                opponentRecord: liveOppRecord,
-                                score: { myScore: myTeam.score, oppScore: oppTeam.score },
-                                time: comp.status.displayClock,
-                                homeTeam: { id: homeComp.team.id, abbrev: homeComp.team.abbreviation, name: homeComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===homeComp.team.abbreviation)?.color : '#333') || '#333', logo: homeComp.team.logos?.[0]?.href },
-                                awayTeam: { id: awayComp.team.id, abbrev: awayComp.team.abbreviation, name: awayComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===awayComp.team.abbreviation)?.color : '#fff') || '#fff', logo: awayComp.team.logos?.[0]?.href }
-                            };
-                            if (league === 'nfl' || league === 'college-football') {
-                                const situation = comp.situation || (liveGame.situation) || {};
-                                const lastPlayText = situation.lastPlay?.text || (liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress");
-                                mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: lastPlayText, opponentColor: '#333' };
-                            } else if (league === 'nhl') { 
-                                const situation = comp.situation || (liveGame.situation) || {};
-                                const lastPlayText = situation.lastPlay?.text || "Update in progress...";
-                                mapped.live = { ...liveBase, period: comp.status.period, lastPlay: lastPlayText };
-                            } 
-                            else if (league === 'mlb') {
-                                const sit = liveGame.situation || {};
-                                mapped.live = { ...liveBase, inning: comp.status.period, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } };
-                            }
-                        }
-                    }
-                    return { [teamId]: mapped };
-                } catch(e) { return { [teamId]: null }; }
-            };
+                }
+                return { [teamId]: mapped };
+            } catch(e) { return { [teamId]: null }; }
+        };
 
             useEffect(() => {
                 const loadAll = async () => {
