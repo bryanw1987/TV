@@ -806,17 +806,34 @@
             // =============================================================================
             // --- PLAYOFF MODE STATE ---
            // --- PLAYOFF MODE STATE ---
+            // --- PLAYOFF MODE STATE ---
             const [showPlayoffMode, setShowPlayoffMode] = usePersistedState('showPlayoffMode', false);
             const [playoffGames, setPlayoffGames] = useState([]);
 
             useEffect(() => {
                 if (!showPlayoffMode) return;
+                
                 const fetchPlayoffs = async () => {
                     try {
-                        // FORCE POSTSEASON WEEK 1 (Wild Card)
-                        // seasonType=3 is Postseason
-                        // week=1 is Wild Card Round
-                        const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=3&week=1');
+                        // AUTOMATIC WEEK CALCULATOR (For Jan/Feb 2026)
+                        const now = new Date();
+                        const month = now.getMonth(); // 0=Jan, 1=Feb
+                        const day = now.getDate();
+                        
+                        let urlParams = "";
+
+                        // If it is January...
+                        if (month === 0) {
+                            if (day < 14) urlParams = "?seasontype=3&week=1";      // Wild Card (Now - Jan 13)
+                            else if (day < 21) urlParams = "?seasontype=3&week=2"; // Divisional (Jan 14 - Jan 20)
+                            else urlParams = "?seasontype=3&week=3";               // Conference (Jan 21 - End of Jan)
+                        } 
+                        // If it is February...
+                        else if (month === 1) {
+                            urlParams = "?seasontype=3&week=5";                    // Super Bowl (Week 4 is usually Pro Bowl)
+                        }
+
+                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard${urlParams}`);
                         if (res.ok) {
                             const data = await res.json();
                             if (data.events) {
