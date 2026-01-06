@@ -646,7 +646,120 @@
         // =================================================================================
         // ⬇️⬇️⬇️ SECTION 1: ADD NEW CARD COMPONENTS HERE ⬇️⬇️⬇️
         // =================================================================================
+        // --- NFL PLAYOFF COMPONENTS ---
+        const PlayoffCard = ({ game }) => {
+            const comp = game.competitions[0];
+            const home = comp.competitors.find(c => c.homeAway === 'home');
+            const away = comp.competitors.find(c => c.homeAway === 'away');
+            const isLive = game.status.type.state === 'in';
+            const isFinal = game.status.type.state === 'post';
 
+            // Re-use standard colors or default to NFL blue/red
+            const homeColor = NFL_TEAMS.find(t => t.id === home.team.abbreviation)?.color || '#002244';
+            const awayColor = NFL_TEAMS.find(t => t.id === away.team.abbreviation)?.color || '#c60c30';
+
+            // Format Game Data for the Layout
+            const teamData = {
+                color: homeColor, // Use home color for background
+                name: "NFL Playoffs",
+                logo: "https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png",
+                record: "Playoffs",
+            };
+
+            // If LIVE, we massage the data to look like your standard Live Card
+            if (isLive) {
+                const liveData = {
+                    ...teamData,
+                    status: 'LIVE',
+                    live: {
+                        score: { myScore: home.score, oppScore: away.score },
+                        quarter: game.status.period,
+                        time: game.status.displayClock,
+                        down: game.situation?.down || 0,
+                        distance: game.situation?.distance || 0,
+                        yardLine: game.situation?.yardLine || 50,
+                        possession: game.situation?.possession || null,
+                        lastPlay: game.situation?.lastPlay?.text || "Playoff Action",
+                        opponent: away.team.shortDisplayName,
+                        opponentLogo: away.team.logo,
+                        homeTeam: { id: home.team.id, logo: home.team.logo, color: homeColor },
+                        awayTeam: { id: away.team.id, logo: away.team.logo, color: awayColor }
+                    }
+                };
+                // We reuse the standard NFLCard logic visually by passing this "fake" team object
+                // But we need to manually render the layout since we aren't using the NFLCard component directly
+                return (
+                    <SportsCardLayout team={liveData} isLive={true}>
+                        <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
+                            <div className="flex items-center gap-[3vmin]">
+                                <div className="flex flex-col items-center">
+                                    <img src={home.team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />
+                                    <div className="text-[14vmin] font-black leading-none tracking-tighter">{home.score}</div>
+                                </div>
+                                <div className="text-[6vmin] font-bold text-gray-600">-</div>
+                                <div className="flex flex-col items-center">
+                                    <img src={away.team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />
+                                    <div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{away.score}</div>
+                                </div>
+                            </div>
+                            <div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{game.status.type.shortDetail}</div>
+                        </div>
+                        <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]">
+                             <div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{game.situation?.lastPlay?.text || "Game in progress..."}</div>
+                             <FootballField yardLine={game.situation?.yardLine || 50} possession={game.situation?.possession} homeTeam={{...home.team, color: homeColor}} awayTeam={{...away.team, color: awayColor}} />
+                        </div>
+                    </SportsCardLayout>
+                );
+            }
+
+            // PRE-GAME or FINAL
+            const dateObj = new Date(game.date);
+            const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-slate-950 flex flex-col items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-900/90" />
+                    <div className="relative z-10 flex flex-col items-center w-full">
+                        <div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[6vmin] bg-blue-900/30 px-[3vmin] py-[1vmin] rounded-full border border-blue-500/30">
+                            {game.name || "NFL Playoff Matchup"}
+                        </div>
+                        
+                        <div className="flex items-center justify-center w-full gap-[8vmin]">
+                            {/* AWAY TEAM */}
+                            <div className="flex flex-col items-center">
+                                <img src={away.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
+                                <div className="text-[6vmin] font-black text-white mt-[2vmin]">{away.team.shortDisplayName}</div>
+                                <div className="text-[3vmin] text-gray-400 font-bold">{away.records?.[0]?.summary}</div>
+                                {isFinal && <div className="text-[10vmin] font-black mt-[2vmin]">{away.score}</div>}
+                            </div>
+
+                            {/* VS / INFO */}
+                            <div className="flex flex-col items-center justify-center h-full">
+                                {isFinal ? (
+                                    <div className="text-[4vmin] font-bold text-gray-500">FINAL</div>
+                                ) : (
+                                    <>
+                                        <div className="text-[8vmin] font-black italic text-white/20">VS</div>
+                                        <div className="text-[3vmin] font-bold text-white bg-red-700 px-[2vmin] py-[0.5vmin] rounded mt-[2vmin]">{dateStr}</div>
+                                        <div className="text-[3vmin] font-bold text-white mt-[1vmin]">{timeStr}</div>
+                                        <div className="text-[2vmin] text-gray-400 mt-[2vmin] max-w-[20vmin] text-center">{comp.venue?.fullName}</div>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* HOME TEAM */}
+                            <div className="flex flex-col items-center">
+                                <img src={home.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
+                                <div className="text-[6vmin] font-black text-white mt-[2vmin]">{home.team.shortDisplayName}</div>
+                                <div className="text-[3vmin] text-gray-400 font-bold">{home.records?.[0]?.summary}</div>
+                                {isFinal && <div className="text-[10vmin] font-black mt-[2vmin]">{home.score}</div>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
         // EXAMPLE: A simple text card you can copy/paste to make new ones
         const GenericCard = ({ title, content }) => (
             <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white p-10 border-4 border-blue-600">
@@ -691,7 +804,29 @@
             // =============================================================================
             // ⬇️⬇️⬇️ SECTION 2: ADD NEW TOGGLES HERE (STATE) ⬇️⬇️⬇️
             // =============================================================================
+            // --- PLAYOFF MODE STATE ---
+            const [showPlayoffMode, setShowPlayoffMode] = usePersistedState('showPlayoffMode', false);
+            const [playoffGames, setPlayoffGames] = useState([]);
 
+            useEffect(() => {
+                if (!showPlayoffMode) return;
+                const fetchPlayoffs = async () => {
+                    try {
+                        // Fetches the main NFL Scoreboard (includes all games for the current week)
+                        const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard');
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.events) {
+                                setPlayoffGames(data.events);
+                            }
+                        }
+                    } catch (e) { console.error("Playoff fetch error", e); }
+                };
+                
+                fetchPlayoffs();
+                const interval = setInterval(fetchPlayoffs, 60000);
+                return () => clearInterval(interval);
+            }, [showPlayoffMode]);
             const [showGenericCard, setShowGenericCard] = usePersistedState('showGenericCard', false);
 
             // =============================================================================
@@ -1043,7 +1178,18 @@
                 // =========================================================================
                 // ⬇️⬇️⬇️ SECTION 3: ADD TO ROTATION HERE ⬇️⬇️⬇️
                 // =========================================================================
-                
+                // --- ADD PLAYOFF CARDS ---
+                if (showPlayoffMode && playoffGames.length > 0) {
+                    playoffGames.forEach(game => {
+                        // Create a card for every single playoff game found
+                        if (game.competitions && game.competitions[0]) {
+                            rotation.push({
+                                id: `playoff-${game.id}`,
+                                component: <PlayoffCard game={game} />
+                            });
+                        }
+                    });
+                }
                 if (showGenericCard) {
                     rotation.push({ 
                         id: 'my_new_card', 
@@ -1118,7 +1264,18 @@
                                             {/* =================================================================== */}
                                             {/* ⬇️⬇️⬇️ SECTION 4: ADD SETTINGS TOGGLES HERE ⬇️⬇️⬇️ */}
                                             {/* =================================================================== */}
-
+                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between border-l-4 border-l-blue-500">
+                                                <div>
+                                                    <span className="text-white font-bold block">NFL Playoff Mode</span>
+                                                    <span className="text-xs text-slate-400">Shows all matchups for the week</span>
+                                                </div>
+                                                <button 
+                                                    onClick={() => setShowPlayoffMode(!showPlayoffMode)} 
+                                                    className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-600' : 'bg-slate-700'}`}
+                                                >
+                                                    <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                </button>
+                                            </div>
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between">
                                                 <span className="text-slate-200">Generic Card Example</span>
                                                 <button 
