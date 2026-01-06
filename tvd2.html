@@ -1072,7 +1072,7 @@
                 return () => clearInterval(interval);
             }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
 
-            const allCards = useMemo(() => {
+         const allCards = useMemo(() => {
                 const liveCards = [];
                 const standardCards = [];
 
@@ -1102,7 +1102,20 @@
 
                 const rotation = [];
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
-                if (showImage) rotation.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
+                
+                // UPDATED: Add every image from the list as its own slide
+                if (Array.isArray(customImages)) {
+                    customImages.forEach(img => {
+                        if (img.url) {
+                            rotation.push({ 
+                                id: `custom_image_${img.id}`, 
+                                component: <CustomImageCard url={img.url} />,
+                                duration: parseInt(img.duration) || 10 // Store duration directly on the card object
+                            });
+                        }
+                    });
+                }
+
                 if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
                 if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} onNext={fetchTrivia} /> });
                 
@@ -1141,18 +1154,33 @@
 
                 rotation.push(...standardCards);
                 return rotation;
-            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl, showTrivia, triviaData, showPlayoffMode, playoffGames]);
+            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, customImages, showYearProgress, welcomeMessage, welcomeAnimation, showTrivia, triviaData, showPlayoffMode, playoffGames]);
 
+            // UPDATED ROTATION TIMER
             useEffect(() => {
                 if (allCards.length === 0) return;
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
 
-                let slideDuration = 6000;
-                if (allCards[currentSlideIndex]?.id === 'custom_image') {
-                    const durationVal = parseInt(customImageDuration) || 10;
-                    slideDuration = Math.max(3, durationVal) * 1000; 
+                let slideDuration = 6000; // Default 6 seconds
+                const currentCard = allCards[currentSlideIndex];
+
+                // 1. Dynamic Duration (Used for Custom Images)
+                if (currentCard?.duration) {
+                    slideDuration = Math.max(3, currentCard.duration) * 1000;
                 }
+                // 2. Trivia Timing
+                else if (currentCard?.id === 'trivia') {
+                    slideDuration = 15000;
+                }
+
+                const timer = setTimeout(() => { 
+                    if (currentCard?.id === 'trivia') fetchTrivia();
+                    setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
+                }, slideDuration);
+
+                return () => clearTimeout(timer);
+            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex]);
 
                 const timer = setTimeout(() => { 
                     setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
@@ -1191,23 +1219,47 @@
                                         <div className="flex flex-col gap-4">
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
                                             
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-slate-200">Custom Image</span>
-                                                    <button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}>
-                                                        <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} />
-                                                    </button>
-                                                </div>
-                                                {showImage && (
-                                                    <div className="flex flex-col gap-2">
-                                                        <input type="text" value={customImageUrl} onChange={(e) => setCustomImageUrl(e.target.value)} placeholder="Paste Image URL here..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-xs text-slate-400 whitespace-nowrap">Duration (sec):</span>
-                                                            <input type="number" min="3" max="300" value={customImageDuration} onChange={(e) => setCustomImageDuration(parseInt(e.target.value) || 10)} className="w-20 bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-sm text-center" />
-                                                        </div>
+                                           {/* // --- START CUSTOM IMAGE BLOCK (UPDATED) --- // */}
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                        <h3 className="font-bold text-white mb-3 flex items-center justify-between">
+                                            Custom Slideshow
+                                            <button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1">
+                                                <Plus size={14} /> Add Slide
+                                            </button>
+                                        </h3>
+                                        <div className="flex flex-col gap-3">
+                                            {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
+                                            {customImages.map((img, index) => (
+                                                <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="bg-slate-700 text-slate-300 text-xs font-bold px-2 py-1 rounded">#{index + 1}</span>
+                                                        <input 
+                                                            type="text" 
+                                                            value={img.url} 
+                                                            onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} 
+                                                            placeholder="Paste Image URL..." 
+                                                            className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-1 text-white text-sm" 
+                                                        />
+                                                        <button onClick={() => removeCustomImage(img.id)} className="bg-red-900/50 hover:bg-red-600 border border-red-800 text-white p-2 rounded-lg transition-colors">
+                                                            <X size={16} />
+                                                        </button>
                                                     </div>
-                                                )}
-                                            </div>
+                                                    <div className="flex items-center gap-2 pl-10">
+                                                        <span className="text-xs text-slate-400">Duration (sec):</span>
+                                                        <input 
+                                                            type="number" 
+                                                            min="3" 
+                                                            max="300" 
+                                                            value={img.duration} 
+                                                            onChange={(e) => updateCustomImage(img.id, 'duration', parseInt(e.target.value) || 10)} 
+                                                            className="w-20 bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-sm text-center" 
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* // --- END CUSTOM IMAGE BLOCK --- // */}
 
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between"><span className="text-slate-200">Year Progress Bar</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
                                             
