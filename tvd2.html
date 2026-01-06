@@ -776,19 +776,20 @@
                 return `${w}-${l}`;
             };
 
-          const fetchSportData = async (sport, league, teamId) => {
+         const fetchSportData = async (sport, league, teamId) => {
             try {
                 const idStr = String(teamId).toLowerCase(); 
                 
                 // 1. Determine the correct "Season Year"
-                // If it is January-July (Month 0-6), the current season actually started the previous year 
-                // for NFL, College Football, and NHL.
+                // NFL & College Football in Jan-July belong to the PREVIOUS year's season (e.g. Jan 2026 is 2025 season)
+                // NHL & NBA in Jan-July belong to the CURRENT year's season ending (e.g. Jan 2026 is 2026 season)
                 const now = new Date();
                 let seasonYear = now.getFullYear();
-                if (now.getMonth() < 7 && ['nfl', 'college-football', 'nhl'].includes(league)) {
+                if (now.getMonth() < 7 && ['nfl', 'college-football'].includes(league)) {
                     seasonYear -= 1;
                 }
 
+                // 2. Try to find a Live Game in the global Scoreboard
                 let liveScoreboardGame = null;
                 try {
                     const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
@@ -801,6 +802,7 @@
                     }
                 } catch(e) {}
 
+                // 3. Fetch Basic Team Info (Logo, Color, Record, Next Event Shortcut)
                 let teamInfoData = null;
                 try {
                     const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
@@ -810,15 +812,13 @@
                 if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
 
                 // ==========================================================
-                // FIXED SCHEDULE LOGIC WITH YEAR FIX
+                // ROBUST SCHEDULE LOGIC
                 // ==========================================================
                 
-                // We deliberately append ?season=YYYY to force the correct season context
                 const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule?season=${seasonYear}`;
-                
                 let allEvents = [];
 
-                // 1. Fetch Regular Season (seasonType=2 is default)
+                // A. Fetch Regular Season (seasonType=2)
                 try {
                     const regRes = await fetch(scheduleUrl);
                     if (regRes.ok) {
@@ -827,7 +827,7 @@
                     }
                 } catch (e) {}
 
-                // 2. Fetch Postseason (seasonType=3)
+                // B. Fetch Postseason (seasonType=3) - CRITICAL FOR PLAYOFFS
                 try {
                     const postRes = await fetch(`${scheduleUrl}&seasonType=3`);
                     if (postRes.ok) {
@@ -836,28 +836,36 @@
                     }
                 } catch (e) {}
 
-                // 3. Deduplicate and Sort
+                // C. Deduplicate and Sort
                 const uniqueEventsMap = new Map();
                 allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
-                
                 const events = Array.from(uniqueEventsMap.values()); 
                 events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-                // 4. Calculate Record
+                // D. Calculate Record
                 let record = "0-0";
                 if (teamInfoData.team.record?.items?.[0]?.summary) record = teamInfoData.team.record.items[0].summary;
                 else record = calculateRecord(events, teamId, league);
 
-                // 5. Define Time Cutoffs (4 hours ago)
-                const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); 
+                // E. Find Previous and Next Games
+                const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); // 4 hours ago
                 const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
 
-                // 6. Determine Prev and Next Games
                 const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
                 const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
                 
                 let prevGame = pastGames.length > 0 ? pastGames[0] : null;
                 let nextGame = futureGames.length > 0 ? futureGames[0] : null;
+
+                // F. FAIL-SAFE: If 'nextGame' is empty, check the Team Profile 'nextEvent' shortcut
+                // This catches games (like Steelers vs Texans) if the schedule list is lagging
+                if (!nextGame && teamInfoData.team.nextEvent && teamInfoData.team.nextEvent.length > 0) {
+                    const fallbackGame = teamInfoData.team.nextEvent[0];
+                    const fallbackDate = new Date(fallbackGame.date);
+                    if (fallbackDate >= cutoff) {
+                         nextGame = fallbackGame;
+                    }
+                }
 
                 // ==========================================================
                 // END SCHEDULE LOGIC
