@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sports, Stocks & Smart Dashboard v3.4</title>
+    <title>Sports, Stocks & Smart Dashboard v3.5</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -128,8 +128,6 @@
             </div>
         );
 
-        /* --- RESTORED COMPONENTS --- */
-        
         const ZipSelector = ({ zipList, onAdd, onRemove, onUpdate }) => {
             const [newZip, setNewZip] = useState('');
             return (
@@ -385,8 +383,6 @@
                 </div>
             );
         };
-        
-        /* --- END RESTORING MISSING COMPONENTS --- */
 
         const YearProgressCard = () => {
             const [progress, setProgress] = useState(0);
@@ -626,111 +622,14 @@
                 </div>
             );
         };
-
-        const SportsCardLayout = ({ team, isLive, children }) => (
-            <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
-                <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20">
-                    <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md logo-glow" />
-                    <div><h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2><div className="flex items-center gap-[1vmin]"><span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>{isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}</div></div>
-                </div>
-                <div className="flex flex-col landscape:flex-row h-full w-full items-center justify-evenly gap-[4vmin] relative z-10 pt-[8vmin]">{children}</div>
-            </div>
-        );
-
-        const FootballField = ({ yardLine, possession, homeTeam, awayTeam }) => {
-            const isHome = String(possession) === String(homeTeam.id);
-            const activeTeam = isHome ? homeTeam : awayTeam;
-            const activeColor = activeTeam.color || '#555';
-            const activeLogo = activeTeam.logo || `https://a.espncdn.com/i/teamlogos/${activeTeam.id.length > 3 ? 'ncaa' : 'nfl'}/500/${activeTeam.abbrev ? activeTeam.abbrev.toLowerCase() : 'scoreboard'}.png`;
-            const teamAbbrev = activeTeam.abbrev || (activeTeam.name ? activeTeam.name.substring(0,3).toUpperCase() : '');
-            let displayWidth = yardLine;
-            if (!isHome) { displayWidth = 100 - yardLine; }
-            const widthPct = Math.min(Math.max(displayWidth, 0), 100);
-            const gridLines = [];
-            for (let i = 5; i < 100; i += 5) { gridLines.push(i); }
-            const [logoError, setLogoError] = useState(false);
-            return (
-                <div className="w-[90%] h-[15vmin] relative flex shadow-inner border-2 border-white/50 rounded-lg overflow-hidden bg-green-800 select-none">
-                    <div className="w-[8.333%] h-full border-r-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: homeTeam.color }}>{homeTeam.logo ? <img src={homeTeam.logo} className="w-[80%] h-[80%] object-contain -rotate-90 opacity-80 logo-glow" /> : <span className="-rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{homeTeam.name.substring(0,3)}</span>}</div>
-                    <div className="w-[83.334%] h-full relative z-0">
-                        {gridLines.map((num) => { const isTen = num % 10 === 0; return (<div key={num} className={`absolute top-0 bottom-0 border-l flex flex-col justify-between py-[0.5vmin] ${isTen ? 'border-white/40' : 'border-white/10'}`} style={{ left: `${num}%` }}>{isTen && (<><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2">{num > 50 ? 100 - num : num}</span><span className="text-[1.5vmin] text-white/50 font-bold -translate-x-1/2 rotate-180">{num > 50 ? 100 - num : num}</span></>)}</div>); })}
-                        <div className="absolute top-1/4 bottom-1/4 transition-all duration-700 ease-out z-20 flex items-center overflow-visible" style={{ left: isHome ? '0%' : 'auto', right: isHome ? 'auto' : '0%', width: `${widthPct}%`, backgroundColor: activeColor, opacity: 0.9, boxShadow: '0 0 10px rgba(0,0,0,0.5)', justifyContent: isHome ? 'flex-end' : 'flex-start' }}><div className={`w-[8vmin] h-[8vmin] bg-white rounded-full p-[2px] border-2 border-black shadow-lg flex items-center justify-center overflow-hidden shrink-0 ${isHome ? 'translate-x-1/2' : '-translate-x-1/2'}`}>{!logoError ? <img src={activeLogo} className="w-full h-full object-contain" onError={() => setLogoError(true)} /> : <span className="text-black font-bold text-[1.5vmin]">{teamAbbrev}</span>}</div></div>
-                    </div>
-                    <div className="w-[8.333%] h-full border-l-2 border-white/30 flex items-center justify-center relative z-10" style={{ backgroundColor: awayTeam.color }}>{awayTeam.logo ? <img src={awayTeam.logo} className="w-[80%] h-[80%] object-contain rotate-90 opacity-80 logo-glow" /> : <span className="rotate-90 text-[2vmin] font-black text-white/50 tracking-widest">{awayTeam.name.substring(0,3)}</span>}</div>
-                </div>
-            );
-        };
-
-        const NFLCard = ({ teamId, realData }) => {
-            const teamConfig = NFL_TEAMS.find(t => t.id === teamId);
-            const team = useMemo(() => {
-                if (!teamConfig) return null;
-                const base = { ...teamConfig, logo: `https://a.espncdn.com/i/teamlogos/nfl/500/${teamId.toLowerCase()}.png` };
-                if (realData) { 
-                    const oppColor = NFL_TEAMS.find(t => t.id === realData.live?.opponent)?.color || '#333';
-                    if (realData.live) realData.live.opponentColor = oppColor;
-                    return { ...base, ...realData }; 
-                }
-                return { ...base, status: 'OFFLINE', record: '0-0', schedule: { prev: { opponent: 'TBD', result: '-', date: '-' }, next: { opponent: 'TBD', time: '-', location: '-' } } };
-            }, [teamId, teamConfig, realData]);
-
-            if (!team) return null;
-            const isLive = team.status === 'LIVE' || team.status === 'IN';
-            const isSeasonEnd = team.schedule?.next?.opponent === 'Season End';
-            const possessionId = String(team.live?.possession || '');
-            const homeId = String(team.live?.homeTeam?.id || '');
-            const awayId = String(team.live?.awayTeam?.id || '');
-            const isHomePossession = possessionId === homeId;
-            const isMyPossession = (String(team.live?.homeTeam?.abbrev) === String(team.id) && isHomePossession) || (String(team.live?.awayTeam?.abbrev) === String(team.id) && possessionId === awayId);
-            const isOppPossession = (String(team.live?.homeTeam?.abbrev) === String(team.id) && possessionId === awayId) || (String(team.live?.awayTeam?.abbrev) === String(team.id) && isHomePossession);
-            
-            let ballOnText = "50";
-            if (isLive && team.live) {
-                const yl = team.live.yardLine;
-                if (yl === 50) ballOnText = "50";
-                else {
-                    if (isHomePossession) { if (yl < 50) ballOnText = `OWN ${yl}`; else ballOnText = `OPP ${100 - yl}`; } 
-                    else { if (yl > 50) ballOnText = `OWN ${100 - yl}`; else ballOnText = `OPP ${yl}`; }
-                }
-            }
-
-            return (
-                <SportsCardLayout team={team} isLive={isLive}>
-                    {isLive ? (
-                        <>
-                            <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
-                                <div className="flex items-center gap-[3vmin]"><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]">{isMyPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}<img src={team.logo} className="w-[10vmin] h-[10vmin] object-contain logo-glow" /></div><div className="text-[14vmin] font-black leading-none tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.live.score.myScore}</div></div><div className="text-[6vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center"><div className="flex items-center justify-center gap-[1vmin] mb-[1vmin]"><img src={team.live.opponentLogo || `https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png`} className="w-[10vmin] h-[10vmin] object-contain logo-glow" />{isOppPossession && <Football className="w-[5vmin] h-[5vmin] drop-shadow-md animate-pulse" />}</div><div className="text-[14vmin] font-black leading-none tracking-tighter text-white/50">{team.live.score.oppScore}</div></div></div><div className="text-[4vmin] font-bold text-gray-400 mt-[1vmin] uppercase tracking-widest">{team.live.quarter}Q | {team.live.time}</div>
-                            </div>
-                            <div className="flex flex-col items-center landscape:items-start landscape:w-2/3 landscape:pl-[4vmin] w-full gap-[3vmin]"><div className="text-[3.5vmin] font-bold text-gray-300 text-center landscape:text-left leading-tight max-w-[80vmin] opacity-90 mb-[1vmin]">{team.live.lastPlay || "Coverage starting..."}</div>{team.live.homeTeam && team.live.awayTeam && ( <FootballField yardLine={team.live.yardLine} possession={team.live.possession} homeTeam={team.live.homeTeam} awayTeam={team.live.awayTeam} /> )}<div className="grid grid-cols-2 gap-[4vmin] mt-[1vmin] w-full max-w-[60vmin]"><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5"><div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Down & Dist</div><div className="text-[4vmin] font-black">{team.live.down > 0 ? `${team.live.down}${getOrdinal(team.live.down)} & ${team.live.distance}` : "1st & 10"}</div></div><div className="bg-white/10 p-[2vmin] rounded-xl text-center backdrop-blur-md border border-white/5"><div className="text-[2vmin] text-gray-400 uppercase font-bold tracking-widest">Ball On</div><div className="text-[4vmin] font-black flex items-center justify-center gap-[1vmin]" style={{ color: '#fff' }}>{ballOnText}</div></div></div></div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-end landscape:w-1/2 landscape:pr-[6vmin] landscape:border-r landscape:border-white/10 w-full text-center landscape:text-right py-[2vmin]">
-                                {isSeasonEnd ? (
-                                    <div className="flex flex-col items-center landscape:items-end justify-center h-full">
-                                            <div className="text-[5vmin] font-bold text-gray-500 uppercase tracking-widest mb-[2vmin]">Season Complete</div>
-                                            <div className="text-[18vmin] font-black leading-none text-white tracking-tighter" style={{ textShadow: `0 0 30px ${team.color}` }}>{team.record}</div>
-                                            <div className="text-[3vmin] font-bold text-gray-400 mt-[2vmin] uppercase tracking-wider">Final Record</div>
-                                    </div>
-                                ) : (
-                                    <>
-                                            <div><div className="text-[4vmin] font-bold text-blue-400 uppercase tracking-widest mb-[1vmin]">Next Game</div>{team.schedule?.next?.opponentLogo ? <img src={team.schedule.next.opponentLogo} className="h-[30vmin] w-[30vmin] object-contain my-[1vmin] drop-shadow-xl logo-glow" /> : <div className="text-[12vmin] font-black leading-none tracking-tighter text-white">VS {team.schedule?.next?.opponent}</div>}</div><div><div className="text-[12vmin] font-black text-gray-200 leading-none">VS {team.schedule?.next?.opponent}</div><div className="text-[6vmin] font-bold text-gray-400 mt-[1vmin]">{team.schedule?.next?.date} @ {team.schedule?.next?.time}</div><div className="text-[3vmin] font-medium text-gray-500 mt-[0.5vmin] uppercase tracking-wider">{team.schedule?.next?.location}</div></div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
-                        </>
-                    )}
-                </SportsCardLayout>
-            );
-        };
-
+        /* --- ALL CARDS COMPLETE IN PART 1 --- */
         const FlightTrackerCard = ({ lat, lon, location }) => {
             const [flights, setFlights] = useState([]);
             const [loading, setLoading] = useState(true);
 
             useEffect(() => {
                 const fetchFlights = async () => {
+                    // Create a bounding box ~50 miles around the location
                     const lamin = lat - 0.7;
                     const lomin = lon - 0.7;
                     const lamax = lat + 0.7;
@@ -741,16 +640,17 @@
                         if (res.ok) {
                             const data = await res.json();
                             if (data.states) {
+                                // Map raw array to object
                                 const formatted = data.states.map(s => ({
                                     icao24: s[0],
                                     callsign: s[1]?.trim(),
                                     country: s[2],
                                     lon: s[5],
                                     lat: s[6],
-                                    alt: s[7],
-                                    velocity: s[9],
+                                    alt: s[7], // meters
+                                    velocity: s[9], // m/s
                                     heading: s[10]
-                                })).filter(f => f.callsign && f.alt > 0).slice(0, 5); 
+                                })).filter(f => f.callsign && f.alt > 0).slice(0, 5); // Limit to top 5 visible
                                 setFlights(formatted);
                             }
                         }
@@ -760,30 +660,52 @@
                         setLoading(false);
                     }
                 };
+
                 fetchFlights();
-                const interval = setInterval(fetchFlights, 20000); 
+                const interval = setInterval(fetchFlights, 20000); // Poll every 20s
                 return () => clearInterval(interval);
             }, [lat, lon]);
 
             return (
                 <div className="h-full w-full bg-slate-900 relative overflow-hidden font-sans flex flex-col p-4">
+                    {/* Radar Background Effect */}
                     <div className="absolute inset-0 z-0 opacity-20">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vmin] h-[80vmin] border border-green-500/30 rounded-full"></div>
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vmin] h-[60vmin] border border-green-500/30 rounded-full"></div>
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vmin] h-[40vmin] border border-green-500/30 rounded-full"></div>
                         <div className="absolute top-1/2 left-1/2 w-1/2 h-1 bg-green-500/20 origin-left animate-[spin_4s_linear_infinite]"></div>
                     </div>
+
                     <div className="relative z-10 flex justify-between items-center mb-4 border-b border-white/10 pb-2">
-                        <div><h2 className="text-3xl font-black text-green-400 uppercase tracking-widest">LIVE RADAR</h2><p className="text-sm text-green-600 font-mono">SECTOR: {location.toUpperCase()}</p></div>
+                        <div>
+                            <h2 className="text-3xl font-black text-green-400 uppercase tracking-widest">LIVE RADAR</h2>
+                            <p className="text-sm text-green-600 font-mono">SECTOR: {location.toUpperCase()}</p>
+                        </div>
                         <div className="animate-pulse w-3 h-3 bg-green-500 rounded-full"></div>
                     </div>
+
                     <div className="relative z-10 flex-1 flex flex-col gap-2 overflow-hidden">
-                        {loading ? <div className="text-green-800 font-mono text-xl animate-pulse">SCANNING AIRSPACE...</div> : flights.length === 0 ? <div className="text-green-800 font-mono text-xl">NO TRAFFIC DETECTED</div> : flights.map(f => (
-                            <div key={f.icao24} className="flex items-center justify-between bg-green-900/20 border border-green-500/30 p-3 rounded-lg backdrop-blur-sm">
-                                <div className="flex items-center gap-3"><div className="text-2xl">✈️</div><div><div className="text-2xl font-black text-green-100 leading-none">{f.callsign}</div><div className="text-xs text-green-400 font-mono">{f.country}</div></div></div>
-                                <div className="text-right font-mono text-green-300 text-sm"><div>ALT: {Math.round(f.alt * 3.28084).toLocaleString()} ft</div><div>SPD: {Math.round(f.velocity * 2.23694)} mph</div></div>
-                            </div>
-                        ))}
+                        {loading ? (
+                            <div className="text-green-800 font-mono text-xl animate-pulse">SCANNING AIRSPACE...</div>
+                        ) : flights.length === 0 ? (
+                            <div className="text-green-800 font-mono text-xl">NO TRAFFIC DETECTED</div>
+                        ) : (
+                            flights.map(f => (
+                                <div key={f.icao24} className="flex items-center justify-between bg-green-900/20 border border-green-500/30 p-3 rounded-lg backdrop-blur-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-2xl">✈️</div>
+                                        <div>
+                                            <div className="text-2xl font-black text-green-100 leading-none">{f.callsign}</div>
+                                            <div className="text-xs text-green-400 font-mono">{f.country}</div>
+                                        </div>
+                                    </div>
+                                    <div className="text-right font-mono text-green-300 text-sm">
+                                        <div>ALT: {Math.round(f.alt * 3.28084).toLocaleString()} ft</div>
+                                        <div>SPD: {Math.round(f.velocity * 2.23694)} mph</div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             );
@@ -800,7 +722,8 @@
             const [mlbData, setMlbData] = useState({});
             const [ncaafData, setNcaafData] = useState({});
 
-            const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3, showFlights: true }]);
+            // Added showFlights to zipConfigs default
+            const [zipConfigs, setZipConfigs] = usePersistedState('zipConfigs', [{ id: '10001', showForecast: false, days: 3, showFlights: false }]);
             const [weatherDataMap, setWeatherDataMap] = useState({});
             
             const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -824,6 +747,100 @@
             const [stockSymbols, setStockSymbols] = usePersistedState('stockSymbols', []);
             const [stockData, setStockData] = useState({});
             const [newStockInput, setNewStockInput] = useState('');
+
+            // --- FETCHERS ---
+            useEffect(() => {
+                const fetchStocks = async () => {
+                    if (!finnhubKey || stockSymbols.length === 0) return;
+                    const newStockData = { ...stockData };
+                    for (const symbol of stockSymbols) {
+                        try {
+                            const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubKey}`);
+                            const quote = await quoteRes.json();
+                            let name = newStockData[symbol]?.name;
+                            if (!name) {
+                                try {
+                                    const profileRes = await fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubKey}`);
+                                    const profile = await profileRes.json();
+                                    name = profile.name;
+                                } catch (e) {}
+                            }
+                            if (quote.c === 0 && quote.d === null) newStockData[symbol] = { error: true };
+                            else newStockData[symbol] = { ...quote, name: name || symbol, error: false };
+                        } catch (e) {}
+                    }
+                    setStockData(newStockData);
+                };
+                fetchStocks();
+                const interval = setInterval(fetchStocks, 60000);
+                return () => clearInterval(interval);
+            }, [stockSymbols, finnhubKey]);
+
+            const fetchTrivia = async () => {
+                const fallback = { category: "General", difficulty: "easy", question: "Which planet is known as the Red Planet?", correct: "Mars", answers: ["Mars", "Venus", "Jupiter", "Saturn"] };
+                try {
+                    const res = await fetch('https://opentdb.com/api.php?amount=1');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.results && data.results.length > 0) {
+                            const decode = (str) => { const txt = document.createElement("textarea"); txt.innerHTML = str; return txt.value; };
+                            const q = data.results[0];
+                            const allAnswers = [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5).map(a => decode(a));
+                            setTriviaData({ category: decode(q.category), question: decode(q.question), correct: decode(q.correct_answer), answers: allAnswers, difficulty: q.difficulty });
+                        } else { setTriviaData(fallback); }
+                    } else { setTriviaData(fallback); }
+                } catch (e) { setTriviaData(fallback); }
+            };
+
+            // Initial fetch if trivia is enabled
+            useEffect(() => { if (showTrivia && !triviaData) fetchTrivia(); }, [showTrivia]);
+
+            // Playoff Fetcher
+            useEffect(() => {
+                if (!showPlayoffMode) return;
+                const fetchPlayoffs = async () => {
+                    try {
+                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`); 
+                        if (res.ok) { const data = await res.json(); if (data.events) setPlayoffGames(data.events); }
+                    } catch (e) {}
+                };
+                fetchPlayoffs();
+                const interval = setInterval(fetchPlayoffs, 60000);
+                return () => clearInterval(interval);
+            }, [showPlayoffMode]);
+
+            // Weather Fetcher
+            useEffect(() => {
+                const fetchWeather = async (zip) => {
+                    try {
+                        let lat = 40.71, lon = -74.00, city = "New York", state = "NY";
+                        try {
+                            const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`);
+                            if (zipRes.ok) {
+                                const zipData = await zipRes.json();
+                                lat = zipData.places[0].latitude;
+                                lon = zipData.places[0].longitude;
+                                city = zipData.places[0]["place name"];
+                                state = zipData.places[0].state;
+                            }
+                        } catch (e) {}
+                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
+                        const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`);
+                        if (weatherRes.ok) {
+                            const wData = await weatherRes.json();
+                            const aqiData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }};
+                            setWeatherDataMap(prev => ({ ...prev, [zip]: { 
+                                temp: wData.current.temperature_2m, condition: wData.current.weather_code, 
+                                wind: wData.current.wind_speed_10m, precip: wData.current.precipitation, 
+                                aqi: aqiData.current?.us_aqi || 0, city: `${city}, ${state}`, 
+                                lat: lat, lon: lon, // Captured for Flight Tracker
+                                timezoneOffset: wData.utc_offset_seconds || -14400, daily: wData.daily, loading: false 
+                            }}));
+                        }
+                    } catch (err) {}
+                };
+                if(Array.isArray(zipConfigs)) zipConfigs.forEach(conf => fetchWeather(conf.id));
+            }, [zipConfigs]);
 
             // Helper for Sport Records
             const calculateRecord = (events, teamId, league) => {
@@ -960,57 +977,7 @@
                 } catch(e) { return { [teamId]: null }; }
             };
 
-            // Effects
-            useEffect(() => {
-                const fetchStocks = async () => {
-                    if (!finnhubKey || stockSymbols.length === 0) return;
-                    const newStockData = { ...stockData };
-                    for (const symbol of stockSymbols) {
-                        try {
-                            const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${finnhubKey}`);
-                            const quote = await quoteRes.json();
-                            let name = newStockData[symbol]?.name;
-                            if (!name) { try { const profileRes = await fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${finnhubKey}`); const profile = await profileRes.json(); name = profile.name; } catch (e) {} }
-                            if (quote.c === 0 && quote.d === null) newStockData[symbol] = { error: true };
-                            else newStockData[symbol] = { ...quote, name: name || symbol, error: false };
-                        } catch (e) {}
-                    }
-                    setStockData(newStockData);
-                };
-                fetchStocks();
-                const interval = setInterval(fetchStocks, 60000);
-                return () => clearInterval(interval);
-            }, [stockSymbols, finnhubKey]);
-
-            useEffect(() => { if (showTrivia && !triviaData) {
-                const fetchTrivia = async () => {
-                   const fallback = { category: "General", difficulty: "easy", question: "Which planet is known as the Red Planet?", correct: "Mars", answers: ["Mars", "Venus", "Jupiter", "Saturn"] };
-                   try { const res = await fetch('https://opentdb.com/api.php?amount=1'); if (res.ok) { const data = await res.json(); if (data.results && data.results.length > 0) { const decode = (str) => { const txt = document.createElement("textarea"); txt.innerHTML = str; return txt.value; }; const q = data.results[0]; const allAnswers = [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5).map(a => decode(a)); setTriviaData({ category: decode(q.category), question: decode(q.question), correct: decode(q.correct_answer), answers: allAnswers, difficulty: q.difficulty }); } else { setTriviaData(fallback); } } else { setTriviaData(fallback); } } catch (e) { setTriviaData(fallback); }
-                };
-                fetchTrivia();
-            } }, [showTrivia]);
-
-            useEffect(() => {
-                if (!showPlayoffMode) return;
-                const fetchPlayoffs = async () => { try { const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard`); if (res.ok) { const data = await res.json(); if (data.events) setPlayoffGames(data.events); } } catch (e) {} };
-                fetchPlayoffs();
-                const interval = setInterval(fetchPlayoffs, 60000);
-                return () => clearInterval(interval);
-            }, [showPlayoffMode]);
-
-            useEffect(() => {
-                const fetchWeather = async (zip) => {
-                    try {
-                        let lat = 40.71, lon = -74.00, city = "New York", state = "NY";
-                        try { const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`); if (zipRes.ok) { const zipData = await zipRes.json(); lat = zipData.places[0].latitude; lon = zipData.places[0].longitude; city = zipData.places[0]["place name"]; state = zipData.places[0].state; } } catch (e) {}
-                        const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=auto&forecast_days=8`);
-                        const aqiRes = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi`);
-                        if (weatherRes.ok) { const wData = await weatherRes.json(); const aqiData = aqiRes.ok ? await aqiRes.json() : { current: { us_aqi: 0 }}; setWeatherDataMap(prev => ({ ...prev, [zip]: { temp: wData.current.temperature_2m, condition: wData.current.weather_code, wind: wData.current.wind_speed_10m, precip: wData.current.precipitation, aqi: aqiData.current?.us_aqi || 0, city: `${city}, ${state}`, lat: lat, lon: lon, timezoneOffset: wData.utc_offset_seconds || -14400, daily: wData.daily, loading: false }})); }
-                    } catch (err) {}
-                };
-                if(Array.isArray(zipConfigs)) zipConfigs.forEach(conf => fetchWeather(conf.id));
-            }, [zipConfigs]);
-
+            // Sports Fetcher
             useEffect(() => {
                 const loadAll = async () => {
                       const promises = [];
@@ -1025,36 +992,96 @@
                 return () => clearInterval(interval);
             }, [nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected]);
 
+            // Controls logic
+            const [showControls, setShowControls] = useState(false);
+            const controlsTimeoutRef = useRef(null);
+            const handleInteraction = () => {
+                setShowControls(true);
+                if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
+                controlsTimeoutRef.current = setTimeout(() => { setShowControls(false); }, 5000);
+            };
+            useEffect(() => { handleInteraction(); }, []);
+
+            // --- ALL CARDS GENERATION ---
             const allCards = useMemo(() => {
                 const liveCards = [];
                 const standardCards = [];
-                const processSport = (list, dataMap, Component) => { if (Array.isArray(list)) list.forEach(id => { const data = dataMap[id]; if (data) { const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> }; standardCards.push(card); if (data.status === 'LIVE' || data.status === 'IN') liveCards.push(card); } }); };
+
+                const processSport = (list, dataMap, Component) => {
+                    if (Array.isArray(list)) list.forEach(id => {
+                        const data = dataMap[id];
+                        if (data) {
+                            const card = { id: `${id}`, component: <Component teamId={id} realData={data} /> };
+                            standardCards.push(card);
+                            if (data.status === 'LIVE' || data.status === 'IN') liveCards.push(card);
+                        }
+                    });
+                };
                 processSport(nflTeamsSelected, nflData, NFLCard);
                 processSport(nhlTeamsSelected, nhlData, NHLCard);
                 processSport(mlbTeamsSelected, mlbData, MLBCard);
                 processSport(ncaafTeamsSelected, ncaafData, NCAAFCard);
-                if (Array.isArray(stockSymbols)) stockSymbols.forEach(symbol => { const data = stockData[symbol]; standardCards.push({ id: `stock-${symbol}`, component: <StockCard symbol={symbol} data={data} /> }); });
+
+                if (Array.isArray(stockSymbols)) stockSymbols.forEach(symbol => {
+                    const data = stockData[symbol];
+                    standardCards.push({ id: `stock-${symbol}`, component: <StockCard symbol={symbol} data={data} /> });
+                });
+
                 if (liveCards.length > 0) return liveCards;
+
                 const rotation = [];
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
                 if (Array.isArray(customImages)) customImages.forEach(img => { if (img.url) rotation.push({ id: `custom_image_${img.id}`, component: <CustomImageCard url={img.url} />, duration: parseInt(img.duration) || 10 }); });
                 if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
                 if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} /> });
-                if (showPlayoffMode && playoffGames.length > 0) { rotation.push({ id: 'playoff-overview', component: <PlayoffOverviewCard games={playoffGames} /> }); playoffGames.forEach(game => { if (game.competitions && game.competitions[0]) rotation.push({ id: `playoff-${game.id}`, component: <PlayoffCard game={game} /> }); }); }
-                if (Array.isArray(zipConfigs) && zipConfigs.length > 0) { const firstZip = zipConfigs[0].id; const clockOffset = weatherDataMap[firstZip]?.timezoneOffset; rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> }); } else { rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> }); }
-                if (Array.isArray(zipConfigs)) { zipConfigs.forEach(config => { const data = weatherDataMap[config.id]; if (data) { rotation.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> }); if (config.showForecast) rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> }); if (config.showFlights && data.lat && data.lon) rotation.push({ id: `flights-${config.id}`, component: <FlightTrackerCard lat={data.lat} lon={data.lon} location={data.city} /> }); } }); }
+                
+                if (showPlayoffMode && playoffGames.length > 0) {
+                    rotation.push({ id: 'playoff-overview', component: <PlayoffOverviewCard games={playoffGames} /> });
+                    playoffGames.forEach(game => { if (game.competitions && game.competitions[0]) rotation.push({ id: `playoff-${game.id}`, component: <PlayoffCard game={game} /> }); });
+                }
+
+                if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
+                    const firstZip = zipConfigs[0].id;
+                    const clockOffset = weatherDataMap[firstZip]?.timezoneOffset;
+                    rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={clockOffset} color={clockColor} /> });
+                } else {
+                    rotation.push({ id: 'clock', component: <ClockCard timezoneOffset={null} color={clockColor} /> });
+                }
+
+                if (Array.isArray(zipConfigs)) {
+                    zipConfigs.forEach(config => {
+                        const data = weatherDataMap[config.id];
+                        if (data) {
+                            rotation.push({ id: `weather-${config.id}`, component: <WeatherCard weatherData={data} /> });
+                            if (config.showForecast) rotation.push({ id: `forecast-${config.id}`, component: <ForecastCard weatherData={data} days={config.days} /> });
+                            // FLIGHT TRACKER INJECTION
+                            if (config.showFlights && data.lat && data.lon) {
+                                rotation.push({ id: `flights-${config.id}`, component: <FlightTrackerCard lat={data.lat} lon={data.lon} location={data.city} /> });
+                            }
+                        }
+                    });
+                }
+
                 rotation.push(...standardCards);
                 return rotation;
             }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showYearProgress, welcomeMessage, welcomeAnimation, customImages, showTrivia, triviaData, showPlayoffMode, playoffGames, stockSymbols, stockData]);
 
+            // Carousel Logic
             useEffect(() => {
                 if (allCards.length === 0) return;
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
                 let slideDuration = 6000; 
                 const currentCard = allCards[currentSlideIndex];
-                if (currentCard) { if (String(currentCard.id).startsWith('custom_image_')) slideDuration = Math.max(3, currentCard.duration) * 1000; else if (currentCard.id === 'trivia') slideDuration = 15000; else if (String(currentCard.id).startsWith('flights-')) slideDuration = 10000; }
-                const timer = setTimeout(() => { if (currentCard?.id === 'trivia') { const fallback = { category: "General", difficulty: "easy", question: "Which planet is known as the Red Planet?", correct: "Mars", answers: ["Mars", "Venus", "Jupiter", "Saturn"] }; fetch('https://opentdb.com/api.php?amount=1').then(res=>res.json()).then(data=>{ if(data.results.length>0){ const decode=(str)=>{const t=document.createElement("textarea");t.innerHTML=str;return t.value};const q=data.results[0];setTriviaData({category:decode(q.category),question:decode(q.question),correct:decode(q.correct_answer),answers:[...q.incorrect_answers,q.correct_answer].sort(()=>Math.random()-0.5).map(a=>decode(a)),difficulty:q.difficulty}); } else setTriviaData(fallback); }).catch(()=>setTriviaData(fallback)); } setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); }, slideDuration);
+                if (currentCard) {
+                    if (String(currentCard.id).startsWith('custom_image_')) slideDuration = Math.max(3, currentCard.duration) * 1000;
+                    else if (currentCard.id === 'trivia') slideDuration = 15000; // 15s for trivia
+                    else if (String(currentCard.id).startsWith('flights-')) slideDuration = 10000; // 10s for radar
+                }
+                const timer = setTimeout(() => { 
+                    if (currentCard?.id === 'trivia') fetchTrivia(); 
+                    setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
+                }, slideDuration);
                 return () => clearTimeout(timer);
             }, [allCards, isPaused, isSettingsOpen, currentSlideIndex]);
 
@@ -1104,6 +1131,7 @@
                                                 <div key={item.id} className="bg-slate-900 border border-slate-700 p-3 rounded-lg flex flex-col gap-3">
                                                     <div className="flex justify-between items-center"><span className="font-bold font-mono text-lg">{item.id}</span><button onClick={() => handleRemoveZip(item.id)} className="text-slate-500 hover:text-red-400"><X size={18} /></button></div>
                                                     <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Forecast</span><button onClick={() => handleUpdateZip(item.id, { showForecast: !item.showForecast })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showForecast ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showForecast ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
+                                                    {/* FLIGHT TRACKER TOGGLE */}
                                                     <div className="flex items-center justify-between"><span className="text-sm text-slate-400">Show Radar (Flights)</span><button onClick={() => handleUpdateZip(item.id, { showFlights: !item.showFlights })} className={`w-10 h-5 rounded-full relative transition-colors ${item.showFlights ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${item.showFlights ? 'translate-x-5' : 'translate-x-0'}`} /></button></div>
                                                     {item.showForecast && (<div className="flex gap-2"><button onClick={() => handleUpdateZip(item.id, { days: 3 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 3 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>3 Day</button><button onClick={() => handleUpdateZip(item.id, { days: 5 })} className={`flex-1 py-1 rounded text-xs font-bold transition-colors ${item.days === 5 ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500 hover:bg-slate-700'}`}>5 Day</button></div>)}
                                                 </div>
@@ -1135,7 +1163,7 @@
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Year Progress</span><button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
                                         <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Trivia Mode</span><button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-purple-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
-                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">NFL Playoff Mode</span><button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between"><span className="font-bold text-white">Playoff Mode</span><button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>
                                     </div>
                                     <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                                         <h3 className="font-bold text-white mb-3">Welcome Slide</h3>
