@@ -315,7 +315,6 @@
 
         const SportsCardLayout = ({ team, isLive, children }) => (
             <div className="h-full w-full relative overflow-hidden font-sans p-[1vmin] bg-black" style={{ background: 'radial-gradient(circle at center, #1a1a1a 0%, #000000 100%)', borderLeft: `2vw solid ${team.color}` }}>
-                {/* UPDATED: Removed opacity-90 from container to let the logo shine fully */}
                 <div className="absolute top-[3vmin] left-[3vmin] flex items-center gap-[1.5vmin] z-20">
                     <img src={team.logo} className="h-[7vmin] w-[7vmin] object-contain drop-shadow-md logo-glow" />
                     <div><h2 className="text-[5vmin] font-black uppercase leading-none tracking-tighter text-white">{team.name}</h2><div className="flex items-center gap-[1vmin]"><span className="text-[3.5vmin] font-bold text-gray-400">({team.record})</span>{isLive && <span className="bg-red-600 text-white text-[2vmin] font-bold px-[1vmin] py-[0.2vmin] rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] tracking-wider">LIVE</span>}</div></div>
@@ -405,7 +404,7 @@
                                     </>
                                 )}
                             </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -469,7 +468,7 @@
                                     </>
                                 )}
                             </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -575,7 +574,7 @@
                                     </>
                                 )}
                             </div>
-                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
+                            <div className="flex flex-col items-center justify-evenly h-full landscape:items-start landscape:w-1/2 landscape:pl-[6vmin] w-full text-center landscape:text-left py-[2vmin]"><div><div className="text-[4vmin] font-bold text-gray-500 uppercase tracking-widest mb-[1vmin]">Last Result</div><div className={`text-[20vmin] font-black uppercase mb-[1vmin] leading-none ${team.schedule?.prev?.isWin ? 'text-green-500' : 'text-red-500'}`} style={{ textShadow: '0 0 50px rgba(0,0,0,0.5)' }}>{team.schedule?.prev?.isWin ? 'WIN' : 'LOSS'}</div></div><div className="flex items-center gap-[4vmin] mt-[2vmin]"><div className="flex flex-col items-center"><img src={team.logo} className="w-[15vmin] h-[15vmin] object-contain mb-[1vmin] logo-glow" /><span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.myScore}</span></div><div className="text-[10vmin] font-bold text-gray-600">-</div><div className="flex flex-col items-center">{team.schedule?.prev?.opponentLogo ? <img src={team.schedule.prev.opponentLogo} className="w-[15vmin] h-[15vmin] object-contain mb-[2vmin] logo-glow" /> : <span className="text-[6vmin] font-bold text-gray-400 mb-[2vmin]">{team.schedule?.prev?.opponent}</span>}<span className="text-[15vmin] font-bold text-white leading-none">{team.schedule?.prev?.oppScore}</span></div></div><div className="text-[4vmin] text-gray-500 font-bold mt-[2vmin]">{team.schedule?.prev?.date}</div></div>
                         </>
                     )}
                 </SportsCardLayout>
@@ -643,10 +642,6 @@
             );
         };
 
-        // =================================================================================
-        // ⬇️⬇️⬇️ SECTION 1: ADD NEW CARD COMPONENTS HERE ⬇️⬇️⬇️
-        // =================================================================================
-        // --- NFL PLAYOFF COMPONENTS ---
         const PlayoffCard = ({ game }) => {
             const comp = game.competitions[0];
             const home = comp.competitors.find(c => c.homeAway === 'home');
@@ -654,19 +649,16 @@
             const isLive = game.status.type.state === 'in';
             const isFinal = game.status.type.state === 'post';
 
-            // Re-use standard colors or default to NFL blue/red
             const homeColor = NFL_TEAMS.find(t => t.id === home.team.abbreviation)?.color || '#002244';
             const awayColor = NFL_TEAMS.find(t => t.id === away.team.abbreviation)?.color || '#c60c30';
 
-            // Format Game Data for the Layout
             const teamData = {
-                color: homeColor, // Use home color for background
+                color: homeColor, 
                 name: "NFL Playoffs",
                 logo: "https://a.espncdn.com/i/teamlogos/nfl/500/nfl.png",
                 record: "Playoffs",
             };
 
-            // If LIVE, we massage the data to look like your standard Live Card
             if (isLive) {
                 const liveData = {
                     ...teamData,
@@ -686,8 +678,6 @@
                         awayTeam: { id: away.team.id, logo: away.team.logo, color: awayColor }
                     }
                 };
-                // We reuse the standard NFLCard logic visually by passing this "fake" team object
-                // But we need to manually render the layout since we aren't using the NFLCard component directly
                 return (
                     <SportsCardLayout team={liveData} isLive={true}>
                         <div className="flex flex-col items-center justify-center landscape:items-end landscape:w-1/3 landscape:pr-[2vmin] landscape:border-r landscape:border-white/10 w-full">
@@ -712,7 +702,6 @@
                 );
             }
 
-            // PRE-GAME or FINAL
             const dateObj = new Date(game.date);
             const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
             const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -726,7 +715,6 @@
                         </div>
                         
                         <div className="flex items-center justify-center w-full gap-[8vmin]">
-                            {/* AWAY TEAM */}
                             <div className="flex flex-col items-center">
                                 <img src={away.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
                                 <div className="text-[6vmin] font-black text-white mt-[2vmin]">{away.team.shortDisplayName}</div>
@@ -734,21 +722,19 @@
                                 {isFinal && <div className="text-[10vmin] font-black mt-[2vmin]">{away.score}</div>}
                             </div>
 
-                            {/* VS / INFO */}
                             <div className="flex flex-col items-center justify-center h-full">
                                 {isFinal ? (
                                     <div className="text-[4vmin] font-bold text-gray-500">FINAL</div>
                                 ) : (
                                     <>
-                                        <div className="text-[8vmin] font-black italic text-white/20">VS</div>
-                                        <div className="text-[3vmin] font-bold text-white bg-red-700 px-[2vmin] py-[0.5vmin] rounded mt-[2vmin]">{dateStr}</div>
-                                        <div className="text-[3vmin] font-bold text-white mt-[1vmin]">{timeStr}</div>
-                                        <div className="text-[2vmin] text-gray-400 mt-[2vmin] max-w-[20vmin] text-center">{comp.venue?.fullName}</div>
+                                            <div className="text-[8vmin] font-black italic text-white/20">VS</div>
+                                            <div className="text-[3vmin] font-bold text-white bg-red-700 px-[2vmin] py-[0.5vmin] rounded mt-[2vmin]">{dateStr}</div>
+                                            <div className="text-[3vmin] font-bold text-white mt-[1vmin]">{timeStr}</div>
+                                            <div className="text-[2vmin] text-gray-400 mt-[2vmin] max-w-[20vmin] text-center">{comp.venue?.fullName}</div>
                                     </>
                                 )}
                             </div>
 
-                            {/* HOME TEAM */}
                             <div className="flex flex-col items-center">
                                 <img src={home.team.logo} className="w-[20vmin] h-[20vmin] object-contain drop-shadow-2xl logo-glow" />
                                 <div className="text-[6vmin] font-black text-white mt-[2vmin]">{home.team.shortDisplayName}</div>
@@ -760,11 +746,8 @@
                 </div>
             );
         };
-        // EXAMPLE: A simple text card you can copy/paste to make new ones
-       
-        // --- PLAYOFF BRACKET / OVERVIEW CARD ---
+
         const PlayoffOverviewCard = ({ games }) => {
-            // Helper to sort games by conference
             const afcTeams = ['BAL','BUF','CIN','CLE','DEN','HOU','IND','JAX','KC','LAC','LV','MIA','NE','NYJ','PIT','TEN'];
             const isAFC = (game) => {
                 const team = game.competitions[0].competitors[0].team.abbreviation;
@@ -778,25 +761,22 @@
                 const comp = game.competitions[0];
                 const home = comp.competitors.find(c => c.homeAway === 'home');
                 const away = comp.competitors.find(c => c.homeAway === 'away');
-                const status = game.status.type.state; // 'pre', 'in', 'post'
+                const status = game.status.type.state; 
                 
                 return (
                     <div className="flex items-center justify-between bg-white/10 rounded-lg p-[1vmin] mb-[1.5vmin] backdrop-blur-md border border-white/5">
-                        {/* Away */}
                         <div className="flex items-center gap-[1vmin] w-[30%]">
                             <img src={away.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
                             <span className="font-bold text-[2vmin]">{away.team.abbreviation}</span>
                             {status !== 'pre' && <span className="font-black text-[2.5vmin] ml-auto">{away.score}</span>}
                         </div>
                         
-                        {/* Status/Clock */}
                         <div className="text-[1.5vmin] font-mono text-gray-400 w-[40%] text-center">
                             {status === 'in' ? <span className="text-red-500 animate-pulse font-bold">LIVE</span> : 
                              status === 'post' ? 'FINAL' : 
                              new Date(game.date).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}
                         </div>
 
-                        {/* Home */}
                         <div className="flex items-center gap-[1vmin] w-[30%] flex-row-reverse">
                             <img src={home.team.logo} className="w-[4vmin] h-[4vmin] object-contain" />
                             <span className="font-bold text-[2vmin]">{home.team.abbreviation}</span>
@@ -816,16 +796,13 @@
                     </div>
 
                     <div className="flex w-full h-full gap-[4vmin] z-10">
-                        {/* AFC COLUMN */}
                         <div className="flex-1 flex flex-col">
                             <div className="text-red-500 font-black text-[3vmin] uppercase mb-[2vmin] border-b border-red-500/30 pb-1">AFC</div>
                             {afcGames.map(g => <MiniGameRow key={g.id} game={g} />)}
                         </div>
 
-                        {/* CENTER DIVIDER */}
                         <div className="w-[2px] bg-white/10 rounded-full"></div>
 
-                        {/* NFC COLUMN */}
                         <div className="flex-1 flex flex-col items-end">
                             <div className="text-blue-500 font-black text-[3vmin] uppercase mb-[2vmin] border-b border-blue-500/30 pb-1 w-full text-right">NFC</div>
                             <div className="w-full">
@@ -836,12 +813,66 @@
                 </div>
             );
         };
-        
-        // end playoff bracket coding
 
-        // =================================================================================
-        // ⬆️⬆️⬆️ END CARD COMPONENTS SECTION ⬆️⬆️⬆️
-        // =================================================================================
+        const TriviaCard = ({ data, onNext }) => {
+            const [revealed, setRevealed] = useState(false);
+            
+            useEffect(() => {
+                setRevealed(false); 
+                const timer = setTimeout(() => {
+                    setRevealed(true);
+                }, 10000); 
+                return () => clearTimeout(timer);
+            }, [data]);
+
+            if (!data) return <div className="h-full w-full flex items-center justify-center bg-purple-950 text-white font-bold animate-pulse text-[3vmin]">Loading Trivia...</div>;
+
+            return (
+                <div className="h-full w-full relative overflow-hidden font-sans p-[3vmin] bg-gradient-to-br from-purple-900 via-fuchsia-900 to-indigo-900 text-white flex flex-col items-center justify-center text-center select-none">
+                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+                    <div className="absolute top-[3vmin] left-[3vmin] bg-white/10 backdrop-blur-md px-[2vmin] py-[0.5vmin] rounded-full text-[2vmin] font-bold uppercase tracking-widest border border-white/20 shadow-lg flex items-center gap-2">
+                        <span className="text-yellow-400">★</span> {data.category} • {data.difficulty}
+                    </div>
+                    {!revealed && <div className="absolute top-0 left-0 h-[1vmin] bg-yellow-400/50 transition-all duration-[10000ms] ease-linear w-full" style={{ width: '0%', animation: 'widthFull 10s linear forwards' }}></div>}
+                    
+                    <div className="mb-[5vmin] max-w-[85%] relative z-10">
+                        <h2 className="text-[4.5vmin] font-black leading-tight drop-shadow-xl filter">{data.question}</h2>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-[2.5vmin] w-full max-w-[100vmin] relative z-10 px-[2vmin]">
+                        {data.answers.map((ans, idx) => {
+                            const isCorrect = ans === data.correct;
+                            let bgClass = "bg-white/10 hover:bg-white/20 hover:scale-[1.02] border-white/10";
+                            if (revealed) {
+                                if (isCorrect) bgClass = "bg-green-500 text-black border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)] scale-[1.03] z-20 font-black";
+                                else bgClass = "bg-black/20 opacity-40 grayscale border-transparent scale-95";
+                            }
+                            return (
+                                <button
+                                    key={idx}
+                                    onClick={() => setRevealed(true)}
+                                    disabled={revealed}
+                                    className={`p-[2.5vmin] rounded-2xl font-bold text-[2.5vmin] transition-all duration-500 border backdrop-blur-md shadow-md ${bgClass}`}
+                                >
+                                    {ans}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <div className="absolute bottom-[4vmin] h-[6vmin] flex items-center justify-center w-full z-20">
+                        {revealed ? (
+                            <div className="text-[2.5vmin] font-bold text-white animate-bounce">
+                                Next question coming up...
+                            </div>
+                        ) : (
+                            <button onClick={() => setRevealed(true)} className="text-[2vmin] text-white/40 hover:text-white font-mono tracking-widest uppercase transition-colors">
+                                Tap to reveal
+                            </button>
+                        )}
+                    </div>
+                    <style>{`@keyframes widthFull { from { width: 100%; } to { width: 0%; } }`}</style>
+                </div>
+            );
+        };
 
         const App = () => {
             const [nflTeamsSelected, setNflTeamsSelected] = usePersistedState('nflTeams', []);
@@ -867,62 +898,78 @@
             const [welcomeAnimation, setWelcomeAnimation] = usePersistedState('welcomeAnim', 'fade');
             const [showAnimModal, setShowAnimModal] = useState(false);
             
-            const [showImage, setShowImage] = usePersistedState('showImage', false);
-            const [customImageUrl, setCustomImageUrl] = usePersistedState('customImgUrl', '');
-            const [customImageDuration, setCustomImageDuration] = usePersistedState('customImgDuration', 10);
-            
-            const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
+            // --- NEW: MULTI-IMAGE STATE ---
+            const [customImages, setCustomImages] = usePersistedState('customImagesList', []);
+            // -----------------------------
 
-            // =============================================================================
-            // ⬇️⬇️⬇️ SECTION 2: ADD NEW TOGGLES HERE (STATE) ⬇️⬇️⬇️
-            // =============================================================================
-            // --- PLAYOFF MODE STATE ---
-           // --- PLAYOFF MODE STATE ---
-            // --- PLAYOFF MODE STATE ---
+            const [showYearProgress, setShowYearProgress] = usePersistedState('showYearProgress', false);
+            const [showTrivia, setShowTrivia] = usePersistedState('showTrivia', false);
+            const [triviaData, setTriviaData] = useState(null);
+            //end sec1
+            const fetchTrivia = async () => {
+                const fallback = {
+                    category: "General Knowledge",
+                    difficulty: "easy",
+                    question: "Which planet is known as the Red Planet?",
+                    correct: "Mars",
+                    answers: ["Mars", "Venus", "Jupiter", "Saturn"].sort(() => Math.random() - 0.5)
+                };
+
+                try {
+                    const res = await fetch('https://opentdb.com/api.php?amount=1');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.results && data.results.length > 0) {
+                            const decode = (str) => {
+                                const txt = document.createElement("textarea");
+                                txt.innerHTML = str;
+                                return txt.value;
+                            };
+                            const q = data.results[0];
+                            const allAnswers = [...q.incorrect_answers, q.correct_answer]
+                                .sort(() => Math.random() - 0.5)
+                                .map(a => decode(a));
+                            
+                            setTriviaData({
+                                category: decode(q.category),
+                                question: decode(q.question),
+                                correct: decode(q.correct_answer),
+                                answers: allAnswers,
+                                difficulty: q.difficulty
+                            });
+                        } else { setTriviaData(fallback); }
+                    } else { setTriviaData(fallback); }
+                } catch (e) { setTriviaData(fallback); }
+            };
+
             const [showPlayoffMode, setShowPlayoffMode] = usePersistedState('showPlayoffMode', false);
             const [playoffGames, setPlayoffGames] = useState([]);
 
             useEffect(() => {
                 if (!showPlayoffMode) return;
-                
                 const fetchPlayoffs = async () => {
                     try {
-                        // AUTOMATIC WEEK CALCULATOR (For Jan/Feb 2026)
                         const now = new Date();
-                        const month = now.getMonth(); // 0=Jan, 1=Feb
+                        const month = now.getMonth(); 
                         const day = now.getDate();
-                        
                         let urlParams = "";
-
-                        // If it is January...
                         if (month === 0) {
-                            if (day < 14) urlParams = "?seasontype=3&week=1";      // Wild Card (Now - Jan 13)
-                            else if (day < 21) urlParams = "?seasontype=3&week=2"; // Divisional (Jan 14 - Jan 20)
-                            else urlParams = "?seasontype=3&week=3";               // Conference (Jan 21 - End of Jan)
+                            if (day < 14) urlParams = "?seasontype=3&week=1";       
+                            else if (day < 21) urlParams = "?seasontype=3&week=2"; 
+                            else urlParams = "?seasontype=3&week=3";                
                         } 
-                        // If it is February...
-                        else if (month === 1) {
-                            urlParams = "?seasontype=3&week=5";                    // Super Bowl (Week 4 is usually Pro Bowl)
-                        }
-
+                        else if (month === 1) { urlParams = "?seasontype=3&week=5"; }
                         const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard${urlParams}`);
                         if (res.ok) {
                             const data = await res.json();
-                            if (data.events) {
-                                setPlayoffGames(data.events);
-                            }
+                            if (data.events) { setPlayoffGames(data.events); }
                         }
-                    } catch (e) { console.error("Playoff fetch error", e); }
+                    } catch (e) {}
                 };
-                
                 fetchPlayoffs();
                 const interval = setInterval(fetchPlayoffs, 60000);
                 return () => clearInterval(interval);
             }, [showPlayoffMode]);
-            
-            
-
-            // =============================================================================
 
             const [showControls, setShowControls] = useState(false);
             const controlsTimeoutRef = useRef(null);
@@ -976,256 +1023,11 @@
                 if(Array.isArray(zipConfigs)) zipConfigs.forEach(conf => fetchWeatherForZip(conf.id));
             }, [zipConfigs]);
 
-            const calculateRecord = (events, teamId, league) => {
-                if (!events || !Array.isArray(events)) return "0-0";
-                let w = 0, l = 0, d = 0, otl = 0;
-                const targetId = String(teamId).toLowerCase();
-                events.forEach(e => {
-                    const comp = e.competitions?.[0];
-                    if (comp?.status?.type?.completed) {
-                        const myTeam = comp.competitors.find(c => String(c.team.id) === targetId || (c.team.abbreviation && c.team.abbreviation.toLowerCase() === targetId));
-                        if (myTeam) {
-                            const myScore = parseInt(myTeam.score?.value || 0, 10);
-                            const oppTeam = comp.competitors.find(c => c.id !== myTeam.id);
-                            const oppScore = parseInt(oppTeam?.score?.value || 0, 10);
-                            let isWin = false, isTie = false;
-                            if (myTeam.winner === true) isWin = true;
-                            else if (myTeam.winner === false) {} 
-                            else { if (myScore > oppScore) isWin = true; else if (myScore === oppScore) isTie = true; }
-                            if (isWin) w++;
-                            else if (isTie && (league === 'nfl' || league === 'college-football')) d++;
-                            else if (league === 'nhl' && comp.status.period > 3) otl++; 
-                            else l++;
-                        }
-                    }
-                });
-                if (league === 'nhl') return `${w}-${l}-${otl}`;
-                if ((league === 'nfl' || league === 'college-football') && d > 0) return `${w}-${l}-${d}`;
-                return `${w}-${l}`;
-            };
-
-         const fetchSportData = async (sport, league, teamId) => {
-            try {
-                const idStr = String(teamId).toLowerCase(); 
-                
-                // 1. Determine the correct "Season Year"
-                // NFL & College Football in Jan-July belong to the PREVIOUS year's season (e.g. Jan 2026 is 2025 season)
-                // NHL & NBA in Jan-July belong to the CURRENT year's season ending (e.g. Jan 2026 is 2026 season)
-                const now = new Date();
-                let seasonYear = now.getFullYear();
-                if (now.getMonth() < 7 && ['nfl', 'college-football'].includes(league)) {
-                    seasonYear -= 1;
-                }
-
-                // 2. Try to find a Live Game in the global Scoreboard
-                let liveScoreboardGame = null;
-                try {
-                    const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
-                    if(sbRes.ok) {
-                        const sbData = await sbRes.json();
-                        liveScoreboardGame = sbData.events?.find(e => {
-                            const isTeamInGame = e.competitions[0].competitors.some(c => String(c.team.id) === idStr || (c.team.abbreviation && c.team.abbreviation.toLowerCase() === idStr));
-                            return isTeamInGame && e.status.type.state === 'in';
-                        });
-                    }
-                } catch(e) {}
-
-                // 3. Fetch Basic Team Info (Logo, Color, Record, Next Event Shortcut)
-                let teamInfoData = null;
-                try {
-                    const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
-                    if (teamInfoRes.ok) teamInfoData = await teamInfoRes.json();
-                } catch (e) {}
-
-                if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
-
-                // ==========================================================
-                // ROBUST SCHEDULE LOGIC
-                // ==========================================================
-                
-                const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule?season=${seasonYear}`;
-                let allEvents = [];
-
-                // A. Fetch Regular Season (seasonType=2)
-                try {
-                    const regRes = await fetch(scheduleUrl);
-                    if (regRes.ok) {
-                        const regData = await regRes.json();
-                        if (regData.events) allEvents.push(...regData.events);
-                    }
-                } catch (e) {}
-
-                // B. Fetch Postseason (seasonType=3) - CRITICAL FOR PLAYOFFS
-                try {
-                    const postRes = await fetch(`${scheduleUrl}&seasonType=3`);
-                    if (postRes.ok) {
-                        const postData = await postRes.json();
-                        if (postData.events) allEvents.push(...postData.events);
-                    }
-                } catch (e) {}
-
-                // C. Deduplicate and Sort
-                const uniqueEventsMap = new Map();
-                allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
-                const events = Array.from(uniqueEventsMap.values()); 
-                events.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                // D. Calculate Record
-                let record = "0-0";
-                if (teamInfoData.team.record?.items?.[0]?.summary) record = teamInfoData.team.record.items[0].summary;
-                else record = calculateRecord(events, teamId, league);
-
-                // E. Find Previous and Next Games
-                const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); // 4 hours ago
-                const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
-
-                const pastGames = validEvents.filter(e => e.dateObj < cutoff).sort((a,b) => b.dateObj - a.dateObj);
-                const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
-                
-                let prevGame = pastGames.length > 0 ? pastGames[0] : null;
-                let nextGame = futureGames.length > 0 ? futureGames[0] : null;
-
-                // F. FAIL-SAFE: If 'nextGame' is empty, check the Team Profile 'nextEvent' shortcut
-                // This catches games (like Steelers vs Texans) if the schedule list is lagging
-                if (!nextGame && teamInfoData.team.nextEvent && teamInfoData.team.nextEvent.length > 0) {
-                    const fallbackGame = teamInfoData.team.nextEvent[0];
-                    const fallbackDate = new Date(fallbackGame.date);
-                    if (fallbackDate >= cutoff) {
-                         nextGame = fallbackGame;
-                    }
-                }
-
-                // ==========================================================
-                // END SCHEDULE LOGIC
-                // ==========================================================
-
-                const fetchOpponentRecord = async (oppId) => {
-                    if (!oppId) return null;
-                    try {
-                        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`);
-                        if(res.ok) {
-                            const d = await res.json();
-                            return d.team?.record?.items?.[0]?.summary || null;
-                        }
-                    } catch (e) { return null; }
-                    return null;
-                };
-                const isMe = (comp) => {
-                    const target = String(teamId).toLowerCase();
-                    const compId = String(comp.team.id).toLowerCase();
-                    const compAbbrev = comp.team.abbreviation ? comp.team.abbreviation.toLowerCase() : '';
-                    return compId === target || compAbbrev === target;
-                };
-
-                let prevOppRecord = null, nextOppRecord = null, prevOppLogo = null, nextOppLogo = null, prevGameData = null;
-
-                if (prevGame && prevGame.competitions) {
-                    const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c));
-                    const myComp = prevGame.competitions[0].competitors.find(c => isMe(c));
-                    if (prevComp && myComp) {
-                        if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href;
-                        prevOppRecord = await fetchOpponentRecord(prevComp.team.id);
-                        const myScore = parseInt(myComp.score?.value || 0, 10);
-                        const oppScore = parseInt(prevComp.score?.value || 0, 10);
-                        const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore);
-                        prevGameData = {
-                            opponent: prevComp.team.abbreviation || 'OPP',
-                            opponentLogo: prevOppLogo,
-                            opponentRecord: prevOppRecord,
-                            myScore: myScore,
-                            oppScore: oppScore,
-                            isWin: isWin,
-                            score: `${myScore}-${oppScore}`,
-                            result: isWin ? `W ${myScore}-${oppScore}` : `L ${myScore}-${oppScore}`,
-                            date: new Date(prevGame.date).toLocaleDateString()
-                        };
-                    }
-                }
-
-                if (nextGame && nextGame.competitions) {
-                    const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c));
-                    if (nextComp) {
-                        if (nextComp.team.logos?.length > 0) nextOppLogo = nextComp.team.logos[0].href;
-                        nextOppRecord = await fetchOpponentRecord(nextComp.team.id);
-                    }
-                }
-
-                let liveGame = liveScoreboardGame;
-                if (!liveGame) {
-                    const localLive = events.find(e => e.status?.type?.state === 'in');
-                    if (localLive) {
-                         try {
-                            const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${localLive.id}`);
-                            if (summaryRes.ok) liveGame = await summaryRes.json();
-                        } catch(e) {}
-                    }
-                }
-
-                let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: null };
-                mapped.schedule = {
-                    prev: prevGameData || { opponent: 'None', result: '-', date: '-' },
-                    next: nextGame ? {
-                        opponent: nextGame.competitions?.[0]?.competitors?.find(c => !isMe(c))?.team?.abbreviation || 'TBD',
-                        opponentLogo: nextOppLogo,
-                        opponentRecord: nextOppRecord,
-                        rawDate: nextGame.date,
-                        id: nextGame.id, 
-                        date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}),
-                        time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                        location: nextGame.competitions?.[0]?.venue?.fullName || 'TBD'
-                    } : { opponent: 'Season End', date: '-', time: '-', location: '-' }
-                };
-
-                if (liveGame) {
-                    const comp = liveGame.competitions ? liveGame.competitions[0] : (liveGame.header ? liveGame.header.competitions[0] : null);
-                    if (comp) {
-                        const myTeam = comp.competitors.find(c => isMe(c));
-                        const oppTeam = comp.competitors.find(c => !isMe(c));
-                        const homeComp = comp.competitors.find(c => c.homeAway === 'home');
-                        const awayComp = comp.competitors.find(c => c.homeAway === 'away');
-                        let oppLogo = null;
-                        if (oppTeam.team.logos?.length > 0) { oppLogo = oppTeam.team.logos[0].href; } else {
-                            const abbrev = oppTeam.team.abbreviation ? oppTeam.team.abbreviation.toLowerCase() : '';
-                            if (league === 'nfl') { const t = NFL_TEAMS.find(x => x.id.toLowerCase() === abbrev); if(t) oppLogo = `https://a.espncdn.com/i/teamlogos/nfl/500/${t.id.toLowerCase()}.png`; } 
-                            else if (league === 'nhl') { oppLogo = `https://a.espncdn.com/i/teamlogos/nhl/500/${abbrev}.png`; } 
-                            else if (league === 'mlb') { oppLogo = `https://a.espncdn.com/i/teamlogos/mlb/500/${abbrev}.png`; } 
-                            else if (league === 'college-football') { oppLogo = `https://a.espncdn.com/i/teamlogos/ncaa/500/${oppTeam.team.id}.png`; }
-                        }
-                        const liveOppRecord = await fetchOpponentRecord(oppTeam.team.id);
-                        const liveBase = {
-                            id: liveGame.id || (liveGame.header ? liveGame.header.id : 'unknown'),
-                            opponent: oppTeam.team.abbreviation,
-                            opponentLogo: oppLogo,
-                            opponentRecord: liveOppRecord,
-                            score: { myScore: myTeam.score, oppScore: oppTeam.score },
-                            time: comp.status.displayClock,
-                            homeTeam: { id: homeComp.team.id, abbrev: homeComp.team.abbreviation, name: homeComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===homeComp.team.abbreviation)?.color : '#333') || '#333', logo: homeComp.team.logos?.[0]?.href },
-                            awayTeam: { id: awayComp.team.id, abbrev: awayComp.team.abbreviation, name: awayComp.team.abbreviation, color: (league === 'nfl' ? NFL_TEAMS.find(t=>t.id===awayComp.team.abbreviation)?.color : '#fff') || '#fff', logo: awayComp.team.logos?.[0]?.href }
-                        };
-                        if (league === 'nfl' || league === 'college-football') {
-                            const situation = comp.situation || (liveGame.situation) || {};
-                            const lastPlayText = situation.lastPlay?.text || (liveGame.drives?.current?.plays?.length ? liveGame.drives.current.plays[liveGame.drives.current.plays.length-1].text : "Game in progress");
-                            mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: lastPlayText, opponentColor: '#333' };
-                        } else if (league === 'nhl') { 
-                            const situation = comp.situation || (liveGame.situation) || {};
-                            const lastPlayText = situation.lastPlay?.text || "Update in progress...";
-                            mapped.live = { ...liveBase, period: comp.status.period, lastPlay: lastPlayText };
-                        } 
-                        else if (league === 'mlb') {
-                            const sit = liveGame.situation || {};
-                            mapped.live = { ...liveBase, inning: comp.status.period, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } };
-                        }
-                    }
-                }
-                return { [teamId]: mapped };
-            } catch(e) { return { [teamId]: null }; }
-        };
-
             useEffect(() => {
                 const loadAll = async () => {
                       const promises = [];
                       if(Array.isArray(nflTeamsSelected)) nflTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'nfl', id).then(d => setNflData(prev => ({...prev, ...d})))));
-                      if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => promises.push(fetchSportData('hockey', 'nhl', id).then(d => setNhlData(prev => ({...prev, ...d})))));
+                      if(Array.isArray(nhlTeamsSelected)) nhlTeamsSelected.forEach(id => promises.push(fetchNHLData(id).then(d => setNhlData(prev => ({...prev, ...d})))));
                       if(Array.isArray(mlbTeamsSelected)) mlbTeamsSelected.forEach(id => promises.push(fetchSportData('baseball', 'mlb', id).then(d => setMlbData(prev => ({...prev, ...d})))));
                       if(Array.isArray(ncaafTeamsSelected)) ncaafTeamsSelected.forEach(id => promises.push(fetchSportData('football', 'college-football', id).then(d => setNcaafData(prev => ({...prev, ...d})))));
                       await Promise.all(promises);
@@ -1265,22 +1067,28 @@
 
                 const rotation = [];
                 if (showWelcome) rotation.push({ id: 'custom_welcome', component: <WelcomeCard message={welcomeMessage} animation={welcomeAnimation} /> });
-                if (showImage) rotation.push({ id: 'custom_image', component: <CustomImageCard url={customImageUrl} /> });
-                if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
+                
+                // --- MULTIPLE CUSTOM IMAGES LOGIC ---
+                if (Array.isArray(customImages)) {
+                    customImages.forEach(img => {
+                        if (img.url) {
+                            rotation.push({ 
+                                id: `custom_image_${img.id}`, 
+                                component: <CustomImageCard url={img.url} />,
+                                duration: parseInt(img.duration) || 10 
+                            });
+                        }
+                    });
+                }
 
-                // =========================================================================
-                // ⬇️⬇️⬇️ SECTION 3: ADD TO ROTATION HERE ⬇️⬇️⬇️
-                // =========================================================================
-               // --- ADD PLAYOFF CARDS ---
+                if (showYearProgress) rotation.push({ id: 'year_progress', component: <YearProgressCard /> });
+                if (showTrivia) rotation.push({ id: 'trivia', component: <TriviaCard data={triviaData} onNext={fetchTrivia} /> });
+                
                 if (showPlayoffMode && playoffGames.length > 0) {
-                    
-                    // 1. Add the Bracket/Overview Card FIRST
                     rotation.push({
                         id: 'playoff-overview',
                         component: <PlayoffOverviewCard games={playoffGames} />
                     });
-
-                    // 2. Then add individual cards for every game
                     playoffGames.forEach(game => {
                         if (game.competitions && game.competitions[0]) {
                             rotation.push({
@@ -1290,9 +1098,6 @@
                         }
                     });
                 }
-               
-
-                // =========================================================================
 
                 if (Array.isArray(zipConfigs) && zipConfigs.length > 0) {
                     const firstZip = zipConfigs[0].id;
@@ -1314,37 +1119,49 @@
 
                 rotation.push(...standardCards);
                 return rotation;
-            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, showImage, showYearProgress, welcomeMessage, welcomeAnimation, customImageUrl]);
+            }, [zipConfigs, weatherDataMap, nflTeamsSelected, nhlTeamsSelected, mlbTeamsSelected, ncaafTeamsSelected, nflData, nhlData, mlbData, ncaafData, clockColor, showWelcome, customImages, showYearProgress, welcomeMessage, welcomeAnimation, showTrivia, triviaData, showPlayoffMode, playoffGames]);
 
+            // --- ROTATION TIMER WITH DYNAMIC DURATION ---
             useEffect(() => {
                 if (allCards.length === 0) return;
-                // Boundary check
                 if (currentSlideIndex >= allCards.length) { setCurrentSlideIndex(0); return; }
-                // Pause checks
                 if (allCards.length <= 1 || isPaused || isSettingsOpen) return;
 
-                // DYNAMIC DURATION LOGIC
-                let slideDuration = 6000; // Default global speed (6 seconds)
-                
-                // Check if the current slide is the Custom Image slide
-                if (allCards[currentSlideIndex]?.id === 'custom_image') {
-                    // Use custom duration (ensure it is at least 3 seconds to prevent loops)
-                    const durationVal = parseInt(customImageDuration) || 10;
-                    slideDuration = Math.max(3, durationVal) * 1000; 
+                let slideDuration = 6000; 
+                const currentCard = allCards[currentSlideIndex];
+
+                // If the card object has a specific 'duration' property (added in the useMemo above), use it.
+                if (currentCard && currentCard.duration) {
+                    slideDuration = currentCard.duration * 1000; // Convert to ms
+                }
+                else if (currentCard?.id === 'trivia') { 
+                    slideDuration = 15000; 
                 }
 
-                // Use setTimeout instead of setInterval for variable timing
                 const timer = setTimeout(() => { 
+                    if (currentCard?.id === 'trivia') { fetchTrivia(); }
                     setCurrentSlideIndex((prev) => (prev + 1) % allCards.length); 
                 }, slideDuration);
 
                 return () => clearTimeout(timer);
-            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex, customImageDuration]);
+            }, [allCards, isPaused, isSettingsOpen, currentSlideIndex]);
 
             const handleAddZip = (newZip) => { if (!zipConfigs.find(z => z.id === newZip)) setZipConfigs([...zipConfigs, { id: newZip, showForecast: false, days: 3 }]); };
             const handleRemoveZip = (id) => { setZipConfigs(zipConfigs.filter(z => z.id !== id)); };
             const handleUpdateZip = (id, newSettings) => { setZipConfigs(zipConfigs.map(z => z.id === id ? { ...z, ...newSettings } : z)); };
             const closeSettings = () => { setIsSettingsOpen(false); };
+
+            // --- IMAGE HELPERS ---
+            const addCustomImage = () => {
+                const newId = Date.now().toString();
+                setCustomImages([...customImages, { id: newId, url: '', duration: 10 }]);
+            };
+            const removeCustomImage = (id) => {
+                setCustomImages(customImages.filter(img => img.id !== id));
+            };
+            const updateCustomImage = (id, field, value) => {
+                setCustomImages(customImages.map(img => img.id === id ? { ...img, [field]: value } : img));
+            };
 
             return (
                 <div className="w-full h-[100dvh] bg-black text-slate-200 overflow-hidden font-sans selection:bg-indigo-500 selection:text-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]" onMouseMove={handleInteraction} onClick={handleInteraction} onTouchStart={handleInteraction}>
@@ -1370,77 +1187,83 @@
                                         <h3 className="font-bold text-white mb-3">Custom Slides</h3>
                                         <div className="flex flex-col gap-4">
                                             <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2"><div className="flex items-center justify-between"><span className="text-slate-200">Welcome Message</span><button onClick={() => setShowWelcome(!showWelcome)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showWelcome ? 'bg-green-500' : 'bg-slate-700'}`}><div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showWelcome ? 'translate-x-6' : 'translate-x-0'}`} /></button></div>{showWelcome && (<div className="flex flex-col gap-2"><input type="text" value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} placeholder="Type custom message..." className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /><div className="flex items-center gap-2"><span className="text-xs text-slate-400">Effect:</span><button onClick={() => setShowAnimModal(true)} className="bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm flex-1 text-left capitalize">{welcomeAnimation === 'scroll' ? 'Scrolling' : welcomeAnimation === 'drop' ? 'Drop In' : 'Fade In'}</button></div></div>)}</div>
-                                            {/* // --- START CUSTOM IMAGE BLOCK --- // */}
-<div className="bg-slate-900 p-3 rounded-lg border border-slate-700 space-y-2">
-    <div className="flex items-center justify-between">
-        <span className="text-slate-200">Custom Image</span>
-        <button onClick={() => setShowImage(!showImage)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showImage ? 'bg-green-500' : 'bg-slate-700'}`}>
-            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showImage ? 'translate-x-6' : 'translate-x-0'}`} />
-        </button>
-    </div>
-    {showImage && (
-        <div className="flex flex-col gap-2">
-            <input 
-                type="text" 
-                value={customImageUrl} 
-                onChange={(e) => setCustomImageUrl(e.target.value)} 
-                placeholder="Paste Image URL here..." 
-                className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" 
-            />
-            <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400 whitespace-nowrap">Duration (sec):</span>
-                <input 
-                    type="number" 
-                    min="3" 
-                    max="300" 
-                    value={customImageDuration} 
-                    onChange={(e) => setCustomImageDuration(parseInt(e.target.value) || 10)} 
-                    className="w-20 bg-slate-950 border border-slate-600 rounded-lg px-2 py-1 text-white text-sm text-center" 
-                />
-            </div>
-        </div>
-    )}
-</div>
-{/* // --- END CUSTOM IMAGE BLOCK --- // */}
-
-                                            {/* =================================================================== */}
-                                            {/* ⬇️⬇️⬇️ SECTION 4: ADD SETTINGS TOGGLES HERE ⬇️⬇️⬇️ */}
-                                            {/* =================================================================== */}
-                                            <div className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex items-center justify-between border-l-4 border-l-blue-500">
-                                                <div>
-                                                    <span className="text-white font-bold block">NFL Playoff Mode</span>
-                                                    <span className="text-xs text-slate-400">Shows all matchups for the week</span>
-                                                </div>
-                                                <button 
-                                                    onClick={() => setShowPlayoffMode(!showPlayoffMode)} 
-                                                    className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-600' : 'bg-slate-700'}`}
-                                                >
-                                                    <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} />
-                                                </button>
-                                            </div>
                                             
-
-                                            {/* =================================================================== */}
-
+                                            {/* --- MULTIPLE IMAGES MANAGEMENT --- */}
+                                            <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                                <h3 className="font-bold text-white mb-3 flex items-center justify-between">
+                                                    Custom Slideshow
+                                                    <button onClick={addCustomImage} className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded-full font-bold flex items-center gap-1">
+                                                        <Plus size={14} /> Add Slide
+                                                    </button>
+                                                </h3>
+                                                <div className="flex flex-col gap-3">
+                                                    {customImages.length === 0 && <div className="text-slate-500 text-sm italic">No custom images added.</div>}
+                                                    {customImages.map((img, index) => (
+                                                        <div key={img.id} className="bg-slate-900 p-3 rounded-lg border border-slate-700 flex flex-col gap-2 relative group">
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded-full">{index + 1}</span>
+                                                                <button onClick={() => removeCustomImage(img.id)} className="ml-auto text-red-400 hover:text-red-300"><X size={16} /></button>
+                                                            </div>
+                                                            <input type="text" value={img.url} onChange={(e) => updateCustomImage(img.id, 'url', e.target.value)} placeholder="Image URL..." className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" />
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-xs text-slate-400">Duration (sec):</span>
+                                                                <input type="number" value={img.duration} onChange={(e) => updateCustomImage(img.id, 'duration', e.target.value)} className="w-16 bg-slate-950 border border-slate-600 rounded px-2 py-1 text-white text-xs" min="3" />
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700"><label className="block text-sm text-slate-400 mb-2">Clock Color</label><select value={clockColor} onChange={(e) => setClockColor(e.target.value)} className="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white">{CLOCK_COLORS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>
-                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
-                                    <div className="mt-4 space-y-8">
-                                        <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(t => t !== id))} />
-                                        <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(t => t !== id))} />
-                                        <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(t => t !== id))} />
-                                        <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(t => t !== id))} />
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Year Progress</span>
+                                            <button onClick={() => setShowYearProgress(!showYearProgress)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showYearProgress ? 'bg-green-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showYearProgress ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Trivia Mode</span>
+                                            <button onClick={() => setShowTrivia(!showTrivia)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showTrivia ? 'bg-purple-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showTrivia ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+                                        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center justify-between">
+                                            <span className="font-bold text-white">Playoff Mode</span>
+                                            <button onClick={() => setShowPlayoffMode(!showPlayoffMode)} className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${showPlayoffMode ? 'bg-blue-500' : 'bg-slate-700'}`}>
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${showPlayoffMode ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
                                     </div>
+
+                                    <ZipSelector zipList={zipConfigs} onAdd={handleAddZip} onRemove={handleRemoveZip} onUpdate={handleUpdateZip} />
+                                    <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                                        <h3 className="font-bold text-white mb-2">Clock Color</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {CLOCK_COLORS.map(c => (
+                                                <button key={c.value} onClick={() => setClockColor(c.value)} className={`px-3 py-1 rounded border transition-all ${clockColor === c.value ? 'bg-white text-black border-white font-bold' : 'bg-slate-900 text-slate-400 border-slate-600 hover:border-slate-400'}`}>
+                                                    {c.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <TeamSelector title="NFL Teams" teams={NFL_TEAMS} selected={nflTeamsSelected} onAdd={(id) => setNflTeamsSelected([...nflTeamsSelected, id])} onRemove={(id) => setNflTeamsSelected(nflTeamsSelected.filter(x => x !== id))} />
+                                    <TeamSelector title="NHL Teams" teams={NHL_TEAMS} selected={nhlTeamsSelected} onAdd={(id) => setNhlTeamsSelected([...nhlTeamsSelected, id])} onRemove={(id) => setNhlTeamsSelected(nhlTeamsSelected.filter(x => x !== id))} />
+                                    <TeamSelector title="MLB Teams" teams={MLB_TEAMS} selected={mlbTeamsSelected} onAdd={(id) => setMlbTeamsSelected([...mlbTeamsSelected, id])} onRemove={(id) => setMlbTeamsSelected(mlbTeamsSelected.filter(x => x !== id))} />
+                                    <TeamSelector title="NCAA Football" teams={NCAAF_TEAMS} selected={ncaafTeamsSelected} onAdd={(id) => setNcaafTeamsSelected([...ncaafTeamsSelected, id])} onRemove={(id) => setNcaafTeamsSelected(ncaafTeamsSelected.filter(x => x !== id))} />
                                 </div>
-                                <div className="p-4 bg-slate-950 border-t border-slate-800 shrink-0 flex justify-end"><button onClick={closeSettings} className="w-fit bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl flex items-center gap-2 transition-colors shadow-lg"><Check size={20} /> Done</button></div>
+                                <div className="p-4 border-t border-slate-700 bg-slate-900 shrink-0 z-10">
+                                    <div className="text-center text-slate-500 text-sm font-mono">Weekend Custom Creations v2.0</div>
+                                </div>
                             </div>
                         </div>
                     )}
+
                     {showAnimModal && (
-                        <SelectionModal 
-                            title="Select Animation" 
-                            options={[{ label: 'Fade In', value: 'fade' }, { label: 'Drop In', value: 'drop' }, { label: 'Scrolling', value: 'scroll' }]}
+                        <SelectionModal
+                            title="Select Animation"
+                            options={[{label: 'Fade', value: 'fade'}, {label: 'Drop In', value: 'drop'}, {label: 'Scrolling', value: 'scroll'}]}
                             selectedValue={welcomeAnimation}
                             onSelect={setWelcomeAnimation}
                             onClose={() => setShowAnimModal(false)}
@@ -1449,6 +1272,7 @@
                 </div>
             );
         };
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<ErrorBoundary><App /></ErrorBoundary>);
     </script>
