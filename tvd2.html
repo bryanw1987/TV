@@ -776,9 +776,19 @@
                 return `${w}-${l}`;
             };
 
-           const fetchSportData = async (sport, league, teamId) => {
+          const fetchSportData = async (sport, league, teamId) => {
             try {
                 const idStr = String(teamId).toLowerCase(); 
+                
+                // 1. Determine the correct "Season Year"
+                // If it is January-July (Month 0-6), the current season actually started the previous year 
+                // for NFL, College Football, and NHL.
+                const now = new Date();
+                let seasonYear = now.getFullYear();
+                if (now.getMonth() < 7 && ['nfl', 'college-football', 'nhl'].includes(league)) {
+                    seasonYear -= 1;
+                }
+
                 let liveScoreboardGame = null;
                 try {
                     const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`);
@@ -790,6 +800,7 @@
                         });
                     }
                 } catch(e) {}
+
                 let teamInfoData = null;
                 try {
                     const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`);
@@ -799,12 +810,15 @@
                 if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
 
                 // ==========================================================
-                // FIXED SCHEDULE LOGIC START
+                // FIXED SCHEDULE LOGIC WITH YEAR FIX
                 // ==========================================================
-                const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule`;
+                
+                // We deliberately append ?season=YYYY to force the correct season context
+                const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule?season=${seasonYear}`;
+                
                 let allEvents = [];
 
-                // 1. Fetch Regular Season
+                // 1. Fetch Regular Season (seasonType=2 is default)
                 try {
                     const regRes = await fetch(scheduleUrl);
                     if (regRes.ok) {
@@ -813,9 +827,9 @@
                     }
                 } catch (e) {}
 
-                // 2. Fetch Postseason (force check)
+                // 2. Fetch Postseason (seasonType=3)
                 try {
-                    const postRes = await fetch(`${scheduleUrl}?seasonType=3`);
+                    const postRes = await fetch(`${scheduleUrl}&seasonType=3`);
                     if (postRes.ok) {
                         const postData = await postRes.json();
                         if (postData.events) allEvents.push(...postData.events);
@@ -826,7 +840,6 @@
                 const uniqueEventsMap = new Map();
                 allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
                 
-                // *** CRITICAL FIX: We define 'events' here so downstream code works ***
                 const events = Array.from(uniqueEventsMap.values()); 
                 events.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -835,9 +848,8 @@
                 if (teamInfoData.team.record?.items?.[0]?.summary) record = teamInfoData.team.record.items[0].summary;
                 else record = calculateRecord(events, teamId, league);
 
-                // 5. Define Time Cutoffs
-                const now = new Date();
-                const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); // 4 hours ago
+                // 5. Define Time Cutoffs (4 hours ago)
+                const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000)); 
                 const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
 
                 // 6. Determine Prev and Next Games
@@ -848,7 +860,7 @@
                 let nextGame = futureGames.length > 0 ? futureGames[0] : null;
 
                 // ==========================================================
-                // FIXED SCHEDULE LOGIC END
+                // END SCHEDULE LOGIC
                 // ==========================================================
 
                 const fetchOpponentRecord = async (oppId) => {
