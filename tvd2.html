@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sports & Smart Dashboard v2.4</title>
+    <title>Sports & Smart Dashboard v2.5</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -796,6 +796,29 @@
 
         const StockSelector = ({ selected, onAdd, onRemove }) => {
             const [input, setInput] = useState('');
+            const [error, setError] = useState(false);
+            const FINNHUB_KEY = 'd5ensbhr01qmi0sjs2ggd5ensbhr01qmi0sjs2h0';
+
+            const validateAndAdd = async () => {
+                const sym = input.trim().toUpperCase();
+                if (!sym) return;
+                
+                try {
+                    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${FINNHUB_KEY}`);
+                    const data = await res.json();
+                    if (data.c && data.c !== 0) {
+                        onAdd(sym);
+                        setInput('');
+                        setError(false);
+                    } else {
+                        setError(true);
+                        setTimeout(() => setError(false), 2000);
+                    }
+                } catch (e) {
+                    setError(true);
+                }
+            };
+
             return (
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
                     <label className="block text-sm text-slate-400 mb-2 font-bold uppercase tracking-wider">Stock Portfolio</label>
@@ -812,15 +835,14 @@
                             type="text" 
                             value={input} 
                             onChange={(e) => setInput(e.target.value.toUpperCase())} 
-                            className="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white font-bold placeholder:text-slate-600" 
-                            placeholder="Add Ticker (e.g. AAPL)" 
-                            onKeyDown={(e) => e.key === 'Enter' && (onAdd(input), setInput(''))}
+                            className={`flex-1 bg-slate-950 border rounded-lg px-3 py-2 text-white font-bold placeholder:text-slate-600 transition-colors ${error ? 'border-red-500 bg-red-900/10' : 'border-slate-600'}`} 
+                            placeholder={error ? "INVALID TICKER" : "Add Ticker (e.g. AAPL)"} 
+                            onKeyDown={(e) => e.key === 'Enter' && validateAndAdd()}
                         />
-                        <button onClick={() => { onAdd(input); setInput(''); }} className="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg text-white transition-colors shadow-lg">
+                        <button onClick={validateAndAdd} className="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg text-white transition-colors shadow-lg">
                             <Plus size={16} />
                         </button>
                     </div>
-                    <p className="text-[10px] text-slate-500 mt-2 italic">*Invalid tickers will be removed automatically.</p>
                 </div>
             );
         };
@@ -1018,6 +1040,8 @@
             useEffect(() => {
                 const fetchStocks = async () => {
                     const newData = {};
+                    const symbolsToRemove = [];
+                    
                     for (const symbol of selectedStocks) {
                         try {
                             const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_KEY}`);
@@ -1025,10 +1049,13 @@
                             if (data.c && data.c !== 0) {
                                 newData[symbol] = data;
                             } else {
-                                // Auto-remove incorrect stock as requested
-                                setSelectedStocks(prev => prev.filter(s => s !== symbol));
+                                symbolsToRemove.push(symbol);
                             }
                         } catch (e) { console.error("Stock error", e); }
+                    }
+                    
+                    if (symbolsToRemove.length > 0) {
+                        setSelectedStocks(prev => prev.filter(s => !symbolsToRemove.includes(s)));
                     }
                     setStocksData(newData);
                 };
