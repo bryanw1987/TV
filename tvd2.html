@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sports & Smart Dashboard v2.7</title>
+    <title>Sports & Smart Dashboard v2.6</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -339,6 +339,7 @@
                 </div>
             );
         };
+
         const NFLCard = ({ teamId, realData }) => {
             const teamConfig = NFL_TEAMS.find(t => t.id === teamId);
             const team = useMemo(() => {
@@ -1265,12 +1266,9 @@
                             </div>
                         ))}
                     </div>
-                    
-                    {/* FIXED SETTINGS BUTTON: Moved further from corner (top-8 right-8) and increased padding/size (p-4, w-8 h-8) */}
-                    <button onClick={() => setIsSettingsOpen(true)} className={`absolute top-8 right-8 z-50 p-4 bg-black/60 backdrop-blur-md rounded-full hover:bg-white/20 border border-white/10 group transition-all duration-500 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                        <Settings className="w-8 h-8 text-white group-hover:rotate-90 transition-transform duration-500" />
+                    <button onClick={() => setIsSettingsOpen(true)} className={`absolute top-4 right-4 z-50 p-3 bg-black/40 backdrop-blur-md rounded-full hover:bg-white/20 border border-white/10 group transition-all duration-500 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                        <Settings className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-500" />
                     </button>
-
                     {isSettingsOpen && (
                         <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
                             <div className="bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col h-[80vh] max-h-[800px]">
