@@ -1143,19 +1143,35 @@
                     const now = new Date();
                     let seasonYear = now.getFullYear();
                     if (now.getMonth() < 7 && ['nfl', 'college-football'].includes(league)) seasonYear -= 1;
+                    
                     let liveScoreboardGame = null;
-                    try { const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`); if(sbRes.ok) { const sbData = await sbRes.json(); liveScoreboardGame = sbData.events?.find(e => { const isTeamInGame = e.competitions[0].competitors.some(c => String(c.team.id) === idStr || (c.team.abbreviation && c.team.abbreviation.toLowerCase() === idStr)); return isTeamInGame && e.status.type.state === 'in'; }); } } catch(e) {}
+                    try { 
+                        const sbRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/scoreboard`); 
+                        if(sbRes.ok) { 
+                            const sbData = await sbRes.json(); 
+                            liveScoreboardGame = sbData.events?.find(e => { 
+                                return e.competitions[0].competitors.some(c => 
+                                    String(c.team.id).toLowerCase() === idStr || 
+                                    (c.team.abbreviation && c.team.abbreviation.toLowerCase() === idStr)
+                                ) && e.status.type.state === 'in'; 
+                            }); 
+                        } 
+                    } catch(e) {}
+
                     let teamInfoData = null;
                     try { const teamInfoRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}`); if (teamInfoRes.ok) teamInfoData = await teamInfoRes.json(); } catch (e) {}
                     if (!teamInfoData || !teamInfoData.team) return { [teamId]: null };
+                    
                     const scheduleUrl = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${idStr}/schedule?season=${seasonYear}`;
                     let allEvents = [];
                     try { const regRes = await fetch(scheduleUrl); if (regRes.ok) { const regData = await regRes.json(); if (regData.events) allEvents.push(...regData.events); } } catch (e) {}
                     try { const postRes = await fetch(`${scheduleUrl}&seasonType=3`); if (postRes.ok) { const postData = await postRes.json(); if (postData.events) allEvents.push(...postData.events); } } catch (e) {}
+                    
                     const uniqueEventsMap = new Map();
                     allEvents.forEach(e => uniqueEventsMap.set(e.id, e));
                     const events = Array.from(uniqueEventsMap.values()); 
                     events.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    
                     let record = teamInfoData.team.record?.items?.[0]?.summary || calculateRecord(events, teamId, league);
                     const cutoff = new Date(now.getTime() - (4 * 60 * 60 * 1000));
                     const validEvents = events.map(e => ({...e, dateObj: new Date(e.date)}));
@@ -1163,23 +1179,70 @@
                     const futureGames = validEvents.filter(e => e.dateObj >= cutoff).sort((a,b) => a.dateObj - b.dateObj);
                     let prevGame = pastGames.length > 0 ? pastGames[0] : null;
                     let nextGame = futureGames.length > 0 ? futureGames[0] : null;
-                    const fetchOpponentRecord = async (oppId) => { try { const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/teams/${oppId}`); if(res.ok) { const d = await res.json(); return d.team?.record?.items?.[0]?.summary || null; } } catch (e) {} return null; };
-                    const isMe = (comp) => { const target = String(teamId).toLowerCase(); const compId = String(comp.team.id).toLowerCase(); const compAbbrev = comp.team.abbreviation ? comp.team.abbreviation.toLowerCase() : ''; return compId === target || compAbbrev === target; };
+
+                    const isMe = (comp) => { 
+                        const target = String(teamId).toLowerCase(); 
+                        return String(comp.team.id).toLowerCase() === target || 
+                               (comp.team.abbreviation && comp.team.abbreviation.toLowerCase() === target); 
+                    };
+
                     let prevOppLogo = null, nextOppLogo = null, prevGameData = null;
-                    if (prevGame && prevGame.competitions) { const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c)); const myComp = prevGame.competitions[0].competitors.find(c => isMe(c)); if (prevComp && myComp) { if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href; const myScore = parseInt(myComp.score?.value || 0, 10); const oppScore = parseInt(prevComp.score?.value || 0, 10); const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore); prevGameData = { opponent: prevComp.team.abbreviation || 'OPP', opponentLogo: prevOppLogo, myScore: myScore, oppScore: oppScore, isWin: isWin, result: isWin ? `W ${myScore}-${oppScore}` : `L ${myScore}-${oppScore}`, date: new Date(prevGame.date).toLocaleDateString() }; } }
+                    if (prevGame && prevGame.competitions) { 
+                        const prevComp = prevGame.competitions[0].competitors.find(c => !isMe(c)); 
+                        const myComp = prevGame.competitions[0].competitors.find(c => isMe(c)); 
+                        if (prevComp && myComp) { 
+                            if (prevComp.team.logos?.length > 0) prevOppLogo = prevComp.team.logos[0].href; 
+                            const myScore = parseInt(myComp.score?.value || 0, 10); 
+                            const oppScore = parseInt(prevComp.score?.value || 0, 10); 
+                            const isWin = myComp.winner === true || (myComp.winner !== false && myScore > oppScore); 
+                            prevGameData = { opponent: prevComp.team.abbreviation || 'OPP', opponentLogo: prevOppLogo, myScore: myScore, oppScore: oppScore, isWin: isWin, result: isWin ? `W ${myScore}-${oppScore}` : `L ${myScore}-${oppScore}`, date: new Date(prevGame.date).toLocaleDateString() }; 
+                        } 
+                    }
                     if (nextGame && nextGame.competitions) { const nextComp = nextGame.competitions[0].competitors.find(c => !isMe(c)); if (nextComp) { if (nextComp.team.logos?.length > 0) nextOppLogo = nextComp.team.logos[0].href; } }
+                    
                     let liveGame = liveScoreboardGame;
-                    if (!liveGame) { const localLive = events.find(e => e.status?.type?.state === 'in'); if (localLive) { try { const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${localLive.id}`); if (summaryRes.ok) liveGame = await summaryRes.json(); } catch(e) {} } }
+                    if (!liveGame) { 
+                        const localLive = events.find(e => e.status?.type?.state === 'in'); 
+                        if (localLive) { 
+                            try { 
+                                const summaryRes = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${sport}/${league}/summary?event=${localLive.id}`); 
+                                if (summaryRes.ok) liveGame = await summaryRes.json(); 
+                            } catch(e) {} 
+                        } 
+                    }
+
                     let mapped = { status: liveGame ? 'LIVE' : 'OFFLINE', record, live: null, schedule: { prev: prevGameData || { opponent: 'None', result: '-', date: '-' }, next: nextGame ? { opponent: nextGame.competitions?.[0]?.competitors?.find(c => !isMe(c))?.team?.abbreviation || 'TBD', opponentLogo: nextOppLogo, id: nextGame.id, date: new Date(nextGame.date).toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'}), time: new Date(nextGame.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), location: nextGame.competitions?.[0]?.venue?.fullName || 'TBD' } : { opponent: 'Season End', date: '-', time: '-', location: '-' } } };
+                    
                     if (liveGame) {
                         const comp = liveGame.competitions ? liveGame.competitions[0] : (liveGame.header ? liveGame.header.competitions[0] : null);
                         if (comp) {
-                            const myTeam = comp.competitors.find(c => isMe(c)); const oppTeam = comp.competitors.find(c => !isMe(c)); const homeComp = comp.competitors.find(c => c.homeAway === 'home'); const awayComp = comp.competitors.find(c => c.homeAway === 'away');
+                            const myTeam = comp.competitors.find(c => isMe(c)); 
+                            const oppTeam = comp.competitors.find(c => !isMe(c)); 
+                            const homeComp = comp.competitors.find(c => c.homeAway === 'home'); 
+                            const awayComp = comp.competitors.find(c => c.homeAway === 'away');
+                            
                             let oppLogo = oppTeam.team.logos?.[0]?.href;
-                            const liveBase = { opponent: oppTeam.team.abbreviation, opponentLogo: oppLogo, score: { myScore: myTeam.score, oppScore: oppTeam.score }, time: comp.status.displayClock, homeTeam: { id: homeComp.team.id, abbrev: homeComp.team.abbreviation, color: '#333', logo: homeComp.team.logos?.[0]?.href }, awayTeam: { id: awayComp.team.id, abbrev: awayComp.team.abbreviation, color: '#fff', logo: awayComp.team.logos?.[0]?.href } };
-                            if (league === 'nfl' || league === 'college-football') { const situation = comp.situation || (liveGame.situation) || {}; mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: situation.lastPlay?.text || "Game in progress" }; }
-                            else if (league === 'nhl') { mapped.live = { ...liveBase, period: comp.status.period, lastPlay: "Update in progress..." }; } 
-                            else if (league === 'mlb') { const sit = liveGame.situation || {}; mapped.live = { ...liveBase, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } }; }
+                            const liveBase = { 
+                                opponent: oppTeam.team.abbreviation, 
+                                opponentLogo: oppLogo, 
+                                score: { myScore: myTeam.score, oppScore: oppTeam.score }, 
+                                time: comp.status.displayClock || comp.status.type.shortDetail, 
+                                homeTeam: { id: homeComp.team.id, abbrev: homeComp.team.abbreviation, color: '#333', logo: homeComp.team.logos?.[0]?.href }, 
+                                awayTeam: { id: awayComp.team.id, abbrev: awayComp.team.abbreviation, color: '#fff', logo: awayComp.team.logos?.[0]?.href } 
+                            };
+                            
+                            if (league === 'nfl' || league === 'college-football') { 
+                                const situation = comp.situation || (liveGame.situation) || {}; 
+                                mapped.live = { ...liveBase, quarter: comp.status.period, down: situation.down || 0, distance: situation.distance || 0, yardLine: situation.yardLine || 50, possession: situation.possession || null, lastPlay: situation.lastPlay?.text || "Game in progress" }; 
+                            }
+                            else if (league === 'nhl') { 
+                                const plays = liveGame.plays || [];
+                                mapped.live = { ...liveBase, period: comp.status.period, lastPlay: plays.length > 0 ? plays[0].text : "Live updates in progress..." }; 
+                            } 
+                            else if (league === 'mlb') { 
+                                const sit = liveGame.situation || {}; 
+                                mapped.live = { ...liveBase, inningState: comp.status.type.detail || `Inn ${comp.status.period}`, balls: sit.balls || 0, strikes: sit.strikes || 0, outs: sit.outs || 0, runners: { first: !!sit.onFirst, second: !!sit.onSecond, third: !!sit.onThird } }; 
+                            }
                         }
                     }
                     return { [teamId]: mapped };
