@@ -1,5 +1,5 @@
 {
-  "version": 1.2,
+  "version": 1.3,
   "downloadUrl": "https://github.com/bryanw1987/TV/releases/latest/download/urdisplay.apk"
 
 }
